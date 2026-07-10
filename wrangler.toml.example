@@ -1,20 +1,12 @@
 name = "main-secure-build"
 compatibility_date = "2026-07-10"
-pages_build_output_dir = "."
-
-[vars]
-ALLOWED_HOSTS = "www.aplustechspot.com"
-
-# Secrets: TURNSTILE_SECRET_KEY, RESEND_API_KEY, FORM_TO_EMAIL, FORM_FROM_EMAIL
-
-# Optional:
+pages_build_output_dir = "." [vars]
+ALLOWED_HOSTS = "www.atechspot.com" # Secrets: TURNSTILE_SECRET_KEY, RESEND_API_KEY, FORM_TO_EMAIL, FORM_FROM_EMAIL # Optional:
 # [[ratelimits]]
 # name = "FORM_RATE_LIMITER"
 # namespace_id = "41001"
-#   [ratelimits.simple]
-#   limit = 3
-#   period = 60
-
-# [[kv_namespaces]]
+# [ratelimits.simple]
+# limit = 3
+# period = 60 # [[kv_namespaces]]
 # binding = "FORM_DEDUP"
 # id = "REPLACE_WITH_KV_NAMESPACE_ID"
