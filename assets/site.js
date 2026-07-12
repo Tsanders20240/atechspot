@@ -17,3 +17,19 @@ document.querySelectorAll("form[data-secure-form]").forEach(form=>{
    finally{btn.disabled=false;btn.textContent=old;}
  });
 });
+
+
+document.querySelectorAll("[data-event]").forEach(link=>{
+  link.addEventListener("click",()=>{
+    const eventName=link.dataset.event;
+    if(typeof window.gtag==="function"){
+      window.gtag("event",eventName,{
+        link_text:(link.textContent||"").trim(),
+        page_location:window.location.href
+      });
+    }
+    if(typeof window.clarity==="function"){
+      window.clarity("event",eventName);
+    }
+  });
+});

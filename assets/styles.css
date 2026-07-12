@@ -144,3 +144,17 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
   .hero{min-height:auto}
   .v6-trust{grid-template-columns:1fr}
 }
+
+
+/* BOOKING LEAD-GENERATION PAGE */
+.booking-hero{background:
+  radial-gradient(circle at 86% 12%,rgba(14,102,183,.20),transparent 28%),
+  radial-gradient(circle at 7% 88%,rgba(225,173,49,.18),transparent 24%),
+  linear-gradient(120deg,var(--cream),#fff 58%,#eaf4fc)}
+.booking-actions{margin:26px 0 14px}
+.approval-card{border-top:5px solid var(--gold)}
+.approval-card .button{width:100%;margin:10px 0 8px}
+@media(max-width:680px){
+  .booking-actions{display:grid}
+  .booking-actions .button{width:100%}
+}
