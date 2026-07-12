@@ -11,9 +11,9 @@ document.querySelectorAll("form[data-secure-form]").forEach(form=>{
    const payload=Object.fromEntries(new FormData(form).entries()); payload.form_type=form.dataset.formType||document.title;
    try{
      const r=await fetch("/api/submit",{method:"POST",headers:{"content-type":"application/json","accept":"application/json"},body:JSON.stringify(payload)});
-     const result=await r.json(); status.textContent=result.message||"Unable to send request.";
+     const result=await r.json(); status.innerHTML=result.message||'Unable to send request. Please <a href="mailto:aplustechucation@gmail.com">email us</a> or call <a href="tel:+17133962993">(713) 396-2993</a>.';
      if(r.ok){form.reset();if(started)started.value=String(Date.now());}
-   }catch{status.textContent="Secure form service unavailable. Please call (713) 396-2993 or email aplustechucation@gmail.com.";}
+   }catch{status.innerHTML='Form service unavailable. Please call <a href="tel:+17133962993">(713) 396-2993</a> or email <a href="mailto:aplustechucation@gmail.com">aplustechucation@gmail.com</a>.';}
    finally{btn.disabled=false;btn.textContent=old;}
  });
 });
@@ -33,3 +33,37 @@ document.querySelectorAll("[data-event]").forEach(link=>{
     }
   });
 });
+
+
+// Booking choice buttons
+document.querySelectorAll(".meeting-choice").forEach(link=>{
+  link.addEventListener("click",()=>{
+    const select=document.querySelector("#preferred-meeting");
+    if(select){
+      const desired=link.dataset.meeting||"";
+      const match=[...select.options].find(o=>o.value===desired || o.textContent.includes(desired));
+      if(match){select.value=match.value;}
+    }
+  });
+});
+
+// Query-string prefills for booking/contact links
+const params=new URLSearchParams(window.location.search);
+const service=params.get("service");
+const meeting=params.get("meeting");
+const topic=params.get("topic");
+if(service){
+  document.querySelectorAll('select[name="Service"]').forEach(select=>{
+    const match=[...select.options].find(o=>o.value===service || o.textContent===service);
+    if(match)select.value=match.value;
+  });
+}
+if(meeting){
+  document.querySelectorAll('select[name="Preferred Meeting"]').forEach(select=>{
+    const match=[...select.options].find(o=>o.value===meeting || o.textContent.includes(meeting));
+    if(match)select.value=match.value;
+  });
+}
+if(topic){
+  document.querySelectorAll('input[name="Topic"]').forEach(input=>input.value=topic);
+}

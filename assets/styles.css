@@ -158,3 +158,22 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
   .booking-actions{display:grid}
   .booking-actions .button{width:100%}
 }
+
+
+/* V7 BOOKING, BUSINESS, AND DRIVESAVERS */
+.contact-fallback{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.discount-badge{display:inline-grid;gap:2px;background:var(--navy);color:#fff;padding:16px 20px;border-radius:14px;margin:18px 0 8px;box-shadow:var(--shadow)}
+.discount-badge strong{font-size:2rem;color:#f5cb61;letter-spacing:.08em}
+.discount-badge span{font-size:.84rem}
+.code-chip{display:inline-block;padding:3px 9px;border-radius:7px;background:#fff2bf;color:#4a3500;letter-spacing:.06em}
+.discount-line{font-size:1.2rem}
+.business-front{background:linear-gradient(135deg,#eef6fd,#fff 55%,#fbf8f1)}
+.drivesavers-front{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.data-hero{background:
+ radial-gradient(circle at 85% 18%,rgba(15,99,182,.20),transparent 28%),
+ linear-gradient(120deg,#eef6fd,#fff 58%,#fbf8f1)}
+.meeting-choice{margin-top:8px}
+@media(max-width:680px){
+  .booking-actions .button,.meeting-choice{width:100%}
+  .discount-badge{width:100%}
+}
