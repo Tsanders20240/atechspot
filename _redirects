@@ -2,3 +2,6 @@
 /index / 301
 https://atechspot.com/* https://www.atechspot.com/:splat 301
 /book /booking.html 301
+/booking /booking.html 200
+/intake /intake.html 200
+/contact /contact.html 200

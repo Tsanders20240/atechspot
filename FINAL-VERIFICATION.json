@@ -1,0 +1,13 @@
+{
+  "html_pages": 25,
+  "forms_checked": [
+    "intake.html",
+    "contact.html",
+    "business-audit.html",
+    "ai-readiness.html"
+  ],
+  "ga4_pages_ok": 25,
+  "clarity_pages_ok": 25,
+  "redirects_ok": true,
+  "csp_ok": true
+}
