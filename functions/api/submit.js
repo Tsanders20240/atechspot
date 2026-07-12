@@ -89,7 +89,7 @@ export async function onRequestPost({ request, env }) {
   if (!env.RESEND_API_KEY || !env.FORM_TO_EMAIL || !env.FORM_FROM_EMAIL) {
     return reply(
       503,
-      "Email delivery is not configured. Please call (713) 396-2993 or email aplustechucation@gmail.com."
+      "Automatic email delivery is not configured. Your browser can open a prefilled email backup."
     );
   }
 
@@ -120,7 +120,7 @@ export async function onRequestPost({ request, env }) {
   if (!response.ok) {
     return reply(
       503,
-      "Delivery is temporarily unavailable. Please call (713) 396-2993 or email aplustechucation@gmail.com."
+      "Automatic delivery is temporarily unavailable. Your browser can open a prefilled email backup."
     );
   }
 

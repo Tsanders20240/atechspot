@@ -1,4 +1,23 @@
 
+function openEmailFallback(form){
+  const data=Object.fromEntries(new FormData(form).entries());
+  const ignored=new Set(["website","form_started_at","cf-turnstile-response"]);
+  const lines=[];
+  Object.entries(data).forEach(([key,value])=>{
+    if(!ignored.has(key) && String(value).trim()){
+      lines.push(`${key}: ${String(value).trim()}`);
+    }
+  });
+  const subject=encodeURIComponent(`[AtechSpot Website] ${form.dataset.formType||"Request"}`);
+  const body=encodeURIComponent(
+    "The secure website form could not send automatically.\n\n"+
+    lines.join("\n")+
+    "\n\nPlease do not include passwords, Social Security numbers, or full account numbers."
+  );
+  window.location.href=`mailto:aplustechucation@gmail.com?subject=${subject}&body=${body}`;
+}
+
+
 const toggle=document.querySelector(".mobile-toggle"),menu=document.querySelector(".menu");
 if(toggle&&menu)toggle.addEventListener("click",()=>{const o=menu.classList.toggle("open");toggle.setAttribute("aria-expanded",String(o));});
 document.querySelectorAll("[data-year]").forEach(e=>e.textContent=new Date().getFullYear());
@@ -11,9 +30,19 @@ document.querySelectorAll("form[data-secure-form]").forEach(form=>{
    const payload=Object.fromEntries(new FormData(form).entries()); payload.form_type=form.dataset.formType||document.title;
    try{
      const r=await fetch("/api/submit",{method:"POST",headers:{"content-type":"application/json","accept":"application/json"},body:JSON.stringify(payload)});
-     const result=await r.json(); status.innerHTML=result.message||'Unable to send request. Please <a href="mailto:aplustechucation@gmail.com">email us</a> or call <a href="tel:+17133962993">(713) 396-2993</a>.';
-     if(r.ok){form.reset();if(started)started.value=String(Date.now());}
-   }catch{status.innerHTML='Form service unavailable. Please call <a href="tel:+17133962993">(713) 396-2993</a> or email <a href="mailto:aplustechucation@gmail.com">aplustechucation@gmail.com</a>.';}
+     const result=await r.json();
+     if(r.ok){
+       status.textContent=result.message||"Thank you. Your request was sent successfully.";
+       form.reset();
+       if(started)started.value=String(Date.now());
+     }else{
+       status.textContent=(result.message||"Automatic delivery is unavailable.")+" Opening your email app as a backup…";
+       setTimeout(()=>openEmailFallback(form),500);
+     }
+   }catch{
+     status.textContent="Form service unavailable. Opening your email app as a backup…";
+     setTimeout(()=>openEmailFallback(form),500);
+   }
    finally{btn.disabled=false;btn.textContent=old;}
  });
 });
