@@ -125,3 +125,17 @@ if(meeting){
 if(topic){
   document.querySelectorAll('input[name="Topic"]').forEach(input=>input.value=topic);
 }
+
+
+// Prefill the universal intake service from links such as /intake?service=Website%20Design
+const intakeParams = new URLSearchParams(window.location.search);
+const intakeService = intakeParams.get("service");
+if (intakeService) {
+  const serviceSelect = document.querySelector("#service-requested");
+  if (serviceSelect) {
+    const match = [...serviceSelect.options].find(
+      option => option.value === intakeService || option.textContent.trim() === intakeService
+    );
+    if (match) serviceSelect.value = match.value;
+  }
+}

@@ -17,7 +17,7 @@
 })(window, document, "clarity", "script", "xlcdlv9myb");
 </script>
 
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Service Intake &amp; Price Request | A+ Techucation</title><meta name="description" content="Complete the A+ Techucation service intake form to request a service recommendation, price, payment instructions, and meeting option."><link rel="canonical" href="https://www.atechspot.com/intake.html"><meta property="og:title" content="Complete Client Intake | A+ Techucation"><meta property="og:description" content="Submit a secure client intake before payment and booking."><meta property="og:type" content="website"><meta property="og:url" content="https://www.atechspot.com/intake.html"><meta name="theme-color" content="#0f2742"><style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Universal Service Intake | A+ Techucation</title><meta name="description" content="Complete one universal A+ Techucation intake form for technology support, websites, AI, business, accessibility, education, and data recovery."><link rel="canonical" href="https://www.atechspot.com/intake.html"><meta property="og:title" content="Complete Client Intake | A+ Techucation"><meta property="og:description" content="Submit a secure client intake before payment and booking."><meta property="og:type" content="website"><meta property="og:url" content="https://www.atechspot.com/intake.html"><meta name="theme-color" content="#0f2742"><style>
 
 :root{
  --ink:#152033;--navy:#0f2742;--blue:#0f63b6;--blue2:#0a4f91;--gold:#e0ad2f;
@@ -167,36 +167,41 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
 
 </style></head><body><a class="skip" href="#main">Skip to main content</a>
 <div class="utility"><div class="container"><div class="utility-left"><span>Houston, Texas</span><span>Online appointments</span><span>Intake before payment</span></div><a href="tel:+17133962993">(713) 396-2993</a></div></div>
-<header class="header"><div class="container nav"><a class="brand" href="index.html"><span class="mark">A+</span><span>A+ Techucation LLC<small>Technology Within Us</small></span></a><button class="mobile-toggle" aria-label="Toggle navigation">Menu</button><nav class="menu"><a href="index.html">Home</a><a href="services.html">Services</a><a href="learning.html">Learning</a><a href="/business">Business</a><a href="resources.html">Resources</a><a href="shop.html">Shop</a><a href="about.html">About</a></nav><div class="nav-actions"><a class="button secondary" href="/contact">Contact</a><a class="button primary" href="https://scheduler.zoom.us/a-plus-techucation/30-mins-with-a-plus" target="_blank" rel="noopener noreferrer" target="_blank" rel="noopener noreferrer">Book Consultation</a></div></div></header>
+<header class="header"><div class="container nav"><a class="brand" href="/index"><span class="mark">A+</span><span>A+ Techucation LLC<small>Technology Within Us</small></span></a><button class="mobile-toggle" aria-label="Toggle navigation">Menu</button><nav class="menu"><a href="/index">Home</a><a href="/services">Services</a><a href="/learning">Learning</a><a href="/business">Business</a><a href="/resources">Resources</a><a href="/shop">Shop</a><a href="/about">About</a></nav><div class="nav-actions"><a class="button secondary" href="/contact">Contact</a><a class="button primary" href="https://scheduler.zoom.us/a-plus-techucation/30-mins-with-a-plus" target="_blank" rel="noopener noreferrer" target="_blank" rel="noopener noreferrer" target="_blank" rel="noopener noreferrer">Book Consultation</a></div></div></header>
+
 <main id="main">
 <section class="page-hero">
   <div class="container">
-    <div class="eyebrow">Service intake and price request</div>
-    <h1>Tell us what you need before payment.</h1>
-    <p class="lead">Complete this form so A+ Techucation can review the request, recommend the appropriate service, and provide a price or next step.</p>
+    <div class="eyebrow">Universal service intake</div>
+    <h1>Tell us what service you need.</h1>
+    <p class="lead">This intake form is used across the A+ Techucation website for technology support, websites, AI, business systems, accessibility, education, and data-recovery referrals.</p>
     <div class="actions">
-      <a class="button secondary" href="https://scheduler.zoom.us/a-plus-techucation/30-mins-with-a-plus" target="_blank" rel="noopener noreferrer">Zoom Scheduler</a>
-      <a class="button secondary" href="/payment">Payment Process</a>
+      <a class="button primary" href="#universal-intake">Complete Intake</a>
+      <a class="button secondary" href="https://scheduler.zoom.us/a-plus-techucation/30-mins-with-a-plus" target="_blank" rel="noopener noreferrer">Book Zoom Consultation</a>
     </div>
   </div>
 </section>
 
-<section class="section">
+<section class="section" id="universal-intake">
   <div class="container">
     <div class="form-shell">
-      <div class="notice success"><strong>Email-connected intake:</strong> When you submit, your email app opens with the request filled in and addressed to aplustechucation@gmail.com. Review the message, then press Send.</div>
-      <form class="form" data-secure-form data-form-type="Service Intake and Price Request">
+      <div class="notice success">
+        <strong>Universal intake:</strong> Complete this form before payment. Your answers help A+ Techucation recommend the appropriate service, scope, price, and meeting option.
+      </div>
+
+      <form class="form" data-email-form data-endpoint="/api/contact" data-form-type="Universal Service Intake">
         <div class="form-row">
           <label>Full Name<input type="text" name="Full Name" autocomplete="name" required></label>
           <label>Email<input type="email" name="Email" autocomplete="email" required></label>
         </div>
+
         <div class="form-row">
           <label>Phone (optional)<input type="tel" name="Phone" autocomplete="tel"></label>
           <label>Business or organization (optional)<input type="text" name="Business or Organization" autocomplete="organization"></label>
         </div>
 
-        <label>Service requested
-          <select name="Service Requested" required>
+        <label>Service Requested
+          <select name="Topic" id="service-requested" required>
             <option value="">Choose a service</option>
             <option>Technology Consultation</option>
             <option>Computer or Device Help</option>
@@ -215,7 +220,7 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
         </label>
 
         <div class="form-row">
-          <label>Preferred meeting
+          <label>Preferred Meeting
             <select name="Preferred Meeting" required>
               <option value="">Choose a meeting type</option>
               <option>Zoom</option>
@@ -226,7 +231,8 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
               <option>Accessibility accommodation / other</option>
             </select>
           </label>
-          <label>Preferred timeframe
+
+          <label>Preferred Timeframe
             <select name="Preferred Timeframe" required>
               <option value="">Choose a timeframe</option>
               <option>As soon as possible</option>
@@ -240,7 +246,7 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
 
         <div class="form-row">
           <label>Device, website, software, or platform<input type="text" name="Device or Platform"></label>
-          <label>Budget range (optional)
+          <label>Budget Range (optional)
             <select name="Budget Range">
               <option value="">Not sure yet</option>
               <option>Under $100</option>
@@ -253,21 +259,58 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
           </label>
         </div>
 
-        <label>Describe the problem, goal, or service needed<textarea name="Project Details" required></textarea></label>
-        <label>What result would make this successful?<textarea name="Desired Outcome" required></textarea></label>
-        <label>Accessibility or communication needs (optional)<textarea name="Accessibility Needs"></textarea></label>
+        <label>Describe the problem, goal, or service needed
+          <textarea name="Message" required></textarea>
+        </label>
 
-        <label><input type="checkbox" name="Acknowledgment" value="Yes" required> I understand that submitting intake does not confirm a service, price, appointment, or client relationship. A+ Techucation will review the request first.</label>
+        <label>What result would make this successful?
+          <textarea name="Desired Outcome" required></textarea>
+        </label>
+
+        <label>Accessibility or communication needs (optional)
+          <textarea name="Accessibility Needs"></textarea>
+        </label>
+
+        <label>
+          <input type="checkbox" name="Acknowledgment" value="Yes" required>
+          I understand that submitting intake does not confirm a service, price, appointment, or client relationship.
+        </label>
 
         <input type="hidden" name="form_started_at">
         <div class="hp-field"><label>Leave empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
-        <p class="security-note">Do not submit passwords, Social Security numbers, full account numbers, payment-card information, or private medical/financial records.</p>
-        <button class="button primary" type="submit" data-event="intake_email_prepare">Prepare Intake Email</button>
+
+        <p class="security-note">Do not submit passwords, Social Security numbers, full account numbers, payment-card information, or highly sensitive records.</p>
+
+        <button class="button primary" type="submit">Send Intake Request</button>
         <p class="status" data-status aria-live="polite"></p>
       </form>
-      <noscript><p class="notice">JavaScript is required to prepare the email automatically. Email <a href="mailto:aplustechucation@gmail.com?subject=Service%20Intake%20Request">aplustechucation@gmail.com</a> or call <a href="tel:+17133962993">(713) 396-2993</a>.</p></noscript>
+    </div>
+  </div>
+</section>
+
+<section class="section mist">
+  <div class="container split">
+    <div>
+      <div class="eyebrow">Google Forms option</div>
+      <h2>Ready for a dedicated Google Form?</h2>
+      <p>The website is prepared to use one universal Google Form across all service pages. Create the Google Form in your Google account, then replace the placeholder URL inside <code>GOOGLE-FORM-SETUP.md</code>.</p>
+      <p class="security-note">A Google Form cannot be created automatically without access to your Google account. The website intake above is already functional through the existing email-form system.</p>
+    </div>
+    <div class="card">
+      <h3>Recommended Google Form sections</h3>
+      <ul class="list">
+        <li>Contact information</li>
+        <li>Service requested</li>
+        <li>Business or device details</li>
+        <li>Preferred meeting and timeframe</li>
+        <li>Budget range</li>
+        <li>Project description and desired outcome</li>
+        <li>Accessibility or communication needs</li>
+        <li>Consent and sensitive-data warning</li>
+      </ul>
     </div>
   </div>
 </section>
 </main>
-<footer class="footer"><div class="container"><div class="footer-grid"><div><h3>A+ Techucation LLC</h3><p>Professional technology education and digital solutions for individuals, families, creators, nonprofits, churches, and small businesses.</p><p><strong>Technology Within Us</strong></p></div><div><h3>Explore</h3><p><a href="services.html">Services</a><br><a href="learning.html">Learning Center</a><br><a href="/business">Business Solutions</a><br><a href="shop.html">Shop</a></p></div><div><h3>Client Path</h3><p><a href="/intake">Complete Intake</a><br><a href="/payment">Payment Options</a><br><a href="/booking">Booking</a><br><a href="/contact">Contact</a></p></div><div><h3>Policies</h3><p><a href="/privacy">Privacy</a><br><a href="/terms">Terms</a><br><a href="/accessibility">Accessibility</a><br><a href="affiliate.html">Affiliate Disclosure</a></p></div></div><div class="footer-bottom"><span>© <span data-year></span> A+ Techucation LLC.</span><span>(713) 396-2993 • aplustechucation@gmail.com</span></div></div></footer><script src="/assets/site.js"></script></body></html>
+
+<footer class="footer"><div class="container"><div class="footer-grid"><div><h3>A+ Techucation LLC</h3><p>Professional technology education and digital solutions for individuals, families, creators, nonprofits, churches, and small businesses.</p><p><strong>Technology Within Us</strong></p></div><div><h3>Explore</h3><p><a href="/services">Services</a><br><a href="/learning">Learning Center</a><br><a href="/business">Business Solutions</a><br><a href="/shop">Shop</a></p></div><div><h3>Client Path</h3><p><a href="/intake">Complete Intake</a><br><a href="/payment">Payment Options</a><br><a href="/booking">Booking</a><br><a href="/contact">Contact</a></p></div><div><h3>Policies</h3><p><a href="/privacy">Privacy</a><br><a href="/terms">Terms</a><br><a href="/accessibility">Accessibility</a><br><a href="/affiliate">Affiliate Disclosure</a></p></div></div><div class="footer-bottom"><span>© <span data-year></span> A+ Techucation LLC.</span><span>(713) 396-2993 • aplustechucation@gmail.com</span></div></div></footer><script src="/assets/site.js"></script></body></html>
