@@ -1,51 +1,62 @@
 
-function openEmailFallback(form){
-  const data=Object.fromEntries(new FormData(form).entries());
-  const ignored=new Set(["website","form_started_at","cf-turnstile-response"]);
-  const lines=[];
+function submitByEmail(form){
+  const data = Object.fromEntries(new FormData(form).entries());
+  const ignored = new Set(["website","form_started_at","cf-turnstile-response"]);
+  const lines = [];
+
   Object.entries(data).forEach(([key,value])=>{
-    if(!ignored.has(key) && String(value).trim()){
-      lines.push(`${key}: ${String(value).trim()}`);
-    }
+    const text = String(value ?? "").trim();
+    if (!ignored.has(key) && text) lines.push(`${key}: ${text}`);
   });
-  const subject=encodeURIComponent(`[AtechSpot Website] ${form.dataset.formType||"Request"}`);
-  const body=encodeURIComponent(
-    "The secure website form could not send automatically.\n\n"+
-    lines.join("\n")+
-    "\n\nPlease do not include passwords, Social Security numbers, or full account numbers."
+
+  const subject = encodeURIComponent(
+    `[AtechSpot Website] ${form.dataset.formType || "Customer Request"}`
   );
-  window.location.href=`mailto:aplustechucation@gmail.com?subject=${subject}&body=${body}`;
+
+  const body = encodeURIComponent(
+    "New request from AtechSpot.com\n\n" +
+    lines.join("\n") +
+    "\n\nSecurity reminder: Do not include passwords, Social Security numbers, or full account numbers."
+  );
+
+  window.location.href =
+    `mailto:aplustechucation@gmail.com?subject=${subject}&body=${body}`;
 }
+
+document.querySelectorAll("[data-secure-form]").forEach(form=>{
+  const started = form.querySelector('input[name="form_started_at"]');
+  if (started) started.value = String(Date.now());
+
+  form.addEventListener("submit", event=>{
+    event.preventDefault();
+
+    const status = form.querySelector("[data-status]");
+    const honeypot = form.querySelector('input[name="website"]');
+
+    if (honeypot && honeypot.value.trim()) {
+      if (status) status.textContent = "Thank you.";
+      return;
+    }
+
+    if (!form.reportValidity()) return;
+
+    if (status) {
+      status.textContent =
+        "Opening your email app with the request filled in. Review it, then press Send.";
+    }
+
+    submitByEmail(form);
+  });
+});
+
+
+
 
 
 const toggle=document.querySelector(".mobile-toggle"),menu=document.querySelector(".menu");
 if(toggle&&menu)toggle.addEventListener("click",()=>{const o=menu.classList.toggle("open");toggle.setAttribute("aria-expanded",String(o));});
 document.querySelectorAll("[data-year]").forEach(e=>e.textContent=new Date().getFullYear());
-document.querySelectorAll("form[data-secure-form]").forEach(form=>{
- const started=form.querySelector('input[name="form_started_at"]'); if(started)started.value=String(Date.now());
- form.addEventListener("submit",async e=>{
-   e.preventDefault(); if(!form.reportValidity())return;
-   const status=form.querySelector("[data-status]"),btn=form.querySelector("button");
-   status.textContent="Sending your request…"; btn.disabled=true; const old=btn.textContent; btn.textContent="Sending…";
-   const payload=Object.fromEntries(new FormData(form).entries()); payload.form_type=form.dataset.formType||document.title;
-   try{
-     const r=await fetch("/api/submit",{method:"POST",headers:{"content-type":"application/json","accept":"application/json"},body:JSON.stringify(payload)});
-     const result=await r.json();
-     if(r.ok){
-       status.textContent=result.message||"Thank you. Your request was sent successfully.";
-       form.reset();
-       if(started)started.value=String(Date.now());
-     }else{
-       status.textContent=(result.message||"Automatic delivery is unavailable.")+" Opening your email app as a backup…";
-       setTimeout(()=>openEmailFallback(form),500);
-     }
-   }catch{
-     status.textContent="Form service unavailable. Opening your email app as a backup…";
-     setTimeout(()=>openEmailFallback(form),500);
-   }
-   finally{btn.disabled=false;btn.textContent=old;}
- });
-});
+
 
 
 document.querySelectorAll("[data-event]").forEach(link=>{
