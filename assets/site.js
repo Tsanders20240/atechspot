@@ -1,5 +1,5 @@
 
-function submitByEmail(form){
+function buildEmailFallback(form){
   const data = Object.fromEntries(new FormData(form).entries());
   const ignored = new Set(["website","form_started_at","cf-turnstile-response"]);
   const lines = [];
@@ -12,42 +12,60 @@ function submitByEmail(form){
   const subject = encodeURIComponent(
     `[AtechSpot Website] ${form.dataset.formType || "Customer Request"}`
   );
-
   const body = encodeURIComponent(
-    "New request from AtechSpot.com\n\n" +
+    "The website form could not send automatically.\n\n" +
     lines.join("\n") +
-    "\n\nSecurity reminder: Do not include passwords, Social Security numbers, or full account numbers."
+    "\n\nPlease do not include passwords, Social Security numbers, or full account numbers."
   );
 
-  window.location.href =
-    `mailto:aplustechucation@gmail.com?subject=${subject}&body=${body}`;
+  return `mailto:aplustechucation@gmail.com?subject=${subject}&body=${body}`;
 }
 
-document.querySelectorAll("[data-secure-form]").forEach(form=>{
+document.querySelectorAll("[data-email-form]").forEach(form=>{
   const started = form.querySelector('input[name="form_started_at"]');
   if (started) started.value = String(Date.now());
 
-  form.addEventListener("submit", event=>{
+  form.addEventListener("submit", async event=>{
     event.preventDefault();
-
-    const status = form.querySelector("[data-status]");
-    const honeypot = form.querySelector('input[name="website"]');
-
-    if (honeypot && honeypot.value.trim()) {
-      if (status) status.textContent = "Thank you.";
-      return;
-    }
-
     if (!form.reportValidity()) return;
 
-    if (status) {
-      status.textContent =
-        "Opening your email app with the request filled in. Review it, then press Send.";
-    }
+    const status = form.querySelector("[data-status]");
+    const button = form.querySelector('button[type="submit"]');
+    const endpoint = form.dataset.endpoint;
 
-    submitByEmail(form);
+    if (status) status.textContent = "Sending your request…";
+    if (button) button.disabled = true;
+
+    const payload = Object.fromEntries(new FormData(form).entries());
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {"content-type":"application/json"},
+        body: JSON.stringify(payload)
+      });
+      const result = await response.json();
+
+      if (!response.ok) throw new Error(result.message || "Unable to send.");
+
+      if (status) status.textContent = result.message || "Thank you. Your request was sent successfully.";
+      form.reset();
+      if (started) started.value = String(Date.now());
+    } catch (error) {
+      if (status) {
+        status.innerHTML =
+          'Automatic delivery is unavailable. <a href="' +
+          buildEmailFallback(form) +
+          '">Open the prefilled email backup</a>.';
+      }
+    } finally {
+      if (button) button.disabled = false;
+    }
   });
 });
+
+
+
 
 
 
