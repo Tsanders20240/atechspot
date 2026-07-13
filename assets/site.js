@@ -13,9 +13,9 @@ function buildEmailFallback(form){
     `[AtechSpot Website] ${form.dataset.formType || "Customer Request"}`
   );
   const body = encodeURIComponent(
-    "The website form could not send automatically.\n\n" +
+    "Automatic website delivery was unavailable.\n\n" +
     lines.join("\n") +
-    "\n\nPlease do not include passwords, Social Security numbers, or full account numbers."
+    "\n\nDo not include passwords, Social Security numbers, or full account numbers."
   );
 
   return `mailto:aplustechucation@gmail.com?subject=${subject}&body=${body}`;
@@ -36,33 +36,39 @@ document.querySelectorAll("[data-email-form]").forEach(form=>{
     if (status) status.textContent = "Sending your request…";
     if (button) button.disabled = true;
 
-    const payload = Object.fromEntries(new FormData(form).entries());
-
     try {
       const response = await fetch(endpoint, {
         method: "POST",
         headers: {"content-type":"application/json"},
-        body: JSON.stringify(payload)
+        body: JSON.stringify(Object.fromEntries(new FormData(form).entries()))
       });
-      const result = await response.json();
 
-      if (!response.ok) throw new Error(result.message || "Unable to send.");
+      let result = {};
+      try { result = await response.json(); } catch {}
 
-      if (status) status.textContent = result.message || "Thank you. Your request was sent successfully.";
+      if (!response.ok) {
+        throw new Error(result.message || `Form delivery failed (${response.status}).`);
+      }
+
+      if (status) status.textContent =
+        result.message || "Thank you. Your request was emailed successfully.";
+
       form.reset();
       if (started) started.value = String(Date.now());
     } catch (error) {
       if (status) {
         status.innerHTML =
-          'Automatic delivery is unavailable. <a href="' +
-          buildEmailFallback(form) +
-          '">Open the prefilled email backup</a>.';
+          `${error.message} ` +
+          `<a href="${buildEmailFallback(form)}">Open the prefilled email backup</a>.`;
       }
     } finally {
       if (button) button.disabled = false;
     }
   });
 });
+
+
+
 
 
 

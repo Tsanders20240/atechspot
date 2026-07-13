@@ -1,13 +1,16 @@
 
-const HEADERS = {
+const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store"
 };
 
+const json = (status, payload) =>
+  new Response(JSON.stringify(payload), { status, headers: JSON_HEADERS });
+
 const clean = (value, max = 4000) =>
   String(value ?? "").replace(/\u0000/g, "").trim().slice(0, max);
 
-const escapeHtml = value =>
+const escapeHtml = (value) =>
   String(value)
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
@@ -15,122 +18,142 @@ const escapeHtml = value =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 
-const json = (status, message) =>
-  new Response(JSON.stringify({ ok: status < 400, message }), {
-    status,
-    headers: HEADERS
-  });
-
-const validEmail = value =>
+const validEmail = (value) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(value) && value.length <= 254;
 
-async function parseRequest(request) {
+async function parseBody(request) {
   const type = request.headers.get("content-type") || "";
   if (type.includes("application/json")) return request.json();
-  if (type.includes("form")) {
-    const form = await request.formData();
-    return Object.fromEntries(form.entries());
-  }
-  throw new Error("Unsupported content type");
+  const form = await request.formData();
+  return Object.fromEntries(form.entries());
 }
 
-async function sendLead({ request, env, leadType, requiredFields = [] }) {
-  const origin = request.headers.get("Origin");
-  if (origin) {
-    try {
-      const hostname = new URL(origin).hostname;
-      const allowed = (env.ALLOWED_HOSTS || "www.atechspot.com,atechspot.com,atechspot.pages.dev")
-        .split(",")
-        .map(v => v.trim())
-        .filter(Boolean);
-      if (!allowed.includes(hostname)) return json(403, "Unauthorized form origin.");
-    } catch {
-      return json(403, "Unauthorized form origin.");
-    }
-  }
-
+async function deliverLead({ request, env, leadType, requiredFields }) {
   let body;
   try {
-    body = await parseRequest(request);
+    body = await parseBody(request);
   } catch {
-    return json(400, "Invalid form submission.");
+    return json(400, { ok: false, message: "Invalid form submission." });
   }
 
-  // Honeypot
-  if (clean(body.website, 100)) return json(200, "Thank you.");
+  if (clean(body.website, 100)) {
+    return json(200, { ok: true, message: "Thank you." });
+  }
 
-  // Minimum form completion time
-  const startedAt = Number(body.form_started_at || 0);
-  const elapsed = Date.now() - startedAt;
-  if (!startedAt || elapsed < 2500 || elapsed > 86400000) {
-    return json(400, "Please reload the page and complete the form again.");
+  const started = Number(body.form_started_at || 0);
+  const elapsed = Date.now() - started;
+  if (!started || elapsed < 1500 || elapsed > 86400000) {
+    return json(400, {
+      ok: false,
+      message: "Please reload the page and complete the form again."
+    });
   }
 
   const name = clean(body["Full Name"] || body.Name, 120);
   const email = clean(body.Email, 254);
 
   if (name.length < 2 || !validEmail(email)) {
-    return json(400, "Enter a valid name and email address.");
+    return json(400, {
+      ok: false,
+      message: "Enter a valid name and email address."
+    });
   }
 
   for (const field of requiredFields) {
-    if (!clean(body[field], 4000)) return json(400, `Complete the ${field} field.`);
+    if (!clean(body[field], 4000)) {
+      return json(400, {
+        ok: false,
+        message: `Complete the ${field} field.`
+      });
+    }
+  }
+
+  if (!env.RESEND_API_KEY) {
+    return json(503, {
+      ok: false,
+      code: "MISSING_RESEND_KEY",
+      message: "Email delivery is not configured yet."
+    });
   }
 
   const ignored = new Set(["website", "form_started_at", "cf-turnstile-response"]);
-  const safeFields = {};
+  const fields = {};
   for (const [key, value] of Object.entries(body)) {
-    if (ignored.has(key)) continue;
-    safeFields[clean(key, 100)] = clean(value, 4000);
+    if (!ignored.has(key)) fields[clean(key, 100)] = clean(value, 4000);
   }
 
-  const combined = Object.values(safeFields).join("\n");
-  const links = (combined.match(/https?:\/\/|www\./gi) || []).length;
-  if (links > 3 || /<\s*(script|iframe|object|embed)/i.test(combined)) {
-    return json(400, "Submission rejected.");
+  const combined = Object.values(fields).join("\n");
+  if ((combined.match(/https?:\/\/|www\./gi) || []).length > 4) {
+    return json(400, { ok: false, message: "Submission rejected." });
+  }
+  if (/<\s*(script|iframe|object|embed)/i.test(combined)) {
+    return json(400, { ok: false, message: "Submission rejected." });
   }
 
-  if (!env.RESEND_API_KEY || !env.FORM_FROM_EMAIL) {
-    return json(503, "Automatic email delivery is not configured.");
+  const rows = Object.entries(fields).map(([key, value]) => `
+    <tr>
+      <th style="text-align:left;vertical-align:top;padding:9px;border:1px solid #d8e0e8;background:#f4f7fa">
+        ${escapeHtml(key)}
+      </th>
+      <td style="padding:9px;border:1px solid #d8e0e8">
+        ${escapeHtml(value).replace(/\n/g, "<br>")}
+      </td>
+    </tr>
+  `).join("");
+
+  const recipient = env.FORM_TO_EMAIL || "aplustechucation@gmail.com";
+  const sender = env.FORM_FROM_EMAIL || "A+ Techucation Website <onboarding@resend.dev>";
+
+  let resendResponse;
+  try {
+    resendResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "authorization": `Bearer ${env.RESEND_API_KEY}`,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        from: sender,
+        to: [recipient],
+        reply_to: email,
+        subject: `[AtechSpot Website] ${leadType} — ${name}`,
+        html: `
+          <h2>${escapeHtml(leadType)}</h2>
+          <p>A new request was submitted through AtechSpot.com.</p>
+          <table style="border-collapse:collapse;width:100%;max-width:850px">${rows}</table>
+          <p style="margin-top:18px;color:#5f6f7f">
+            Reply to this email to respond directly to ${escapeHtml(name)} at ${escapeHtml(email)}.
+          </p>
+        `
+      })
+    });
+  } catch {
+    return json(503, {
+      ok: false,
+      code: "EMAIL_PROVIDER_UNREACHABLE",
+      message: "The email service is temporarily unavailable."
+    });
   }
 
-  const to = env.FORM_TO_EMAIL || "aplustechucation@gmail.com";
-  const rows = Object.entries(safeFields)
-    .map(([key, value]) => `
-      <tr>
-        <th style="text-align:left;padding:8px;border:1px solid #d8e0e8;background:#f4f7fa">${escapeHtml(key)}</th>
-        <td style="padding:8px;border:1px solid #d8e0e8">${escapeHtml(value).replace(/\n/g, "<br>")}</td>
-      </tr>`)
-    .join("");
+  const providerText = await resendResponse.text();
 
-  const resend = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "authorization": `Bearer ${env.RESEND_API_KEY}`,
-      "content-type": "application/json"
-    },
-    body: JSON.stringify({
-      from: env.FORM_FROM_EMAIL,
-      to: [to],
-      reply_to: email,
-      subject: `[AtechSpot Website] ${leadType} — ${name}`,
-      html: `
-        <h2>${escapeHtml(leadType)}</h2>
-        <p>A new request was submitted on AtechSpot.com.</p>
-        <table style="border-collapse:collapse;width:100%;max-width:850px">${rows}</table>
-      `
-    })
+  if (!resendResponse.ok) {
+    console.error("Resend error:", resendResponse.status, providerText);
+    return json(503, {
+      ok: false,
+      code: "RESEND_REJECTED",
+      message: "The email provider rejected the message. Confirm the Cloudflare RESEND_API_KEY secret and use onboarding@resend.dev until your domain is verified."
+    });
+  }
+
+  return json(200, {
+    ok: true,
+    message: "Thank you. Your request was emailed successfully."
   });
-
-  if (!resend.ok) {
-    return json(503, "Email delivery is temporarily unavailable.");
-  }
-
-  return json(200, "Thank you. Your request was sent successfully.");
 }
 
 export async function onRequestPost({ request, env }) {
-  return sendLead({
+  return deliverLead({
     request,
     env,
     leadType: "Data Recovery Intake",
@@ -139,5 +162,5 @@ export async function onRequestPost({ request, env }) {
 }
 
 export function onRequestGet() {
-  return json(405, "Method not allowed.");
+  return json(405, { ok: false, message: "Method not allowed." });
 }
