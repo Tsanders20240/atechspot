@@ -51,7 +51,15 @@ document.querySelectorAll("[data-email-form]").forEach(form=>{
       }
 
       if (status) status.textContent =
-        result.message || "Thank you. Your request was emailed successfully.";
+        result.message || "Thank you. Your request was delivered successfully.";
+
+      const successPanel = form.querySelector("[data-success-panel]");
+      const referenceNode = form.querySelector("[data-reference]");
+      if (referenceNode) referenceNode.textContent = result.reference || "DS25379";
+      if (successPanel) {
+        successPanel.hidden = false;
+        successPanel.focus();
+      }
 
       form.reset();
       if (started) started.value = String(Date.now());

@@ -11,7 +11,7 @@
 - Front-page promotion for `https://www.atechspot.com/business`
 - DriveSavers data recovery page and homepage/business promotions
 - Official DriveSavers YouTube channel playlist embedded next to the offer
-- Partner code `DS23579` for 10% off eligible DriveSavers services
+- Partner code `DS25379` for 10% off eligible DriveSavers services
 - Partner/compensation disclosure
 - `/data-recovery` route
 - Sitemap updates and internal links for Google discovery
