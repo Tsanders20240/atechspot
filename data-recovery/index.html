@@ -192,8 +192,8 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
     <h1>Tell us what happened to your device.</h1>
     <p class="lead">A+ Techucation is an authorized DriveSavers reseller partner for data recovery, eDiscovery, and digital forensic services. Use partner code <strong>DS25379</strong> for a 10% discount on eligible DriveSavers services.</p>
     <div class="actions">
-      <a class="button primary" href="#data-recovery-form" data-event="drivesavers_new_request">Submit Data Recovery Intake</a>
-      <a class="button secondary" href="tel:+17133962993">Call (713) 396-2993</a>
+      <a class="button primary" href="#data-recovery-form">Start Data Recovery Intake</a>
+      <a class="button secondary" href="#data-recovery-form" data-event="drivesavers_new_request">Submit DriveSavers New Request</a>
       <a class="button secondary" href="https://scheduler.zoom.us/a-plus-techucation/30-mins-with-a-plus" target="_blank" rel="noopener noreferrer">Book Consultation</a>
     </div>
   </div>
@@ -214,12 +214,12 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
         <div class="eyebrow">Data recovery intake</div>
         <h2>Provide the information needed for the next step.</h2>
         <div class="rule"></div>
-        <p class="lead">Submit this secure referral intake to A+ Techucation. We review the request, contact you, and create the official DriveSavers referral using partner code <strong>DS25379</strong>. Do not include passwords, encryption keys, Social Security numbers, or confidential file contents.</p>
+        <p class="lead">This form is delivered to aplustechucation@gmail.com. Do not include passwords, encryption keys, Social Security numbers, or confidential file contents.</p>
       </div>
     </div>
 
     <div class="form-shell">
-      <div class="notice success"><strong>What happens next:</strong> Your intake is sent to A+ Techucation for review. You will receive an email confirmation when delivery succeeds. A+ Techucation will then contact you and submit the official DriveSavers referral. This form does not create a DriveSavers job by itself.</div>
+      <div class="notice success"><strong>Email delivery:</strong> Your data recovery request is sent to aplustechucation@gmail.com. A prefilled email backup appears if automatic delivery is unavailable.</div>
       <form class="form" data-email-form data-endpoint="/api/data-recovery" data-form-type="Data Recovery Intake">
         <div class="form-row">
           <label>Full Name<input type="text" name="Full Name" autocomplete="name" required></label>
@@ -343,12 +343,8 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
 
         <p class="security-note">Do not submit passwords, passcodes, encryption keys, Social Security numbers, payment-card numbers, or confidential file contents. DriveSavers will provide secure instructions if sensitive information is required.</p>
 
-        <button class="button primary" type="submit">Submit Secure Referral Intake</button>
+        <button class="button primary" type="submit">Send Data Recovery Request</button>
         <p class="status" data-status aria-live="polite"></p>
-        <div class="notice success" data-success-panel hidden tabindex="-1">
-          <strong>Request received.</strong>
-          <p>Your intake was delivered to A+ Techucation. Save your reference number: <strong data-reference></strong>. Check your email for confirmation and keep your device powered off unless instructed otherwise.</p>
-        </div>
       </form>
       <noscript><p class="notice">JavaScript is required for automatic delivery. Email <a href="mailto:aplustechucation@gmail.com?subject=Data%20Recovery%20Request">aplustechucation@gmail.com</a> or call <a href="tel:+17133962993">(713) 396-2993</a>.</p></noscript>
     </div>
