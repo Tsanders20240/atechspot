@@ -51,11 +51,19 @@ async function deliverLead({ request, env, leadType, requiredFields }) {
 
   const name = clean(body["Full Name"] || body.Name, 120);
   const email = clean(body.Email, 254);
+  const discountCode = clean(body["Discount Code"], 40).toUpperCase();
 
   if (name.length < 2 || !validEmail(email)) {
     return json(400, {
       ok: false,
       message: "Enter a valid name and email address."
+    });
+  }
+
+  if (discountCode !== "DS25379") {
+    return json(400, {
+      ok: false,
+      message: "The required A+ Techucation partner code DS25379 is missing or invalid. Reload the form and submit again."
     });
   }
 
@@ -157,7 +165,7 @@ export async function onRequestPost({ request, env }) {
     request,
     env,
     leadType: "Data Recovery Intake",
-    requiredFields: ["Device Type", "Problem Description"]
+    requiredFields: ["Device Type", "Problem Description", "Discount Code"]
   });
 }
 

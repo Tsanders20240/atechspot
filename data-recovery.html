@@ -337,7 +337,12 @@ body{font-family:Inter,"Segoe UI",Arial,sans-serif;color:var(--ink)}
         <label><input type="checkbox" name="Authorization" value="Yes" required> I confirm that I own the device/data or am authorized by the owner to request recovery information.</label>
         <label><input type="checkbox" name="Partner Disclosure Acknowledgment" value="Yes" required> I understand that DriveSavers performs and controls the recovery service, estimate, shipping, billing, and recovery decisions. A+ Techucation may receive compensation from qualifying referrals.</label>
 
-        <input type="hidden" name="Discount Code" value="DS25379">
+        <div class="notice success">
+          <label>Required A+ Techucation / DriveSavers Partner Code
+            <input type="text" name="Discount Code" value="DS25379" required readonly aria-readonly="true">
+          </label>
+          <p class="security-note"><strong>Automatically applied:</strong> Keep DS25379 on this request so DriveSavers can identify the A+ Techucation referral and evaluate the eligible 10% discount.</p>
+        </div>
         <input type="hidden" name="form_started_at">
         <div class="hp-field"><label>Leave empty<input name="website" tabindex="-1" autocomplete="off"></label></div>
 
