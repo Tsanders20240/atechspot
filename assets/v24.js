@@ -3,11 +3,11 @@
   if (intro) {
     const finish = () => {
       intro.classList.add('is-done');
-      try { sessionStorage.setItem('atechspot-v24-intro-seen','1'); } catch {}
+      try { sessionStorage.setItem('atechspot-v26-legacy-intro-seen','1'); } catch {}
       setTimeout(() => intro.remove(), 750);
     };
     let seen = false;
-    try { seen = sessionStorage.getItem('atechspot-v24-intro-seen') === '1'; } catch {}
+    try { seen = sessionStorage.getItem('atechspot-v26-legacy-intro-seen') === '1'; } catch {}
     if (seen) finish();
     intro.querySelectorAll('[data-enter-site]').forEach(btn => btn.addEventListener('click', finish));
     document.addEventListener('keydown', e => { if (e.key === 'Escape') finish(); }, { once:false });
