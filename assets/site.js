@@ -145,3 +145,26 @@ if (intakeService) {
     if (match) serviceSelect.value = match.value;
   }
 }
+
+// V22: secure review-before-send forms (business audit + AI readiness).
+document.querySelectorAll('[data-secure-form]').forEach(form=>{
+  const started=form.querySelector('input[name="form_started_at"]');
+  if(started) started.value=String(Date.now());
+  form.addEventListener('submit',event=>{
+    event.preventDefault();
+    if(!form.reportValidity()) return;
+    const data=Object.fromEntries(new FormData(form).entries());
+    if(String(data.website||'').trim()) return;
+    const ignored=new Set(['website','form_started_at','cf-turnstile-response']);
+    const lines=[];
+    Object.entries(data).forEach(([key,value])=>{
+      const text=String(value??'').trim();
+      if(!ignored.has(key)&&text) lines.push(`${key}: ${text}`);
+    });
+    const subject=encodeURIComponent(`[AtechSpot Website] ${form.dataset.formType||'Customer Request'}`);
+    const body=encodeURIComponent(lines.join('\n')+'\n\nDo not include passwords, Social Security numbers, or full account numbers.');
+    const status=form.querySelector('[data-status]');
+    if(status) status.textContent='Opening your email app so you can review the request before sending…';
+    window.location.href=`mailto:aplustechucation@gmail.com?subject=${subject}&body=${body}`;
+  });
+});
