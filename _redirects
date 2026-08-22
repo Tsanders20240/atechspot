@@ -1,4 +1,6 @@
 https://www.atechspot.com/* https://atechspot.com/:splat 301
+/home /home.html 200
+/home/ /home.html 200
 /business /business/index.html 200
 /business/ /business/index.html 200
 /booking /booking/index.html 200
