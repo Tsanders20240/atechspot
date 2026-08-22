@@ -5,24 +5,28 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>A+ Techucation | Welcome</title>
 <meta name="description" content="A+ Techucation — Technology Within Us.">
-<meta name="theme-color" content="#06111f">
+<meta name="theme-color" content="#000000">
 <link rel="preload" as="image" href="/assets/atechucationlogo.png">
-<link rel="preload" as="image" href="/assets/ai-intro-lab.png">
 <style>
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#06111f;color:#fff;font-family:Arial,Helvetica,sans-serif}html{background:#06111f}body{min-height:100vh;min-height:100dvh;overflow-x:hidden}.splash{position:relative;min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:32px 20px;background:#06111f;isolation:isolate}.splash:before{content:"";position:absolute;inset:0;z-index:-2;background:#06111f url('/assets/ai-intro-lab.png') center/cover no-repeat}.splash:after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(2,9,18,.68),rgba(2,9,18,.88))}.card{width:min(860px,100%);text-align:center;padding:38px 28px;border:1px solid rgba(255,255,255,.16);border-radius:28px;background:rgba(4,14,27,.82);box-shadow:0 24px 70px rgba(0,0,0,.38);backdrop-filter:blur(12px)}.status{display:inline-flex;gap:8px;align-items:center;font-size:12px;letter-spacing:.15em;font-weight:700;color:#b9d8ff}.dot{width:8px;height:8px;border-radius:50%;background:#5ad6ff}.logo{display:block;width:min(360px,72vw);height:auto;margin:18px auto 26px}.card h1{margin:0;font-size:clamp(40px,7vw,78px);line-height:.98;letter-spacing:-.045em}.card h1 span{color:#7bc7ff}.card p{max-width:700px;margin:22px auto 30px;font-size:clamp(16px,2vw,20px);line-height:1.6;color:#d8e7f7}.enter{display:inline-flex;align-items:center;justify-content:center;min-width:220px;min-height:58px;padding:15px 28px;border-radius:999px;background:#fff;color:#06111f;text-decoration:none;font-weight:800;letter-spacing:.04em}.enter:focus-visible{outline:3px solid #7bc7ff;outline-offset:4px}.cats{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:26px}.cats span{padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.08);font-size:12px;color:#d9e8f8}.skip{position:absolute;top:18px;right:20px;color:#e7f1fb;text-decoration:none;font-size:14px;padding:10px 12px}.note{margin-top:18px!important;font-size:13px!important;color:#9fb5ca!important}@media(max-width:600px){.card{padding:30px 18px;border-radius:22px}.cats{display:none}}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#000;color:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,"Segoe UI",Arial,sans-serif}body{min-height:100vh;min-height:100dvh;overflow:hidden}.intro{min-height:100vh;min-height:100dvh;display:grid;place-items:center;position:relative;padding:28px;isolation:isolate;background:#000}.orb{position:absolute;border-radius:999px;filter:blur(70px);opacity:.38;pointer-events:none}.o1{width:42vw;height:42vw;min-width:360px;min-height:360px;background:#0071e3;left:-12vw;top:-20vw}.o2{width:36vw;height:36vw;min-width:320px;min-height:320px;background:#6e5cff;right:-8vw;bottom:-18vw}.grain{position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 50% 10%,rgba(255,255,255,.08),transparent 38%),linear-gradient(180deg,#080808 0,#000 72%)}.wrap{position:relative;z-index:2;width:min(940px,100%);text-align:center}.logo{display:block;width:min(270px,64vw);height:auto;margin:0 auto 42px;filter:brightness(0) invert(1)}.eyebrow{font-size:12px;font-weight:650;letter-spacing:.16em;text-transform:uppercase;color:#a1a1a6;margin-bottom:18px}.wrap h1{margin:0 auto;max-width:920px;font-size:clamp(52px,8vw,104px);line-height:.94;letter-spacing:-.07em;font-weight:720;color:#f5f5f7}.wrap h1 span{color:#86868b}.wrap p{max-width:720px;margin:28px auto 34px;color:#a1a1a6;font-size:clamp(18px,2vw,23px);line-height:1.45;letter-spacing:-.02em}.actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}.enter,.skip{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:0 24px;border-radius:999px;text-decoration:none;font-size:15px;font-weight:650}.enter{background:#0071e3;color:#fff}.enter:hover{background:#0077ed}.skip{background:#1d1d1f;color:#f5f5f7}.skip:hover{background:#2a2a2d}.fine{margin-top:24px!important;font-size:12px!important;color:#6e6e73!important}.enter:focus-visible,.skip:focus-visible{outline:3px solid #2997ff;outline-offset:4px}@media(max-width:640px){body{overflow:auto}.intro{padding:32px 18px}.logo{margin-bottom:30px}.wrap h1{font-size:54px}.wrap p{font-size:18px}.enter,.skip{width:100%}}
 </style>
+<script>
+function enterSite(e){if(e)e.preventDefault();window.location.replace('/home/');return false;}
+</script>
 </head>
 <body>
-<main class="splash">
-<a class="skip" href="/home/">Skip intro</a>
-<section class="card" aria-labelledby="welcome-title">
-<div class="status"><span class="dot"></span> SYSTEM READY</div>
-<img class="logo" src="/assets/atechucationlogo.png" alt="A+ Techucation — Technology Within Us">
-<h1 id="welcome-title">Technology built <span>around you.</span></h1>
-<p>Websites. AI consulting. Automation. Ecommerce. Digital marketing. Software. Education. Accessibility.</p>
-<a class="enter" href="/home/">ENTER SITE&nbsp; →</a>
-<div class="cats" aria-hidden="true"><span>AI Consulting</span><span>Automation</span><span>Ecommerce</span><span>Digital Marketing</span><span>Software</span><span>Learning &amp; Accessibility</span></div>
-<p class="note">One click opens the complete A+ Techucation website.</p>
+<main class="intro">
+<div class="grain"></div><div class="orb o1"></div><div class="orb o2"></div>
+<section class="wrap" aria-labelledby="intro-title">
+<img class="logo" src="/assets/atechucationlogo.png" alt="A+ Techucation">
+<div class="eyebrow">Technology Within Us</div>
+<h1 id="intro-title">Technology that feels <span>simpler.</span></h1>
+<p>AI, automation, websites, business systems, support, accessibility, education, ecommerce, and digital solutions—brought together in one clear experience.</p>
+<div class="actions">
+<a class="enter" href="/home/" onclick="return enterSite(event)">Enter A+ Techucation&nbsp; →</a>
+<a class="skip" href="/home/" onclick="return enterSite(event)">Skip intro</a>
+</div>
+<p class="fine">One click opens the complete A+ Techucation website.</p>
 </section>
 </main>
 </body>
