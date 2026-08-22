@@ -1,18 +1,4 @@
 (() => {
-  const intro = document.querySelector('.v23-intro');
-  if (intro) {
-    const finish = () => {
-      intro.classList.add('is-done');
-      try { sessionStorage.setItem('atechspot-v26-legacy-intro-seen','1'); } catch {}
-      setTimeout(() => intro.remove(), 750);
-    };
-    let seen = false;
-    try { seen = sessionStorage.getItem('atechspot-v26-legacy-intro-seen') === '1'; } catch {}
-    if (seen) finish();
-    intro.querySelectorAll('[data-enter-site]').forEach(btn => btn.addEventListener('click', finish));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') finish(); }, { once:false });
-  }
-
   const guide = document.querySelector('[data-v23-guide]');
   if (guide) {
     const data = {
@@ -49,11 +35,6 @@
 
 
 (() => {
-  // Keep the public experience on the canonical non-WWW hostname when this bundle is deployed there.
-  if (location.hostname === 'www.atechspot.com') {
-    const next = 'https://atechspot.com' + location.pathname + location.search + location.hash;
-    location.replace(next);
-  }
   // Improve guide semantics for assistive technology.
   const guide = document.querySelector('[data-v23-guide]');
   if (guide) {
