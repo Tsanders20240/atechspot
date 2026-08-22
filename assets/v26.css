@@ -36,3 +36,11 @@ header .brand img{display:block;width:205px;max-height:54px;object-fit:contain;o
 @keyframes v27-logo-final{0%{opacity:0;transform:scale(.985)}100%{opacity:1;transform:scale(1)}}
 @keyframes v27-bg-in{from{transform:scale(1.07)}to{transform:scale(1.04)}}
 @media(prefers-reduced-motion:reduce){.v26-logo-parts,.v26-intro-bg{animation:none!important}.v26-logo-parts{display:none!important}.v26-logo-final{opacity:1!important;transform:none!important}}
+
+/* V28 no-flicker patch: intro never flashes after it has been seen, and intro artwork is static. */
+html.atech-intro-seen .v26-intro{display:none!important}
+.v26-intro-bg{animation:none!important;transform:scale(1.04)!important;filter:saturate(1.08) contrast(1.02)!important}
+.v26-status i{animation:none!important;width:98%!important}
+.v26-logo-parts{display:none!important;animation:none!important}
+.v26-logo-final{opacity:1!important;transform:none!important;animation:none!important}
+.v26-intro.is-done{opacity:0!important;visibility:hidden!important;pointer-events:none!important;transition:opacity .24s ease!important}
