@@ -1,0 +1,17 @@
+A+ TECHUCATION — DEPLOYMENT
+
+Upload every file in this folder to the production root for www.atechspot.com.
+The _redirects file supports Cloudflare Pages and Netlify history fallback.
+
+This single package detects the hostname and preserves the branded experiences for:
+www.atechspot.com, abcoftech.atechspot.com, abctechproducts.atechspot.com,
+ascrfinancial.atechspot.com, atechucationfigures.atechspot.com,
+atechnetwork.atechspot.com, auto.atechspot.com, credit.atechspot.com,
+hazil.atechspot.com, hazilflix.atechspot.com, mraplusportfolio.atechspot.com,
+and visionofsanders.atechspot.com.
+
+Before launch, confirm the intake destination and legal pages at:
+https://www.atechspot.com/intake
+https://www.atechspot.com/privacy
+https://www.atechspot.com/terms
+https://www.atechspot.com/accessibility
