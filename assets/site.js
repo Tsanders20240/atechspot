@@ -67,6 +67,27 @@ document.querySelectorAll("[data-email-form]").forEach(form=>{
   });
 });
 
+// V21 shared Apple-style category navigation
+const mainHeader=document.querySelector(".header");
+if(mainHeader&&!document.querySelector(".v21-tabs")){
+  const current=location.pathname.replace(/\/$/,"")||"/";
+  const tabs=[
+    ["AI","/ai-readiness"],["Websites","/website-development"],["Business","/business"],
+    ["Remote Support","/remote-support"],["Data Recovery","/data-recovery"],
+    ["Learning","/learning"],["Accessibility","/accessibility-support"],["Start Intake","/intake"]
+  ];
+  const tabLinks=tabs.map(([label,href])=>`<a href="${href}"${current===href?' aria-current="true"':''}>${label}</a>`).join("");
+  mainHeader.insertAdjacentHTML("afterend",`<nav class="v21-tabs" aria-label="Technology categories"><div class="container v21-tabs-inner">${tabLinks}</div></nav><div class="v21-announcement">Not sure which service fits? Start with a short, human-reviewed intake. <a href="/intake">Get a recommendation ›</a></div>`);
+}
+
+// V21 revenue funnel added to informational pages without changing their content
+const pageMain=document.querySelector("main");
+const excludedPages=["/","/intake","/contact","/booking","/payment","/privacy","/terms","/accessibility"];
+const normalizedPath=location.pathname.replace(/\/$/,"")||"/";
+if(pageMain&&!excludedPages.includes(normalizedPath)&&!pageMain.querySelector(".v21-page-cta")){
+  pageMain.insertAdjacentHTML("beforeend",`<section class="v21-page-cta"><div class="container"><h2>Move from information to action.</h2><p>Tell us the outcome you want. Your request is reviewed for fit, scope, timing and the most useful next step before payment or booking.</p><div class="actions" style="justify-content:center"><a class="button primary" href="/intake">Start My Intake</a><a class="button secondary" href="/contact">Ask a Question</a></div></div></section>`);
+}
+
 // V19 service finder
 const serviceFinder = document.querySelector("[data-service-finder]");
 if (serviceFinder) {
