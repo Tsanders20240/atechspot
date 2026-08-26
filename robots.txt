@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
-Sitemap: https://atechspot.com/sitemap.xml
+Sitemap: https://www.atechspot.com/sitemap.xml
 
 Disallow: /internal-forms
 Disallow: /internal-forms.html

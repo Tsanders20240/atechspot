@@ -67,6 +67,37 @@ document.querySelectorAll("[data-email-form]").forEach(form=>{
   });
 });
 
+// V19 service finder
+const serviceFinder = document.querySelector("[data-service-finder]");
+if (serviceFinder) {
+  const select = serviceFinder.querySelector("select");
+  const result = serviceFinder.querySelector("[data-finder-result]");
+  const title = result?.querySelector("strong");
+  const copy = result?.querySelector("span");
+  const link = result?.querySelector("a");
+  const routes = {
+    customers:["Business Technology Audit","Map your website, leads, booking and follow-up before investing.","/business-audit"],
+    website:["Website Development","Improve your message, mobile experience, lead capture and conversion path.","/website-development"],
+    automate:["AI & Automation Planning","Identify repetitive work and build a practical human-reviewed workflow.","/ai-readiness"],
+    support:["Technology Support","Start with a structured intake so the right support path is clear.","/remote-support"],
+    learn:["AI Training","Build confident, responsible AI skills for work, business or everyday use.","/ai-training"],
+    accessible:["Accessibility Support","Create a more usable technology setup around individual access needs.","/accessibility-support"]
+  };
+  select?.addEventListener("change",()=>{
+    const match=routes[select.value];
+    if(!match||!result)return result?.classList.remove("show");
+    title.textContent=match[0];copy.textContent=match[1];link.href=match[2];result.classList.add("show");
+  });
+}
+
+// V19 conversion helpers
+if (!document.querySelector(".v19-mobile-cta")) {
+  document.body.insertAdjacentHTML("beforeend",`<div class="v19-mobile-cta" aria-label="Quick actions"><a class="button secondary" href="tel:+17133962993">Call</a><a class="button primary" href="/intake">Start Intake</a></div><button class="v19-backtop" type="button" aria-label="Back to top">↑</button>`);
+}
+const backTop=document.querySelector(".v19-backtop");
+window.addEventListener("scroll",()=>backTop?.classList.toggle("show",window.scrollY>700),{passive:true});
+backTop?.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));
+
 
 
 
@@ -145,26 +176,3 @@ if (intakeService) {
     if (match) serviceSelect.value = match.value;
   }
 }
-
-// V22: secure review-before-send forms (business audit + AI readiness).
-document.querySelectorAll('[data-secure-form]').forEach(form=>{
-  const started=form.querySelector('input[name="form_started_at"]');
-  if(started) started.value=String(Date.now());
-  form.addEventListener('submit',event=>{
-    event.preventDefault();
-    if(!form.reportValidity()) return;
-    const data=Object.fromEntries(new FormData(form).entries());
-    if(String(data.website||'').trim()) return;
-    const ignored=new Set(['website','form_started_at','cf-turnstile-response']);
-    const lines=[];
-    Object.entries(data).forEach(([key,value])=>{
-      const text=String(value??'').trim();
-      if(!ignored.has(key)&&text) lines.push(`${key}: ${text}`);
-    });
-    const subject=encodeURIComponent(`[AtechSpot Website] ${form.dataset.formType||'Customer Request'}`);
-    const body=encodeURIComponent(lines.join('\n')+'\n\nDo not include passwords, Social Security numbers, or full account numbers.');
-    const status=form.querySelector('[data-status]');
-    if(status) status.textContent='Opening your email app so you can review the request before sending…';
-    window.location.href=`mailto:aplustechucation@gmail.com?subject=${subject}&body=${body}`;
-  });
-});
