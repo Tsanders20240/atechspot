@@ -72,11 +72,11 @@ const mainHeader=document.querySelector(".header");
 if(mainHeader&&!document.querySelector(".v21-tabs")){
   const current=location.pathname.replace(/\/$/,"")||"/";
   const tabs=[
-    ["AI","/ai-readiness"],["Websites","/website-development"],["Business","/business"],
+    ["AI","/ai-readiness"],["Websites","/website-development"],["Business","/business"],["Digital Products","/digital-products"],
     ["Remote Support","/remote-support"],["Data Recovery","/data-recovery"],
-    ["Learning","/learning"],["Accessibility","/accessibility-support"],["Start Intake","/intake"]
+    ["Learning","/learning"],["Accessibility","/accessibility-support"],["Portfolio","https://www.mraplusportfolio.atechspot.com/"],["Start Intake","/intake"]
   ];
-  const tabLinks=tabs.map(([label,href])=>`<a href="${href}"${current===href?' aria-current="true"':''}>${label}</a>`).join("");
+  const tabLinks=tabs.map(([label,href])=>`<a href="${href}"${current===href?' aria-current="true"':''}${href.startsWith("http")?' target="_blank" rel="noopener noreferrer"':''}>${label}</a>`).join("");
   mainHeader.insertAdjacentHTML("afterend",`<nav class="v21-tabs" aria-label="Technology categories"><div class="container v21-tabs-inner">${tabLinks}</div></nav><div class="v21-announcement">Not sure which service fits? Start with a short, human-reviewed intake. <a href="/intake">Get a recommendation ›</a></div>`);
 }
 
@@ -85,7 +85,7 @@ const pageMain=document.querySelector("main");
 const excludedPages=["/","/intake","/contact","/booking","/payment","/privacy","/terms","/accessibility"];
 const normalizedPath=location.pathname.replace(/\/$/,"")||"/";
 if(pageMain&&!excludedPages.includes(normalizedPath)&&!pageMain.querySelector(".v21-page-cta")){
-  pageMain.insertAdjacentHTML("beforeend",`<section class="v21-page-cta"><div class="container"><h2>Move from information to action.</h2><p>Tell us the outcome you want. Your request is reviewed for fit, scope, timing and the most useful next step before payment or booking.</p><div class="actions" style="justify-content:center"><a class="button primary" href="/intake">Start My Intake</a><a class="button secondary" href="/contact">Ask a Question</a></div></div></section>`);
+  pageMain.insertAdjacentHTML("beforeend",`<section class="v21-page-cta"><div class="container"><h2>Move from information to action.</h2><p>Tell us the outcome you want. Your request is reviewed for fit, scope, timing and the most useful next step before payment or booking.</p><div class="actions" style="justify-content:center"><a class="button primary" href="/intake">Start My Intake</a><a class="button secondary" href="/contact">Ask a Question</a><a class="button secondary" href="https://www.mraplusportfolio.atechspot.com/" target="_blank" rel="noopener noreferrer">View Portfolio</a></div></div></section>`);
 }
 
 // V19 service finder
@@ -188,6 +188,7 @@ if(topic){
 // Prefill the universal intake service from links such as /intake?service=Website%20Design
 const intakeParams = new URLSearchParams(window.location.search);
 const intakeService = intakeParams.get("service");
+const requestedProduct = intakeParams.get("product");
 if (intakeService) {
   const serviceSelect = document.querySelector("#service-requested");
   if (serviceSelect) {
@@ -195,5 +196,12 @@ if (intakeService) {
       option => option.value === intakeService || option.textContent.trim() === intakeService
     );
     if (match) serviceSelect.value = match.value;
+  }
+}
+if (requestedProduct) {
+  const productSelect = document.querySelector("#product-requested");
+  if (productSelect) {
+    const match = [...productSelect.options].find(option => option.value === requestedProduct || option.textContent.trim() === requestedProduct);
+    if (match) productSelect.value = match.value;
   }
 }
