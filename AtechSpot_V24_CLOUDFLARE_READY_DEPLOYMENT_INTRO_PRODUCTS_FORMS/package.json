@@ -1,0 +1,14 @@
+{
+  "name": "atechspot-cloudflare-pages",
+  "private": true,
+  "type": "module",
+  "version": "24.0.0",
+  "scripts": {
+    "dev": "wrangler pages dev .",
+    "deploy": "wrangler pages deploy . --project-name atechspot-v5 --branch main",
+    "deploy:preview": "wrangler pages deploy . --project-name atechspot-v5 --branch v24-preview"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
