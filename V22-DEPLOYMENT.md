@@ -1,15 +1,24 @@
-# A+ Techucation V22 deployment
+# V22 Deployment — Cloudflare Pages
 
-V22 preserves every existing static page, Cloudflare form function, redirect, legal page, internship/career route, service funnel and media asset from V21.
+This package keeps the existing Cloudflare Pages structure.
 
-## New front-end experience
+1. Back up the currently deployed project.
+2. Upload/deploy the entire V22 folder contents to the same Pages project.
+3. Keep these environment variables/secrets configured:
+   - `RESEND_API_KEY`
+   - `FORM_TO_EMAIL` (optional; defaults to aplustechucation@gmail.com)
+   - `FORM_FROM_EMAIL` (optional; use a verified sender when available)
+4. Verify `/api/form-health` returns `ok: true`.
+5. Test:
+   - `/contact`
+   - `/intake`
+   - `/data-recovery`
+   - `/business-audit.html`
+   - `/ai-readiness.html`
+   - consultation links
+   - mobile menu
+   - BotPenguin chat
+6. Confirm GA4 and Clarity events after deployment.
+7. Clear Cloudflare cache if the prior homepage remains visible.
 
-- Cinematic black-and-white YouTube introduction on the home page.
-- Video playback begins at 30 seconds using YouTube's privacy-enhanced embed.
-- Apple-inspired typography, spacing, monochrome presentation and focused calls to action.
-- Mr. A+ Portfolio is available from the cinematic introduction, home hero, global category bar and every informational-page conversion panel.
-- Existing AI, website, business, remote support, data recovery, learning, accessibility, contact, intake, booking and payment routes remain intact.
-
-## Deploy
-
-Upload the extracted folder to Cloudflare Pages or deploy it with Wrangler as a static Pages project. Keep the `functions` directory, `_headers`, `_redirects`, `_routes.json` and all files in `assets` together at the project root.
+No Apple, Microsoft, or Lucid assets are required by this build.

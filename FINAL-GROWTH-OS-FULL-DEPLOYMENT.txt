@@ -1,0 +1,48 @@
+A+ TECHUCATION — FINAL GROWTH OS 10/10 FULL-SITE DEPLOYMENT
+==========================================================
+
+THIS IS A COMPLETE ROOT-READY SITE PACKAGE.
+No 3-file merge is required.
+
+DEPLOY TARGET
+Repository: Tsanders20240/atechspot
+Branch: main
+Cloudflare Pages project: atechspot
+Production domain: https://www.atechspot.com/
+
+UPLOAD METHOD
+1. Extract this ZIP.
+2. Upload ALL extracted contents to the ROOT of the existing atechspot repository/deployment.
+3. Replace matching files when prompted.
+4. Keep the directory structure exactly as packaged.
+5. Commit to main with message:
+   Deploy final A+ Growth OS full site
+6. Wait for Cloudflare Pages production deployment to show Success.
+7. Open the new unique *.atechspot.pages.dev deployment URL first.
+8. Verify the homepage headline: Build what your business should become.
+9. Verify the free assessment and $997 Executive Growth Review form.
+10. Then purge Cloudflare cache and hard-refresh www.atechspot.com.
+
+INCLUDED / PRESERVED
+- Root homepage
+- Existing service pages
+- Contact/intake/booking/payment pages
+- Data Recovery pages
+- Privacy/Terms/Accessibility/Affiliate pages
+- Cloudflare Pages Functions
+- /api/contact, /api/data-recovery, /api/form-health
+- _headers, _redirects, _routes.json
+- sitemap.xml and robots.txt
+- Existing production assets and AI imagery
+- GA4 / Microsoft Clarity / BotPenguin infrastructure
+- Final Growth OS CSS and JS
+
+FINAL REVENUE PATH
+Free Business Growth Assessment
+→ $997 Executive Growth Review
+→ Implementation
+→ GrowthCare recurring support
+
+IMPORTANT
+Cloudflare runtime secrets are NOT stored in this ZIP.
+Keep the existing production bindings/secrets, especially RESEND_API_KEY and FORM_TO_EMAIL.
