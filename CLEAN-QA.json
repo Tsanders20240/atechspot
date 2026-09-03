@@ -1,0 +1,14 @@
+{
+  "file_count": 69,
+  "under_github_100_file_limit": true,
+  "internal_refs_checked": 1138,
+  "missing_internal_refs": [],
+  "js_syntax": {
+    "assets/growth-os-final.js": true,
+    "functions/api/contact.js": true,
+    "functions/api/data-recovery.js": true,
+    "functions/api/form-health.js": true
+  },
+  "root_index": true,
+  "proof_section": true
+}

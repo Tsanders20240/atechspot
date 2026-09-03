@@ -224,12 +224,6 @@
 
     const payload = {
       ...raw,
-      'Topic': 'Executive Growth Review — $997',
-      'Message': [
-        raw['Biggest Growth Challenge'] || 'Executive Growth Review request',
-        'Request: Please send secure payment instructions for the $997 A+ Executive Growth Review.',
-        'Detailed analysis begins after payment confirmation.'
-      ].join('\n'),
       'Request Type': 'A+ Executive Growth Review — $997',
       'Assessment - Primary Goal': assessment.goal || 'Not completed',
       'Assessment - Website': assessment.website || 'Not completed',
@@ -329,5 +323,23 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && mobileMenu && !mobileMenu.hidden) closeMobileMenu(); });
   const currentYear = $('#currentYear');
   if (currentYear) currentYear.textContent = String(new Date().getFullYear());
+
+
+
+  // Portfolio proof analytics: measure which live examples prospects inspect.
+  document.querySelectorAll('[data-proof]').forEach(link => {
+    link.addEventListener('click', () => {
+      const project = (link.getAttribute('data-proof') || link.textContent || '').trim().slice(0,100);
+      if (typeof window.gtag === 'function') {
+        window.gtag('event', 'portfolio_proof_click', {
+          project_name: project,
+          destination: link.href
+        });
+      }
+      if (typeof window.clarity === 'function') {
+        window.clarity('event', 'portfolio_proof_click');
+      }
+    });
+  });
 
 })();
