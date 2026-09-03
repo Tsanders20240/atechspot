@@ -1,0 +1,27 @@
+{
+  "build": "AtechSpot Growth OS + Mr. A Plus Portfolio Proof Merge 10/10",
+  "target": "https://www.atechspot.com/",
+  "proof_source": "https://www.mraplusportfolio.atechspot.com/",
+  "files_to_replace": [
+    "index.html",
+    "assets/growth-os-final.css",
+    "assets/growth-os-final.js"
+  ],
+  "selected_live_projects": [
+    "ABC of Technology",
+    "A+ Automotive",
+    "HAZIL",
+    "HazilFlix",
+    "Vision of Sanders",
+    "DreamStyler Archive"
+  ],
+  "earlier_web_examples": [
+    "Annette Wasden",
+    "Axess Energy",
+    "Cargenixs Detailing",
+    "Coach Chris Mercer",
+    "Doctor Law"
+  ],
+  "performance_claims_added": false,
+  "analytics_event_added": "portfolio_proof_click"
+}

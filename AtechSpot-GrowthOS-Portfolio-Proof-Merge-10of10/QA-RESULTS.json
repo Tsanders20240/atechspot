@@ -1,0 +1,16 @@
+{
+  "checks": {
+    "proof_section": true,
+    "desktop_proof_nav": true,
+    "mobile_proof_nav": true,
+    "complete_portfolio_link": true,
+    "six_selected_cards": true,
+    "proof_css": true,
+    "proof_analytics": true,
+    "review_preserved": true,
+    "growthcare_preserved": true,
+    "assessment_preserved": true,
+    "js_syntax": true
+  },
+  "node_check": "PASS"
+}
