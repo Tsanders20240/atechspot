@@ -1,0 +1,28 @@
+A+ TECHUCATION — FUNDING & GROWTH UPDATE
+
+UPLOAD THESE FILES TO THE EXISTING ATECHSPOT SITE ROOT:
+1. funding.html
+2. assets/funding-growth-v1.css
+3. assets/funding-growth-v1.js
+
+THEN ADD THIS LINK TO THE EXISTING TOP NAVIGATION AND MOBILE MENU:
+<a href="/funding.html">Funding & Growth</a>
+
+ALSO ADD THIS LINK TO THE EXISTING FOOTER BUSINESS LINKS:
+<a href="/funding.html">Funding & Growth</a>
+
+RECOMMENDED NAV ORDER:
+Growth System | Revenue Path | Assessment | Solutions | Proof | Funding & Growth | Executive Review
+
+IMPORTANT:
+- This overlay does not delete or replace the existing Growth OS homepage.
+- It adds a lender/investor-ready top-level page.
+- The page uses existing public AtechSpot revenue-model pricing and live-property references.
+- CommerceFlow is described as a software concept / development roadmap, not as a launched product.
+- Use-of-funds percentages are explicitly illustrative.
+- No guaranteed returns, ranking claims, fabricated traction, or unsupported financial performance claims are included.
+
+AFTER UPLOAD:
+Open https://www.atechspot.com/funding.html
+Confirm mobile layout, buttons, ABC link, contact link and phone link.
+If Cloudflare Pages is serving the domain, deploy the files to the project source and purge cache only if the new page or nav does not appear after deployment.
