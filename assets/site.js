@@ -142,3 +142,8 @@ if(service){
   const serviceSelect=document.querySelector('#service-requested');
   if(serviceSelect){const match=[...serviceSelect.options].find(option=>option.value===service||option.textContent.trim()===service);if(match)serviceSelect.value=match.value;}
 }
+
+// Replace the retired BookBaby profile URL everywhere with the current live product page.
+document.querySelectorAll('a[href="https://store.bookbaby.com/profile/abc"]').forEach(link=>{
+  link.href='https://store.bookbaby.com/book/a-techucations-abcs-of-technology';
+});
