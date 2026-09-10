@@ -16,3 +16,6 @@
 /terms/ /terms/index.html 200
 /accessibility /accessibility/index.html 200
 /accessibility/ /accessibility/index.html 200
+/ecosystem.html /ecosystem/ 301
+/ecosystem /ecosystem/index.html 200
+/ecosystem/ /ecosystem/index.html 200
