@@ -9,12 +9,15 @@
 /contact/ /contact/index.html 200
 /solutions /solutions/ 301
 /solutions/ /solutions/index.html 200
-/services /solutions/ 301
-/services.html /solutions/ 301
-/apps /solutions/ 301
-/apps.html /solutions/ 301
-/about /#about 301
-/about.html /#about 301
+/services /services/ 301
+/services.html /services/ 301
+/services/ /services/index.html 200
+/apps /apps/ 301
+/apps.html /apps/ 301
+/apps/ /apps/index.html 200
+/about /about/ 301
+/about.html /about/ 301
+/about/ /about/index.html 200
 /data-recovery /data-recovery/index.html 200
 /data-recovery/ /data-recovery/index.html 200
 /payment /payment/index.html 200
@@ -32,10 +35,10 @@
 # Retire obsolete ATechSpot full-site builds so only the canonical production architecture is crawlable.
 /atechspot-final-website / 301
 /atechspot-final-website/ / 301
-/atechspot-final-website/services.html /solutions/ 301
-/atechspot-final-website/apps.html /solutions/ 301
+/atechspot-final-website/services.html /services/ 301
+/atechspot-final-website/apps.html /apps/ 301
 /atechspot-final-website/ecosystem.html /ecosystem/ 301
-/atechspot-final-website/about.html /#about 301
+/atechspot-final-website/about.html /about/ 301
 /atechspot-final-website/contact.html /contact/ 301
 /atechspot-final-website/* / 301
 /atechspot-ai-site / 301
