@@ -28,12 +28,27 @@
 /ecosystem.html /ecosystem/ 301
 /ecosystem /ecosystem/ 301
 /ecosystem/ /ecosystem/index.html 200
+
+# Retire obsolete ATechSpot full-site builds so only the canonical production architecture is crawlable.
 /atechspot-final-website / 301
 /atechspot-final-website/ / 301
-/atechspot-final-website/index.html / 301
 /atechspot-final-website/services.html /solutions/ 301
 /atechspot-final-website/apps.html /solutions/ 301
 /atechspot-final-website/ecosystem.html /ecosystem/ 301
 /atechspot-final-website/about.html /#about 301
 /atechspot-final-website/contact.html /contact/ 301
 /atechspot-final-website/* / 301
+/atechspot-ai-site / 301
+/atechspot-ai-site/* / 301
+/atechspot-site / 301
+/atechspot-site/* / 301
+/atechspot-01-production-10-10 / 301
+/atechspot-01-production-10-10/* / 301
+/main-site / 301
+/main-site/* / 301
+/AtechSpot-GrowthOS-Portfolio-Proof-Merge-10of10 / 301
+/AtechSpot-GrowthOS-Portfolio-Proof-Merge-10of10/* / 301
+/AtechSpot_V24_CLOUDFLARE_READY_DEPLOYMENT_INTRO_PRODUCTS_FORMS / 301
+/AtechSpot_V24_CLOUDFLARE_READY_DEPLOYMENT_INTRO_PRODUCTS_FORMS/* / 301
+/A-Techucation-Website https://atechucation.atechspot.com/ 301
+/A-Techucation-Website/* https://atechucation.atechspot.com/ 301
