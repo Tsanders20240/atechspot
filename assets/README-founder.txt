@@ -1,0 +1,1 @@
+Founder portrait production note: final founder portrait asset is being replaced with an optimized WebP and loaded directly by the homepage. This text file may be removed after verification.
