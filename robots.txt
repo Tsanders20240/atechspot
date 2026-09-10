@@ -1,6 +1,8 @@
 User-agent: *
 Allow: /
-Sitemap: https://atechspot.com/sitemap.xml
-
-Disallow: /internal-forms
-Disallow: /internal-forms.html
+Disallow: /api/
+Disallow: /client-portal/
+Disallow: /payment/
+Disallow: /booking/
+Disallow: /intake/
+Sitemap: https://www.atechspot.com/sitemap.xml
