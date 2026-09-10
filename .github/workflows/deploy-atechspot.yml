@@ -4,7 +4,20 @@ on:
   push:
     branches: [main]
     paths:
+      - 'index.html'
+      - 'contact.html'
+      - 'contact/**'
+      - 'intake.html'
+      - 'intake/**'
+      - 'assets/**'
+      - 'functions/**'
       - 'atechspot-final-website/**'
+      - '_worker.js'
+      - '_routes.json'
+      - '_redirects'
+      - '_headers'
+      - 'wrangler.jsonc'
+      - 'package.json'
       - '.github/workflows/deploy-atechspot.yml'
   workflow_dispatch:
 
@@ -35,4 +48,4 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: npx --yes wrangler@latest pages deploy atechspot-final-website --project-name atechspot-v5 --branch main
+        run: npx --yes wrangler@latest pages deploy . --project-name atechspot --branch main
