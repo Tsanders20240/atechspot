@@ -65,32 +65,76 @@
     resize();addEventListener('resize',resize);draw();
   }
 
-  /* Founder portrait: bypass the SVG wrapper so the production card loads the real web image directly. */
+  /* Founder portrait: always load the sharp production WebP directly. */
   const founderImg=document.querySelector('.founder-photo-card img');
   if(founderImg){
-    founderImg.src='/assets/atechspot-founder-ceo.webp?v=20260910-5';
+    founderImg.src='/assets/atechspot-founder-ceo.webp?v=20260910-6';
     founderImg.removeAttribute('srcset');
     founderImg.loading='eager';
     founderImg.decoding='async';
+    founderImg.style.opacity='1';
   }
 
-  /* ATechSpot brand polish: use the previous ATechSpot logo, larger, with its white canvas keyed out on the dark Command Center background. */
-  document.body.insertAdjacentHTML('afterbegin', `<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs><filter id="atechLogoWhiteToAlpha" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  -1 -1 -1 3 0"/></filter></defs></svg>`);
+  /* Exact legacy ATechSpot logo, enlarged and white background removed in-browser. */
   const logoStyle=document.createElement('style');
   logoStyle.textContent=`
-    .site-header .brand,.footer-brand{background-image:none!important;display:flex!important;align-items:center!important;width:245px!important;height:78px!important;overflow:visible!important;flex:0 0 245px!important}
-    .brand-logo-clean{display:block;width:auto;height:82px;max-width:245px;object-fit:contain;object-position:left center;filter:url(#atechLogoWhiteToAlpha) saturate(1.2) brightness(1.25) drop-shadow(0 0 15px rgba(76,179,255,.26));transform:scale(1.18);transform-origin:left center}
-    .footer-brand .brand-logo-clean{height:88px;filter:url(#atechLogoWhiteToAlpha) saturate(1.15) brightness(1.28) drop-shadow(0 0 13px rgba(76,179,255,.20))}
-    @media(max-width:650px){.site-header .brand{width:195px!important;flex-basis:195px!important}.brand-logo-clean{height:70px;max-width:195px;transform:scale(1.10)}.footer-brand .brand-logo-clean{height:74px}}
+    .site-header{min-height:88px}
+    .site-header .brand,.footer-brand{background:none!important;filter:none!important;width:285px!important;height:76px!important;flex:0 0 285px!important;display:flex!important;align-items:center!important;overflow:visible!important}
+    .brand .brand-mark,.brand .brand-name{display:none!important}
+    .brand-logo-clean{display:block;width:285px;height:76px;object-fit:contain;object-position:left center;filter:drop-shadow(0 0 14px rgba(76,179,255,.20));opacity:1}
+    .footer-brand{width:300px!important;height:82px!important;flex-basis:300px!important}
+    .footer-brand .brand-logo-clean{width:300px;height:82px}
+    @media(max-width:650px){.site-header{min-height:76px}.site-header .brand{width:205px!important;height:62px!important;flex-basis:205px!important}.brand-logo-clean{width:205px;height:62px}.footer-brand{width:220px!important;height:66px!important;flex-basis:220px!important}.footer-brand .brand-logo-clean{width:220px;height:66px}}
   `;
   document.head.appendChild(logoStyle);
-  document.querySelectorAll('.brand').forEach(brand=>{
-    if(brand.querySelector('.brand-logo-clean')) return;
-    const img=document.createElement('img');
-    img.className='brand-logo-clean';
-    img.src='/assets/atechspot-logo.png?v=20260910-5';
-    img.alt='ATechSpot';
-    img.decoding='async';
-    brand.prepend(img);
-  });
+
+  const processLogo=()=>{
+    const source=new Image();
+    source.decoding='async';
+    source.src='/assets/atechspot-logo.png?v=20260910-6';
+    source.onload=()=>{
+      try{
+        const canvas=document.createElement('canvas');
+        const max=1400;
+        const scale=Math.min(1,max/source.naturalWidth,max/source.naturalHeight);
+        canvas.width=Math.max(1,Math.round(source.naturalWidth*scale));
+        canvas.height=Math.max(1,Math.round(source.naturalHeight*scale));
+        const ctx=canvas.getContext('2d',{willReadFrequently:true});
+        ctx.drawImage(source,0,0,canvas.width,canvas.height);
+        const image=ctx.getImageData(0,0,canvas.width,canvas.height);
+        const d=image.data;
+        let minX=canvas.width,minY=canvas.height,maxX=-1,maxY=-1;
+        for(let y=0;y<canvas.height;y++){
+          for(let x=0;x<canvas.width;x++){
+            const i=(y*canvas.width+x)*4;
+            const r=d[i],g=d[i+1],b=d[i+2];
+            const low=Math.min(r,g,b);
+            if(r>242&&g>242&&b>242){d[i+3]=0;continue;}
+            if(r>218&&g>218&&b>218){d[i+3]=Math.max(0,Math.round((242-low)/24*255));}
+            if(d[i+3]>12){if(x<minX)minX=x;if(y<minY)minY=y;if(x>maxX)maxX=x;if(y>maxY)maxY=y;}
+          }
+        }
+        ctx.putImageData(image,0,0);
+        if(maxX<minX||maxY<minY) throw new Error('Logo bounds unavailable');
+        const pad=Math.max(8,Math.round(Math.max(maxX-minX,maxY-minY)*.025));
+        minX=Math.max(0,minX-pad);minY=Math.max(0,minY-pad);maxX=Math.min(canvas.width-1,maxX+pad);maxY=Math.min(canvas.height-1,maxY+pad);
+        const out=document.createElement('canvas');
+        out.width=maxX-minX+1;out.height=maxY-minY+1;
+        out.getContext('2d').drawImage(canvas,minX,minY,out.width,out.height,0,0,out.width,out.height);
+        const transparentLogo=out.toDataURL('image/png');
+        document.querySelectorAll('.brand').forEach(brand=>{
+          let img=brand.querySelector('.brand-logo-clean');
+          if(!img){img=document.createElement('img');img.className='brand-logo-clean';img.alt='ATechSpot';brand.prepend(img);}
+          img.src=transparentLogo;
+        });
+      }catch(err){
+        document.querySelectorAll('.brand').forEach(brand=>{
+          let img=brand.querySelector('.brand-logo-clean');
+          if(!img){img=document.createElement('img');img.className='brand-logo-clean';img.alt='ATechSpot';brand.prepend(img);}
+          img.src='/assets/atechspot-logo.png?v=20260910-6';
+        });
+      }
+    };
+  };
+  processLogo();
 })();
