@@ -5,8 +5,8 @@
   "version": "25.0.0",
   "scripts": {
     "dev": "wrangler pages dev .",
-    "deploy": "wrangler pages deploy . --project-name atechspot-v5 --branch main",
-    "deploy:preview": "wrangler pages deploy . --project-name atechspot-v5 --branch v24-preview"
+    "deploy": "wrangler pages deploy . --project-name atechspot --branch main",
+    "deploy:preview": "wrangler pages deploy . --project-name atechspot --branch preview"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"
