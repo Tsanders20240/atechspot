@@ -13,11 +13,10 @@ function contactRouteFromEmailHref(href){
     params.set('department',department);
     const subject=sourceParams.get('subject');
     if(subject) params.set('subject',subject);
-    return `/contact.html?${params.toString()}`;
+    return `/contact.html?${params.toString()}#contact-form`;
   }catch{return '/contact.html';}
 }
 
-// Keep ATechSpot correspondence inside the website instead of launching a device email app.
 document.addEventListener('click',event=>{
   const link=event.target.closest&&event.target.closest('a[href^="mailto:"]');
   if(!link) return;
@@ -27,8 +26,29 @@ document.addEventListener('click',event=>{
   window.location.href=route;
 },true);
 
-function formPayload(form){
-  return Object.fromEntries(new FormData(form).entries());
+const DEPARTMENT_EMAILS={
+  jason:'jason@atechspot.com',
+  support:'support@atechspot.com',
+  partnerships:'partnerships@atechspot.com',
+  operations:'operations@atechspot.com',
+  legal:'legal@atechspot.com'
+};
+
+function formPayload(form){return Object.fromEntries(new FormData(form).entries());}
+
+function webEmailUrl(form){
+  const data=formPayload(form);
+  const department=String(data.Department||'jason').toLowerCase();
+  const to=DEPARTMENT_EMAILS[department]||DEPARTMENT_EMAILS.jason;
+  const subject=String(data.Subject||data.Topic||data.Service||form.dataset.formType||'ATechSpot Website Inquiry').trim();
+  const ignored=new Set(['website','form_started_at','cf-turnstile-response']);
+  const lines=[];
+  Object.entries(data).forEach(([key,value])=>{
+    const text=String(value??'').trim();
+    if(!ignored.has(key)&&text) lines.push(`${key}: ${text}`);
+  });
+  lines.push('','Sent from ATechSpot.com');
+  return `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(to)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
 }
 
 async function sendWebsiteForm(form){
@@ -40,14 +60,22 @@ async function sendWebsiteForm(form){
   });
   let result={};
   try{result=await response.json();}catch{}
-  if(!response.ok) throw new Error(result.message||`Form delivery failed (${response.status}).`);
+  if(!response.ok){
+    const error=new Error(result.message||`Form delivery failed (${response.status}).`);
+    error.status=response.status;
+    throw error;
+  }
   return result;
 }
 
-document.querySelectorAll('[data-email-form]').forEach(form=>{
+function openWebEmailFallback(form,status){
+  if(status) status.textContent='Opening your web email with this message prefilled…';
+  window.location.href=webEmailUrl(form);
+}
+
+function wireForm(form){
   const started=form.querySelector('input[name="form_started_at"]');
   if(started) started.value=String(Date.now());
-
   form.addEventListener('submit',async event=>{
     event.preventDefault();
     if(!form.reportValidity()) return;
@@ -61,13 +89,18 @@ document.querySelectorAll('[data-email-form]').forEach(form=>{
       form.reset();
       if(started) started.value=String(Date.now());
     }catch(error){
-      if(status){
-        status.innerHTML=`${error.message} Please use the <a href="/contact.html">ATechSpot contact page</a> or call (713) 396-2993.`;
-      }
+      openWebEmailFallback(form,status);
+      return;
     }finally{
       if(button) button.disabled=false;
     }
   });
+}
+
+document.querySelectorAll('[data-email-form]').forEach(wireForm);
+document.querySelectorAll('[data-secure-form]').forEach(form=>{
+  if(form.matches('[data-email-form]')) return;
+  wireForm(form);
 });
 
 const toggle=document.querySelector('.mobile-toggle'),menu=document.querySelector('.menu');
@@ -99,58 +132,13 @@ const meeting=params.get('meeting');
 const topic=params.get('topic');
 const department=params.get('department');
 const subject=params.get('subject');
-if(service){
-  document.querySelectorAll('select[name="Service"]').forEach(select=>{
-    const match=[...select.options].find(o=>o.value===service||o.textContent===service);
-    if(match)select.value=match.value;
-  });
-}
-if(meeting){
-  document.querySelectorAll('select[name="Preferred Meeting"]').forEach(select=>{
-    const match=[...select.options].find(o=>o.value===meeting||o.textContent.includes(meeting));
-    if(match)select.value=match.value;
-  });
-}
+if(service){document.querySelectorAll('select[name="Service"]').forEach(select=>{const match=[...select.options].find(o=>o.value===service||o.textContent===service);if(match)select.value=match.value;});}
+if(meeting){document.querySelectorAll('select[name="Preferred Meeting"]').forEach(select=>{const match=[...select.options].find(o=>o.value===meeting||o.textContent.includes(meeting));if(match)select.value=match.value;});}
 if(topic)document.querySelectorAll('input[name="Topic"]').forEach(input=>input.value=topic);
-if(department){
-  document.querySelectorAll('select[name="Department"]').forEach(select=>{
-    const match=[...select.options].find(o=>o.value===department);
-    if(match)select.value=match.value;
-  });
-}
+if(department){document.querySelectorAll('select[name="Department"]').forEach(select=>{const match=[...select.options].find(o=>o.value===department);if(match)select.value=match.value;});}
 if(subject)document.querySelectorAll('input[name="Subject"]').forEach(input=>input.value=subject);
 
-const intakeService=params.get('service');
-if(intakeService){
+if(service){
   const serviceSelect=document.querySelector('#service-requested');
-  if(serviceSelect){
-    const match=[...serviceSelect.options].find(option=>option.value===intakeService||option.textContent.trim()===intakeService);
-    if(match)serviceSelect.value=match.value;
-  }
+  if(serviceSelect){const match=[...serviceSelect.options].find(option=>option.value===service||option.textContent.trim()===service);if(match)serviceSelect.value=match.value;}
 }
-
-// Previously these forms opened a mail client. They now use the same website delivery endpoint.
-document.querySelectorAll('[data-secure-form]').forEach(form=>{
-  const started=form.querySelector('input[name="form_started_at"]');
-  if(started)started.value=String(Date.now());
-  form.addEventListener('submit',async event=>{
-    event.preventDefault();
-    if(!form.reportValidity())return;
-    const data=formPayload(form);
-    if(String(data.website||'').trim())return;
-    const status=form.querySelector('[data-status]');
-    const button=form.querySelector('button[type="submit"]');
-    if(status)status.textContent='Sending your request…';
-    if(button)button.disabled=true;
-    try{
-      const result=await sendWebsiteForm(form);
-      if(status)status.textContent=result.message||'Thank you. Your request was sent successfully.';
-      form.reset();
-      if(started)started.value=String(Date.now());
-    }catch(error){
-      if(status)status.innerHTML=`${error.message} Please use the <a href="/contact.html">ATechSpot contact page</a> or call (713) 396-2993.`;
-    }finally{
-      if(button)button.disabled=false;
-    }
-  });
-});
