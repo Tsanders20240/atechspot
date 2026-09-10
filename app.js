@@ -38,20 +38,51 @@
 
   const routeResult = document.getElementById('routeResult');
   const routes = {
-    website: 'Recommended starting point: Website & Conversion Architecture — audit the message, search intent, customer path and conversion friction before rebuilding.',
-    automation: 'Recommended starting point: Automation Opportunity Map — identify repetitive work, trigger points, handoffs and tasks that can be safely automated.',
-    systems: 'Recommended starting point: Business Systems Architecture — map the current tools, data flow, ownership and integration gaps before adding new software.',
-    app: 'Recommended starting point: App Discovery — define the user, problem, workflow, must-have functionality and success metric before development.',
-    ai: 'Recommended starting point: AI Readiness Review — prioritize practical AI use cases around measurable business value, approved data and human oversight.',
-    ecommerce: 'Recommended starting point: Ecommerce Revenue Review — inspect product discovery, merchandising, trust, checkout friction, follow-up and retention.'
+    website: {
+      text: 'Recommended starting point: Website & Conversion Architecture — audit the message, search intent, customer path and conversion friction before rebuilding.',
+      topic: 'Website, Funnel or Conversion System'
+    },
+    automation: {
+      text: 'Recommended starting point: Automation Opportunity Map — identify repetitive work, trigger points, handoffs and tasks that can be safely automated.',
+      topic: 'Business Automation'
+    },
+    systems: {
+      text: 'Recommended starting point: Business Systems Architecture — map the current tools, data flow, ownership and integration gaps before adding new software.',
+      topic: 'Not sure — diagnose the problem first'
+    },
+    app: {
+      text: 'Recommended starting point: App Discovery — define the user, problem, workflow, must-have functionality and success metric before development.',
+      topic: 'Business App or Internal Tool'
+    },
+    ai: {
+      text: 'Recommended starting point: AI Readiness Review — prioritize practical AI use cases around measurable business value, approved data and human oversight.',
+      topic: 'AI Strategy & Implementation'
+    },
+    ecommerce: {
+      text: 'Recommended starting point: Ecommerce Revenue Review — inspect product discovery, merchandising, trust, checkout friction, follow-up and retention.',
+      topic: 'Ecommerce Growth System'
+    }
   };
   document.querySelectorAll('.problem-card').forEach(card => card.addEventListener('click', () => {
     if (!routeResult) return;
-    routeResult.textContent = routes[card.dataset.route];
+    const recommendation = routes[card.dataset.route];
+    if (!recommendation) return;
+    const intakeUrl = `/intake/?topic=${encodeURIComponent(recommendation.topic)}#project-intake`;
+    routeResult.innerHTML = `<div class="route-copy"><strong>Your recommended starting point</strong><span>${recommendation.text}</span></div><div class="route-actions"><a class="btn btn-primary" href="${intakeUrl}">Continue With This Need →</a><a class="btn btn-ghost" href="/contact/">Ask ATechSpot a Question</a></div>`;
     routeResult.classList.add('show');
     routeResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    if (window.gtag) gtag('event', 'assessment_route_selected', { route: card.dataset.route });
+    if (window.gtag) gtag('event', 'assessment_route_selected', { route: card.dataset.route, recommended_topic: recommendation.topic });
   }));
+
+  const conversionStyle = document.createElement('style');
+  conversionStyle.textContent = `
+    .route-result.show{display:grid;grid-template-columns:1.3fr .7fr;gap:22px;align-items:center;padding:24px;border:1px solid #23506f;border-radius:18px;background:linear-gradient(135deg,#091d2e,#07131f)}
+    .route-copy{display:grid;gap:7px}.route-copy strong{color:#65dff0;font-size:11px;letter-spacing:.12em;text-transform:uppercase}.route-copy span{color:#b2c5d4;line-height:1.65}
+    .route-actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}.route-actions .btn{white-space:nowrap}
+    .founder-id{margin:0 0 18px!important;padding:12px 14px;border-left:2px solid #65dff0;background:#071827;border-radius:8px;color:#dcebf7!important}.founder-id strong{color:#fff}.founder-id span{color:#7f9aae}
+    @media(max-width:760px){.route-result.show{grid-template-columns:1fr}.route-actions{justify-content:flex-start}}
+  `;
+  document.head.appendChild(conversionStyle);
 
   const canvas = document.getElementById('networkCanvas');
   if (canvas && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -106,11 +137,32 @@
   const founderImg = document.querySelector('.founder-photo-card img');
   if (founderImg) {
     founderImg.src = '/assets/atechspot-founder-ceo.webp?v=20260910-10';
+    founderImg.alt = 'Jason Hughes, Founder and CEO of ATechSpot, in the ATechSpot technology command center';
     founderImg.removeAttribute('srcset');
     founderImg.loading = 'lazy';
     founderImg.decoding = 'async';
     founderImg.style.opacity = '1';
   }
+
+  const founderCopy = document.querySelector('.founder-copy');
+  if (founderCopy && !founderCopy.querySelector('.founder-id')) {
+    const firstParagraph = founderCopy.querySelector('p');
+    const identity = document.createElement('p');
+    identity.className = 'founder-id';
+    identity.innerHTML = '<strong>Jason Hughes</strong> <span>· Founder &amp; CEO, ATechSpot</span>';
+    if (firstParagraph) founderCopy.insertBefore(identity, firstParagraph);
+    else founderCopy.appendChild(identity);
+  }
+
+  /* Give every offer a clear conversion destination. */
+  document.querySelectorAll('.price-card').forEach(card => {
+    const title = card.querySelector('h3')?.textContent.trim();
+    const link = card.querySelector('a');
+    if (!link) return;
+    if (title === 'Executive Growth Review') link.href = '/intake/?topic=Executive%20Growth%20Review#project-intake';
+    if (title === 'Implementation') link.href = '/intake/#project-intake';
+    if (title === 'GrowthCare') link.href = '/intake/?topic=GrowthCare%20Ongoing%20Optimization#project-intake';
+  });
 
   /* Exact ATechSpot logo treatment. Keep the CSS wordmark as a fail-safe, and
      remove only edge-connected near-white pixels so internal white logo details survive. */
