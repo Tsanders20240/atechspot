@@ -1,4 +1,3 @@
-
 const JSON_HEADERS = {
   "content-type": "application/json; charset=utf-8",
   "cache-control": "no-store"
@@ -28,7 +27,7 @@ async function parseBody(request) {
   return Object.fromEntries(form.entries());
 }
 
-async function deliverLead({ request, env, leadType, requiredFields }) {
+async function deliverLead({ request, env, defaultLeadType }) {
   let body;
   try {
     body = await parseBody(request);
@@ -36,6 +35,7 @@ async function deliverLead({ request, env, leadType, requiredFields }) {
     return json(400, { ok: false, message: "Invalid form submission." });
   }
 
+  // Honeypot: return a neutral success response to automated spam.
   if (clean(body.website, 100)) {
     return json(200, { ok: true, message: "Thank you." });
   }
@@ -51,6 +51,7 @@ async function deliverLead({ request, env, leadType, requiredFields }) {
 
   const name = clean(body["Full Name"] || body.Name, 120);
   const email = clean(body.Email, 254);
+  const message = clean(body.Message, 4000);
 
   if (name.length < 2 || !validEmail(email)) {
     return json(400, {
@@ -59,13 +60,14 @@ async function deliverLead({ request, env, leadType, requiredFields }) {
     });
   }
 
-  for (const field of requiredFields) {
-    if (!clean(body[field], 4000)) {
-      return json(400, {
-        ok: false,
-        message: `Complete the ${field} field.`
-      });
-    }
+  // Message is the only universal required field. The project intake requires
+  // Topic in its HTML; the general Contact form intentionally allows Subject
+  // to remain optional, so both forms can share this endpoint safely.
+  if (!message) {
+    return json(400, {
+      ok: false,
+      message: "Complete the Message field."
+    });
   }
 
   if (!env.RESEND_API_KEY) {
@@ -90,6 +92,7 @@ async function deliverLead({ request, env, leadType, requiredFields }) {
     return json(400, { ok: false, message: "Submission rejected." });
   }
 
+  const leadType = clean(body["Form Type"], 120) || defaultLeadType;
   const rows = Object.entries(fields).map(([key, value]) => `
     <tr>
       <th style="text-align:left;vertical-align:top;padding:9px;border:1px solid #d8e0e8;background:#f4f7fa">
@@ -116,10 +119,10 @@ async function deliverLead({ request, env, leadType, requiredFields }) {
         from: sender,
         to: [recipient],
         reply_to: email,
-        subject: `[AtechSpot Website] ${leadType} — ${name}`,
+        subject: `[ATechSpot Website] ${leadType} — ${name}`,
         html: `
           <h2>${escapeHtml(leadType)}</h2>
-          <p>A new request was submitted through AtechSpot.com.</p>
+          <p>A new request was submitted through ATechSpot.com.</p>
           <table style="border-collapse:collapse;width:100%;max-width:850px">${rows}</table>
           <p style="margin-top:18px;color:#5f6f7f">
             Reply to this email to respond directly to ${escapeHtml(name)} at ${escapeHtml(email)}.
@@ -142,13 +145,13 @@ async function deliverLead({ request, env, leadType, requiredFields }) {
     return json(503, {
       ok: false,
       code: "RESEND_REJECTED",
-      message: "The email provider rejected the message. Confirm the Cloudflare RESEND_API_KEY secret and use onboarding@resend.dev until your domain is verified."
+      message: "The email provider rejected the message. Confirm the Cloudflare RESEND_API_KEY secret and sender-domain configuration."
     });
   }
 
   return json(200, {
     ok: true,
-    message: "Thank you. Your request was emailed successfully."
+    message: "Thank you. Your request was sent successfully."
   });
 }
 
@@ -156,8 +159,7 @@ export async function onRequestPost({ request, env }) {
   return deliverLead({
     request,
     env,
-    leadType: "Contact / Service Intake",
-    requiredFields: ["Topic", "Message"]
+    defaultLeadType: "Contact / Project Intake"
   });
 }
 
