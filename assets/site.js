@@ -34,7 +34,11 @@ const DEPARTMENT_EMAILS={
   legal:'legal@atechspot.com'
 };
 
-function formPayload(form){return Object.fromEntries(new FormData(form).entries());}
+function formPayload(form){
+  const data=Object.fromEntries(new FormData(form).entries());
+  if(form.dataset.formType)data['Form Type']=form.dataset.formType;
+  return data;
+}
 
 function webEmailUrl(form){
   const data=formPayload(form);
