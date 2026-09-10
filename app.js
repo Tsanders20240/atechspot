@@ -64,4 +64,24 @@
     };
     resize();addEventListener('resize',resize);draw();
   }
+
+  /* ATechSpot brand polish: restore the original logo at a larger size and visually remove its white canvas on the dark Command Center header/footer. */
+  document.body.insertAdjacentHTML('afterbegin', `<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute"><defs><filter id="atechLogoWhiteToAlpha" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  -1 -1 -1 3 0"/></filter></defs></svg>`);
+  const logoStyle=document.createElement('style');
+  logoStyle.textContent=`
+    .site-header .brand,.footer-brand{background-image:none!important;display:flex!important;align-items:center!important;width:230px!important;height:76px!important;overflow:visible!important;flex:0 0 230px!important}
+    .brand-logo-clean{display:block;width:auto;height:76px;max-width:230px;object-fit:contain;object-position:left center;filter:url(#atechLogoWhiteToAlpha) saturate(1.18) brightness(1.2) drop-shadow(0 0 13px rgba(76,179,255,.24));transform:scale(1.15);transform-origin:left center}
+    .footer-brand .brand-logo-clean{height:82px;filter:url(#atechLogoWhiteToAlpha) saturate(1.12) brightness(1.25) drop-shadow(0 0 12px rgba(76,179,255,.18))}
+    @media(max-width:650px){.site-header .brand{width:190px!important;flex-basis:190px!important}.brand-logo-clean{height:68px;max-width:190px;transform:scale(1.08)}.footer-brand .brand-logo-clean{height:72px}}
+  `;
+  document.head.appendChild(logoStyle);
+  document.querySelectorAll('.brand').forEach(brand=>{
+    if(brand.querySelector('.brand-logo-clean')) return;
+    const img=document.createElement('img');
+    img.className='brand-logo-clean';
+    img.src='/assets/atechspot-logo.png?v=20260910-4';
+    img.alt='ATechSpot';
+    img.decoding='async';
+    brand.prepend(img);
+  });
 })();
