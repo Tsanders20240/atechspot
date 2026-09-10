@@ -11,4 +11,10 @@ html{scroll-behavior:smooth} body{background:var(--v35-bg);color:var(--v35-ink);
 .v23-service-card,.v23-duo-card,.v26-panel,.v24-division-card{border-radius:28px!important;border:1px solid var(--v35-line)!important;box-shadow:0 8px 30px rgba(0,0,0,.05)!important;transition:transform .28s ease,box-shadow .28s ease!important}
 .v23-service-card:hover,.v23-duo-card:hover,.v26-panel:hover,.v24-division-card:hover{transform:translateY(-4px);box-shadow:0 18px 50px rgba(0,0,0,.08)!important}
 .v23-dark,.v23-final{background:#000!important}.footer{background:#f5f5f7!important;color:#424245!important;border-top:1px solid var(--v35-line)}
-@media (max-width:760px){.v23-section{padding:64px 0!important}.v23-hero{padding-top:56px!important;padding-bottom:56px!important}.v23-hero h1{font-size:clamp(2.8rem,15vw,4.5rem)!important}}
+
+/* ATechSpot brand lockup for atechspot.com pages, including intake/contact. */
+.header .brand{display:block!important;width:265px!important;height:58px!important;flex:0 0 265px!important;background:url('/atechspot-final-website/assets/atechspot-logo.png') left center/contain no-repeat!important;color:transparent!important;font-size:0!important;overflow:hidden!important;white-space:nowrap!important}
+.header .brand .mark,.header .brand>span{display:none!important}
+
+@media (max-width:980px){.header .brand{width:220px!important;height:52px!important;flex-basis:220px!important}}
+@media (max-width:760px){.v23-section{padding:64px 0!important}.v23-hero{padding-top:56px!important;padding-bottom:56px!important}.v23-hero h1{font-size:clamp(2.8rem,15vw,4.5rem)!important}.header .brand{width:185px!important;height:46px!important;flex-basis:185px!important}}
