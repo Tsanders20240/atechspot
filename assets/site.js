@@ -13,8 +13,8 @@ function contactRouteFromEmailHref(href){
     params.set('department',department);
     const subject=sourceParams.get('subject');
     if(subject) params.set('subject',subject);
-    return `/contact.html?${params.toString()}#contact-form`;
-  }catch{return '/contact.html';}
+    return `/contact/?${params.toString()}#contact-form`;
+  }catch{return '/contact/';}
 }
 
 document.addEventListener('click',event=>{
@@ -73,6 +73,12 @@ function openWebEmailFallback(form,status){
   window.location.href=webEmailUrl(form);
 }
 
+function trackFormSuccess(form){
+  const formType=form.dataset.formType||'ATechSpot Website Form';
+  if(typeof window.gtag==='function')window.gtag('event','form_submit_success',{form_type:formType,page_location:window.location.href});
+  if(typeof window.clarity==='function')window.clarity('event','form_submit_success');
+}
+
 function wireForm(form){
   const started=form.querySelector('input[name="form_started_at"]');
   if(started) started.value=String(Date.now());
@@ -86,6 +92,7 @@ function wireForm(form){
     try{
       const result=await sendWebsiteForm(form);
       if(status) status.textContent=result.message||'Thank you. Your request was sent successfully.';
+      trackFormSuccess(form);
       form.reset();
       if(started) started.value=String(Date.now());
     }catch(error){
@@ -134,7 +141,14 @@ const department=params.get('department');
 const subject=params.get('subject');
 if(service){document.querySelectorAll('select[name="Service"]').forEach(select=>{const match=[...select.options].find(o=>o.value===service||o.textContent===service);if(match)select.value=match.value;});}
 if(meeting){document.querySelectorAll('select[name="Preferred Meeting"]').forEach(select=>{const match=[...select.options].find(o=>o.value===meeting||o.textContent.includes(meeting));if(match)select.value=match.value;});}
-if(topic)document.querySelectorAll('input[name="Topic"]').forEach(input=>input.value=topic);
+if(topic){
+  document.querySelectorAll('input[name="Topic"]').forEach(input=>input.value=topic);
+  document.querySelectorAll('select[name="Topic"]').forEach(select=>{
+    const normalized=topic.trim().toLowerCase();
+    const match=[...select.options].find(o=>o.value.trim().toLowerCase()===normalized||o.textContent.trim().toLowerCase()===normalized);
+    if(match)select.value=match.value;
+  });
+}
 if(department){document.querySelectorAll('select[name="Department"]').forEach(select=>{const match=[...select.options].find(o=>o.value===department);if(match)select.value=match.value;});}
 if(subject)document.querySelectorAll('input[name="Subject"]').forEach(input=>input.value=subject);
 
