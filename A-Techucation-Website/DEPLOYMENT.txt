@@ -1,17 +1,46 @@
-A+ TECHUCATION — DEPLOYMENT
+A+ TECHUCATION — WEBSITE #2 DEPLOYMENT
 
-Upload every file in this folder to the production root for www.atechspot.com.
-The _redirects file supports Cloudflare Pages and Netlify history fallback.
+Canonical production URL:
+https://atechucation.atechspot.com/
 
-This single package detects the hostname and preserves the branded experiences for:
-www.atechspot.com, abcoftech.atechspot.com, abctechproducts.atechspot.com,
-ascrfinancial.atechspot.com, atechucationfigures.atechspot.com,
-atechnetwork.atechspot.com, auto.atechspot.com, credit.atechspot.com,
-hazil.atechspot.com, hazilflix.atechspot.com, mraplusportfolio.atechspot.com,
-and visionofsanders.atechspot.com.
+IMPORTANT ARCHITECTURE RULE
+- Deploy ONLY the A-Techucation-Website folder to the dedicated A+ Techucation Cloudflare Worker/project configured as `icy-dew-8c6c`.
+- NEVER upload this folder to the root of www.atechspot.com.
+- www.atechspot.com is the separate ATechSpot corporate/technology property (Website #1).
 
-Before launch, confirm the intake destination and legal pages at:
-https://www.atechspot.com/intake
-https://www.atechspot.com/privacy
-https://www.atechspot.com/terms
-https://www.atechspot.com/accessibility
+AUTOMATED DEPLOYMENT
+The repository workflow `.github/workflows/deploy-atechucation.yml` deploys this folder when files under A-Techucation-Website/** change.
+Required GitHub repository secrets:
+- CLOUDFLARE_API_TOKEN
+- CLOUDFLARE_ACCOUNT_ID
+
+PRODUCTION QA
+Confirm:
+- https://atechucation.atechspot.com/
+- /privacy/
+- /terms/
+- /accessibility/
+- /onboarding/
+- transparent header and hero logos (no white logo box)
+- six learning schools
+- animated AI teacher characters
+- lesson previews
+- placement assessment
+- member dashboard/progress preview
+- Tech Guru and RemoteCare cross-links
+- 22-property ecosystem link
+
+CHECKOUT
+Live production membership buttons must not use Stripe test URLs.
+Stripe TEST MODE links are available only for operator QA when the page is opened with `?stripe-test=1` or on a workers.dev/pages.dev preview.
+Test mode tiers:
+- Starter $19/month
+- Pro $39/month
+- Business $79/month
+Production live charging requires live-mode Stripe products/payment links or a production Checkout integration before switching the public CTAs.
+
+ONBOARDING
+Stripe test checkout redirects to `/onboarding/?plan=<tier>&session_id={CHECKOUT_SESSION_ID}`. The onboarding page must not treat a query-string session ID as proof of payment; actual membership activation must be based on Stripe/payment records.
+
+LEGAL / SUPPORT
+A+ Techucation remains the education property operated by A+ Techucation LLC. ATechSpot remains the flagship technology implementation brand. Use the local Privacy/Terms/Accessibility pages and secure ATechSpot support routes rather than mailto/Gmail popups.
