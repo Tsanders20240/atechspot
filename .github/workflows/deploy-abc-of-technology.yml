@@ -35,23 +35,59 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || (echo 'Missing CLOUDFLARE_API_TOKEN' && exit 1)
           test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo 'Missing CLOUDFLARE_ACCOUNT_ID' && exit 1)
 
+      - name: Build official book assets and 26 printable PDFs
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet reportlab pillow
+          python ABC-of-Technology-Website/scripts/build_page.py
+          python ABC-of-Technology-Website/scripts/decode_assets.py
+          python ABC-of-Technology-Website/scripts/build_coloring.py
+
       - name: Validate children-first 10/10 source
         shell: bash
         run: |
           set -euo pipefail
-          test -f ABC-of-Technology-Website/public/index.html
-          test -f ABC-of-Technology-Website/worker.js
-          test -f ABC-of-Technology-Website/wrangler.jsonc
-          node --check ABC-of-Technology-Website/worker.js
-          grep -q "Every letter is a" ABC-of-Technology-Website/public/index.html
-          grep -q "ABC Tech Bus" ABC-of-Technology-Website/public/index.html
-          grep -q "26 A–Z technology coloring activities" ABC-of-Technology-Website/public/index.html
-          grep -q "No checkout lives on this children's site" ABC-of-Technology-Website/public/index.html
-          grep -q "No child account" ABC-of-Technology-Website/public/index.html
-          grep -q "external retailer" ABC-of-Technology-Website/public/index.html
-          grep -q "abcoftech.atechspot.com" ABC-of-Technology-Website/wrangler.jsonc
-          if grep -Eqi 'stripe|paypal|card number|checkout session' ABC-of-Technology-Website/public/index.html ABC-of-Technology-Website/worker.js; then echo 'On-site payment code detected' && exit 1; fi
-          echo 'ABC of Technology source assertions passed.'
+          ROOT='ABC-of-Technology-Website'
+          HTML="$ROOT/public/index.html"
+          test -f "$HTML"
+          test -f "$ROOT/worker.js"
+          test -f "$ROOT/wrangler.jsonc"
+          node --check "$ROOT/worker.js"
+
+          test -f "$ROOT/public/assets/book/book-cover.webp"
+          test -f "$ROOT/public/assets/book/book-bus-crop.webp"
+          test -f "$ROOT/public/assets/book/book-page-title.webp"
+          test -f "$ROOT/public/assets/book/book-page-best-you.webp"
+          test -f "$ROOT/public/assets/book/book-page-a.webp"
+          grep -q 'ACTUAL BOOK PREVIEW' "$HTML"
+          grep -q 'book-page-title.webp' "$HTML"
+          grep -q 'book-page-best-you.webp' "$HTML"
+          grep -q 'book-page-a.webp' "$HTML"
+          grep -q 'book-bus-crop.webp' "$HTML"
+          grep -q 'book-cover.webp' "$HTML"
+
+          grep -q 'Every letter is a' "$HTML"
+          grep -q 'Pick a letter. The book bus takes you there.' "$HTML"
+          grep -q '26 A–Z technology coloring activities' "$HTML"
+          grep -q 'No child account' "$HTML"
+          grep -q 'external adult-managed retailers' "$HTML"
+          grep -q 'authors text-only' "$HTML"
+          ! grep -q '/assets/authors/' "$HTML"
+
+          test -f "$ROOT/public/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf"
+          test "$(find "$ROOT/public/downloads/coloring-pages" -maxdepth 1 -type f -name '[a-z]-*.pdf' | wc -l)" -eq 26
+          test -f "$ROOT/public/assets/coloring/coloring-preview-sheet.webp"
+          grep -q '/downloads/coloring-pages/' "$HTML"
+          grep -q '/assets/coloring/coloring-preview-sheet.webp' "$HTML"
+
+          grep -q 'does not collect card information or process a checkout' "$HTML"
+          if grep -Eqi 'stripe|paypal|card number|checkout session' "$HTML" "$ROOT/worker.js"; then
+            echo 'On-site payment code detected' && exit 1
+          fi
+
+          grep -q 'abcoftech.atechspot.com' "$ROOT/wrangler.jsonc"
+          echo 'ABC of Technology final 10/10 source assertions passed.'
 
       - name: Deploy dedicated custom-domain Worker
         working-directory: ABC-of-Technology-Website
@@ -60,12 +96,12 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx --yes wrangler@latest deploy
 
-      - name: Diagnose canonical domain
+      - name: Diagnose canonical domain and key routes
         shell: bash
         continue-on-error: true
         run: |
           sleep 7
-          for path in / /robots.txt /sitemap.xml /api/health /coloring/?letter=A; do
+          for path in / /robots.txt /sitemap.xml /api/health /coloring/?letter=A /coloring/?all=1 /downloads/coloring-pages/a-analog-phone.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-a.webp; do
             code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://abcoftech.atechspot.com${path}" || true)
             echo "$path -> $code"
           done
