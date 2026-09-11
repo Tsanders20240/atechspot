@@ -69,8 +69,11 @@ jobs:
         continue-on-error: true
         run: |
           sleep 6
-          for path in / /about/ /affiliate-disclosure/ /privacy/ /robots.txt /sitemap.xml /api/health; do
-            code=$(curl -sS -o /dev/null -w '%{http_code}' "https://abctechproducts.atechspot.com${path}" || true)
-            echo "$path -> $code"
+          for host in abctechproducts.atechspot.com www.abctechproducts.atechspot.com; do
+            echo "=== $host ==="
+            for path in / /about/ /affiliate-disclosure/ /privacy/ /robots.txt /sitemap.xml /api/health; do
+              code=$(curl -sS -o /dev/null -w '%{http_code}' "https://${host}${path}" || true)
+              echo "$path -> $code"
+            done
+            curl -sSI "https://${host}/" | head -n 15 || true
           done
-          curl -sSI https://abctechproducts.atechspot.com/ | head -n 25 || true
