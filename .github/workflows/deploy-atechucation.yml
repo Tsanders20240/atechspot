@@ -8,6 +8,10 @@ on:
       - '.github/workflows/deploy-atechucation.yml'
   workflow_dispatch:
 
+concurrency:
+  group: atechucation-production
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -30,9 +34,41 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || (echo "Missing CLOUDFLARE_API_TOKEN repository secret" && exit 1)
           test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "Missing CLOUDFLARE_ACCOUNT_ID repository secret" && exit 1)
 
+      - name: Validate membership payment source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f A-Techucation-Website/billing/index.html
+          test -f A-Techucation-Website/terms/index.html
+          test -f A-Techucation-Website/privacy/index.html
+          test -f A-Techucation-Website/payments-live.js
+          grep -q 'payments-live.js' A-Techucation-Website/index.html
+          grep -q 'https://buy.stripe.com/9B628s9Pw7D8bdpdma6EU01' A-Techucation-Website/payments-live.js
+          grep -q 'https://buy.stripe.com/8x2fZi0eWg9EepBfui6EU02' A-Techucation-Website/payments-live.js
+          grep -q 'https://buy.stripe.com/3cIdRa1j0bTo0yL5TI6EU03' A-Techucation-Website/payments-live.js
+          grep -q 'Renews monthly until canceled' A-Techucation-Website/payments-live.js
+          grep -q 'Cancel future renewals' A-Techucation-Website/billing/index.html
+          echo 'A+ Techucation payment source assertions passed.'
+
       - name: Deploy to Cloudflare Worker
         working-directory: A-Techucation-Website
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx --yes wrangler@latest deploy
+
+      - name: Verify canonical custom domain
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 5
+          for path in / /billing/ /terms/ /privacy/ /onboarding/; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' "https://atechucation.atechspot.com${path}")
+            echo "$path -> $code"
+            test "$code" = "200"
+          done
+          curl -fsS https://atechucation.atechspot.com/ -o /tmp/atechucation.html
+          grep -q 'A+ Techucation' /tmp/atechucation.html
+          curl -fsS https://atechucation.atechspot.com/billing/ -o /tmp/billing.html
+          grep -q 'Clear pricing. Simple cancellation.' /tmp/billing.html
+          echo 'A+ Techucation custom-domain payment QA passed.'
