@@ -3,6 +3,7 @@
   const CANONICAL_APP='/app/';
   const LEGACY_APP_PATHS=new Set(['/apps','/apps/','/apps.html']);
   const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const LIVE_PAYMENTS={executiveReview:'https://book.stripe.com/3cI3cw1j00aG6X93LA6EU04'};
 
   function normalizedPath(pathname){if(!pathname||pathname==='/index.html')return '/';if(pathname.endsWith('/index.html'))return pathname.slice(0,-10)||'/';return pathname.endsWith('/')||pathname.includes('.')?pathname:`${pathname}/`}
   function normalizeRoutes(){document.querySelectorAll('a[href]').forEach(link=>{const href=link.getAttribute('href');if(LEGACY_APP_PATHS.has(href))link.setAttribute('href',CANONICAL_APP);if(['/solutions','/solutions/','/solutions.html'].includes(href))link.setAttribute('href','/services/');if(href==='https://creator.atechspot.com/'||href==='https://creator.atechspot.com')link.setAttribute('href','/creator/');const clean={'/resources.html':'/resources/','/privacy.html':'/privacy/','/terms.html':'/terms/','/accessibility.html':'/accessibility/','/affiliate-disclosure.html':'/affiliate-disclosure/','/remote-support.html':'/remote-support/','/business.html':'/assessment/','/business/':'/assessment/'};if(clean[href])link.setAttribute('href',clean[href])})}
@@ -18,9 +19,32 @@
     if(growthPrimary){growthPrimary.href='/assessment/';growthPrimary.textContent='Start With My Business Assessment'}
   }
 
+  function wireLivePayments(){
+    if(normalizedPath(location.pathname)!=='/services/')return;
+    document.querySelectorAll('.price').forEach(card=>{
+      const title=(card.querySelector('h3')?.textContent||'').trim();
+      const link=card.querySelector('a');
+      if(!link)return;
+      if(title==='Executive Growth Review'){
+        link.href=LIVE_PAYMENTS.executiveReview;
+        link.textContent='Book securely with Stripe →';
+        link.setAttribute('aria-label','Book the $997 Executive Growth Review securely with Stripe');
+        link.dataset.livePayment='true';
+        const note=document.createElement('p');note.className='payment-disclosure';note.style.cssText='margin-top:10px;font-size:.78rem;line-height:1.5;color:#8fa5b7';note.innerHTML='One-time $997 charge. Review <a href="/payments/" style="color:#65dff0">Payments & Billing</a> and <a href="/terms/" style="color:#65dff0">Terms</a> before checkout.';card.appendChild(note);
+      }
+      if(title==='Project Build'){
+        link.href='/intake/';link.textContent='Get written scope & pricing →';
+      }
+      if(title==='GrowthCare'){
+        link.href='/intake/?service=GrowthCare';link.textContent='Apply for GrowthCare →';
+        const note=document.createElement('p');note.className='payment-disclosure';note.style.cssText='margin-top:10px;font-size:.78rem;line-height:1.5;color:#8fa5b7';note.textContent='Recurring billing starts only after written scope and monthly pricing are confirmed.';card.appendChild(note);
+      }
+    });
+  }
+
   function contactRouteFromEmailHref(href){try{const raw=String(href||'');if(!raw.toLowerCase().startsWith('mailto:'))return null;const [addressPart,query='']=raw.slice(7).split('?');let local=(decodeURIComponent(addressPart||'').trim().toLowerCase().split('@')[0]||'hello');const aliases={partnerships:'hello',operations:'hello',info:'hello',contact:'hello'};local=aliases[local]||local;const allowed=new Set(['jason','hello','sales','support','billing','legal']);const department=allowed.has(local)?local:'hello';const source=new URLSearchParams(query),params=new URLSearchParams();params.set('department',department);if(source.get('subject'))params.set('subject',source.get('subject'));return `/contact/?${params.toString()}#contact-form`}catch{return '/contact/'}}
 
-  normalizeRoutes();ensureSkipLink();ensureAccessibleHeader();enforcePrimaryCtas();
+  normalizeRoutes();ensureSkipLink();ensureAccessibleHeader();enforcePrimaryCtas();wireLivePayments();
   document.addEventListener('click',event=>{const link=event.target.closest&&event.target.closest('a[href^="mailto:"]');if(!link)return;const route=contactRouteFromEmailHref(link.getAttribute('href'));if(!route)return;event.preventDefault();location.href=route},true);
 
   function formPayload(form){const data=Object.fromEntries(new FormData(form).entries());if(form.dataset.formType)data['Form Type']=form.dataset.formType;return data}
