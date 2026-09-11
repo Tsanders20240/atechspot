@@ -2,21 +2,45 @@
   const CANONICAL_APP = '/app/';
   const LEGACY_APP_PATHS = new Set(['/apps', '/apps/', '/apps.html']);
 
+  function normalizedPath(pathname) {
+    if (!pathname || pathname === '/index.html') return '/';
+    if (pathname.endsWith('/index.html')) return pathname.slice(0, -10) || '/';
+    return pathname.endsWith('/') || pathname.includes('.') ? pathname : `${pathname}/`;
+  }
+
   function normalizeCanonicalRoutes() {
     document.querySelectorAll('a[href]').forEach(link => {
       const href = link.getAttribute('href');
       if (LEGACY_APP_PATHS.has(href)) link.setAttribute('href', CANONICAL_APP);
-      if (href === '/solutions' || href === '/solutions/' || href === '/solutions.html') {
-        link.setAttribute('href', '/services/');
-      }
+      if (href === '/solutions' || href === '/solutions/' || href === '/solutions.html') link.setAttribute('href', '/services/');
     });
   }
 
+  function ensureSkipLink() {
+    let main = document.querySelector('main');
+    if (!main) return;
+    if (!main.id) main.id = 'main';
+    if (!document.querySelector('.skip-link')) {
+      const link = document.createElement('a');
+      link.className = 'skip-link';
+      link.href = `#${main.id}`;
+      link.textContent = 'Skip to main content';
+      document.body.prepend(link);
+    }
+  }
+
   function ensureAccessibleHeader() {
+    const current = normalizedPath(window.location.pathname);
     document.querySelectorAll('.site-header').forEach((header, index) => {
       const nav = header.querySelector('nav');
       if (!nav) return;
       if (!nav.id) nav.id = index === 0 ? 'nav' : `nav-${index + 1}`;
+      nav.querySelectorAll('a[href]').forEach(link => {
+        try {
+          const url = new URL(link.href, window.location.origin);
+          if (url.origin === window.location.origin && normalizedPath(url.pathname) === current) link.setAttribute('aria-current', 'page');
+        } catch {}
+      });
       if (!header.querySelector('.menu-btn')) {
         const button = document.createElement('button');
         button.className = 'menu-btn';
@@ -32,6 +56,7 @@
   }
 
   normalizeCanonicalRoutes();
+  ensureSkipLink();
   ensureAccessibleHeader();
 
   function contactRouteFromEmailHref(href) {
@@ -142,7 +167,7 @@
         trackFormSuccess(form);
         form.reset();
         if (started) started.value = String(Date.now());
-      } catch (error) {
+      } catch {
         openWebEmailFallback(form, status);
         return;
       } finally {
@@ -216,9 +241,7 @@
       if (match) select.value = match.value;
     });
   }
-  if (subject) {
-    document.querySelectorAll('input[name="Subject"]').forEach(input => { input.value = subject; });
-  }
+  if (subject) document.querySelectorAll('input[name="Subject"]').forEach(input => { input.value = subject; });
 
   if (service) {
     const serviceSelect = document.querySelector('#service-requested');
