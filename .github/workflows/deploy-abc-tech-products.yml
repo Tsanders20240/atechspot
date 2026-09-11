@@ -1,0 +1,76 @@
+name: Deploy ABC Tech Products
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ABC-Tech-Products-Website/**'
+      - '.github/workflows/deploy-abc-tech-products.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: abc-tech-products-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Verify Cloudflare credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || (echo "Missing CLOUDFLARE_API_TOKEN" && exit 1)
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "Missing CLOUDFLARE_ACCOUNT_ID" && exit 1)
+
+      - name: Validate ABC Tech Products 10/10 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f ABC-Tech-Products-Website/public/index.html
+          test -f ABC-Tech-Products-Website/public/styles.css
+          test -f ABC-Tech-Products-Website/public/app.js
+          test -f ABC-Tech-Products-Website/public/about/index.html
+          test -f ABC-Tech-Products-Website/public/affiliate-disclosure/index.html
+          test -f ABC-Tech-Products-Website/public/privacy/index.html
+          test -f ABC-Tech-Products-Website/public/robots.txt
+          test -f ABC-Tech-Products-Website/public/sitemap.xml
+          test -f ABC-Tech-Products-Website/worker.js
+          grep -q 'Know what to buy' ABC-Tech-Products-Website/public/index.html
+          grep -q 'INTERACTIVE PRODUCT FINDER' ABC-Tech-Products-Website/public/index.html
+          grep -q 'THE 4-CHECK COMPARISON' ABC-Tech-Products-Website/public/index.html
+          grep -q 'HOW WE CHOOSE' ABC-Tech-Products-Website/public/index.html
+          grep -q 'NO</b> fake reviews' ABC-Tech-Products-Website/public/index.html
+          grep -q 'affiliate relationship does not buy a higher ranking' ABC-Tech-Products-Website/public/index.html
+          grep -q 'abctechproducts.atechspot.com' ABC-Tech-Products-Website/wrangler.jsonc
+          grep -q '/api/health' ABC-Tech-Products-Website/worker.js
+          echo 'ABC Tech Products source assertions passed.'
+
+      - name: Deploy dedicated custom-domain Worker
+        working-directory: ABC-Tech-Products-Website
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@latest deploy
+
+      - name: Diagnose canonical domain and key routes
+        shell: bash
+        continue-on-error: true
+        run: |
+          sleep 6
+          for path in / /about/ /affiliate-disclosure/ /privacy/ /robots.txt /sitemap.xml /api/health; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' "https://abctechproducts.atechspot.com${path}" || true)
+            echo "$path -> $code"
+          done
+          curl -sSI https://abctechproducts.atechspot.com/ | head -n 25 || true
