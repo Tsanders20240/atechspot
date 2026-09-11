@@ -49,6 +49,8 @@ jobs:
           grep -q 'DJI Mic Mini 2' dji/index.html
           grep -q 'clickpid=8880094' dji/index.html
           grep -q 'rel="sponsored noopener"' dji/index.html
+          grep -q 'DJI AFFILIATE PROMO IMAGE' dji/index.html
+          grep -q 'u.djicdn.com/uploads/product_recommendation/cover/' dji/index.html
           grep -q 'Independent commerce and trademark disclosure' dji/index.html
           grep -q 'data-endpoint="/api/assessment"' assessment/index.html
           grep -q 'data-endpoint="/api/assessment"' ai-readiness/index.html
@@ -116,6 +118,8 @@ jobs:
           grep -q 'DJI Mic Mini 2' /tmp/dji.html
           grep -q 'clickpid=8880094' /tmp/dji.html
           grep -q 'rel="sponsored noopener"' /tmp/dji.html
+          grep -q 'DJI AFFILIATE PROMO IMAGE' /tmp/dji.html
+          grep -q 'u.djicdn.com/uploads/product_recommendation/cover/' /tmp/dji.html
           grep -q 'Independent commerce and trademark disclosure' /tmp/dji.html
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/payments/" -o /tmp/payments.html
           grep -q 'Payments &amp; Billing\|Payments & Billing' /tmp/payments.html
