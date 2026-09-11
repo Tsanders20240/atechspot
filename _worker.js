@@ -30,7 +30,7 @@ const LEGACY_PREFIXES=[
 ];
 
 const LINK_REWRITES=new Map([
-  ["/creator/","https://creator.atechspot.com/"],["/creator.html","https://creator.atechspot.com/"],
+  ["https://creator.atechspot.com/","/creator/"],["https://creator.atechspot.com","/creator/"],
   ["/resources.html","/resources/"],["/privacy.html","/privacy/"],["/terms.html","/terms/"],["/accessibility.html","/accessibility/"],["/affiliate-disclosure.html","/affiliate-disclosure/"],["/remote-support.html","/remote-support/"],
   ["/apps/","/app/"],["/apps","/app/"],["/apps.html","/app/"],["/business.html","/assessment/"],["/business/","/assessment/"]
 ]);
@@ -62,7 +62,6 @@ function transformHtml(response,url){const type=response.headers.get("content-ty
 export default{async fetch(request,env){
   const url=new URL(request.url);
   if(url.hostname==='atechspot.com'&&!url.pathname.startsWith('/.well-known/')){url.hostname='www.atechspot.com';return Response.redirect(url.toString(),request.method==='GET'||request.method==='HEAD'?301:308)}
-  if((request.method==='GET'||request.method==='HEAD')&&url.pathname==='/creator/')return Response.redirect('https://creator.atechspot.com/',301);
   if(LEGACY_PREFIXES.some(prefix=>url.pathname.startsWith(prefix)))return redirectResponse(request,'/',301);
   if(url.pathname==="/api/form-health"){if(request.method!=="GET")return json(405,{ok:false,message:"Method not allowed."});const resendConfigured=Boolean(env.RESEND_API_KEY);return json(resendConfigured?200:503,{ok:resendConfigured,resendConfigured,deployment:"ATECHSPOT-EMAIL-ASSESSMENT-10OF10",publicInboxes:Object.values(PUBLIC_INBOXES)})}
   if(url.pathname==="/api/contact"){if(request.method!=="POST")return json(405,{ok:false,message:"Method not allowed."});return deliverLead(request,env,"Contact Request",["Message"],{confirmation:true})}
