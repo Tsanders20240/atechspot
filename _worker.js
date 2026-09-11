@@ -36,7 +36,10 @@ async function deliverLead(request,env,leadType,requiredFields,{confirmation=tru
   return json(200,{ok:true,confirmationSent,message:"Thank you. Your request was received successfully."});
 }
 function transformHtml(response){const type=response.headers.get("content-type")||"";if(!type.includes("text/html"))return response;return new HTMLRewriter().on('a[href]',{element(element){const href=element.getAttribute('href');if(LINK_REWRITES.has(href))element.setAttribute('href',LINK_REWRITES.get(href))}}).on('footer .footer-grid p',{element(element){element.setInnerContent('AI, automation, websites, ecommerce, apps and software built around real business needs. ATechSpot is operated by A+ Techucation LLC.')}}).transform(response)}
-export default{async fetch(request,env){const url=new URL(request.url);if(url.hostname==="atechspot.com"){url.hostname="www.atechspot.com";return Response.redirect(url.toString(),request.method==="GET"||request.method==="HEAD"?301:308)}
+export default{async fetch(request,env){const url=new URL(request.url);
+  // Do not redirect the apex here. Cloudflare Pages must be able to complete
+  // HTTP validation for a newly attached apex custom domain. Once the apex is
+  // Active, a Cloudflare Redirect Rule can canonicalize it to www safely.
   if(url.pathname==="/api/form-health"){if(request.method!=="GET")return json(405,{ok:false,message:"Method not allowed."});const resendConfigured=Boolean(env.RESEND_API_KEY),recipientConfigured=Boolean(env.FORM_TO_EMAIL),senderConfigured=Boolean(env.FORM_FROM_EMAIL);return json(resendConfigured?200:503,{ok:resendConfigured,resendConfigured,recipientConfigured,senderConfigured,deployment:"ATECHSPOT-23-REMEDIATION"})}
   if(url.pathname==="/api/contact"){if(request.method!=="POST")return json(405,{ok:false,message:"Method not allowed."});return deliverLead(request,env,"Contact Request",["Message"],{confirmation:true})}
   if(url.pathname==="/api/intake"){if(request.method!=="POST")return json(405,{ok:false,message:"Method not allowed."});return deliverLead(request,env,"Project Intake",["Topic","Preferred Timeframe","Budget Range","Message","Desired Outcome"],{confirmation:true})}
