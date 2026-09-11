@@ -40,6 +40,10 @@ jobs:
           grep -q '22-PROPERTY ECOSYSTEM' ecosystem/index.html
           grep -q 'ATechSpot RemoteCare' ecosystem/index.html
           grep -q 'ATechSpot Tech Guru' ecosystem/index.html
+          test -f dji/index.html
+          grep -q 'Find the right DJI drone for' dji/index.html
+          grep -q 'Check price at DJIUSA.com' dji/index.html
+          grep -q 'Independent commerce disclosure' dji/index.html
           grep -q 'data-endpoint="/api/assessment"' assessment/index.html
           grep -q 'data-endpoint="/api/assessment"' ai-readiness/index.html
           grep -q 'data-endpoint="/api/intake"' intake/index.html
@@ -77,7 +81,7 @@ jobs:
           set -euo pipefail
           sleep 8
           echo "Testing $DEPLOY_URL"
-          for path in / /ecosystem/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /payments/ /commerce-terms/ /payment-success/; do
+          for path in / /ecosystem/ /dji/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /payments/ /commerce-terms/ /payment-success/; do
             code=$(curl -sS -o /dev/null -w '%{http_code}' "$DEPLOY_URL${path}")
             echo "$path -> $code"
             test "$code" = "200"
@@ -86,6 +90,10 @@ jobs:
           grep -q '22-PROPERTY ECOSYSTEM' /tmp/ecosystem.html
           grep -q 'ATechSpot RemoteCare' /tmp/ecosystem.html
           grep -q 'ATechSpot Tech Guru' /tmp/ecosystem.html
+          curl -fsS "$DEPLOY_URL/dji/" -o /tmp/dji.html
+          grep -q 'Find the right DJI drone for' /tmp/dji.html
+          grep -q 'Check price at DJIUSA.com' /tmp/dji.html
+          grep -q 'Independent commerce disclosure' /tmp/dji.html
           curl -fsS "$DEPLOY_URL/payments/" -o /tmp/payments.html
           grep -q 'Payments &amp; Billing\|Payments & Billing' /tmp/payments.html
           curl -fsS "$DEPLOY_URL/api/form-health" -o /tmp/form-health.json
