@@ -44,6 +44,13 @@ jobs:
           grep -q 'data-endpoint="/api/assessment"' ai-readiness/index.html
           grep -q 'data-endpoint="/api/intake"' intake/index.html
           grep -q 'https://start.atechspot.com/' resources/index.html
+          test -f payments/index.html
+          test -f commerce-terms/index.html
+          test -f payment-success/index.html
+          grep -q 'https://book.stripe.com/3cI3cw1j00aG6X93LA6EU04' assets/site.js
+          grep -q 'One-time $997 charge' assets/site.js
+          grep -q 'Recurring GrowthCare' terms/index.html
+          grep -q 'Payments and Stripe' privacy/index.html
           for email in jason@atechspot.com hello@atechspot.com sales@atechspot.com support@atechspot.com billing@atechspot.com legal@atechspot.com; do
             grep -q "$email" contact/index.html
             grep -q "$email" _worker.js
@@ -70,7 +77,7 @@ jobs:
           set -euo pipefail
           sleep 8
           echo "Testing $DEPLOY_URL"
-          for path in / /ecosystem/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/; do
+          for path in / /ecosystem/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /payments/ /commerce-terms/ /payment-success/; do
             code=$(curl -sS -o /dev/null -w '%{http_code}' "$DEPLOY_URL${path}")
             echo "$path -> $code"
             test "$code" = "200"
@@ -79,6 +86,8 @@ jobs:
           grep -q '22-PROPERTY ECOSYSTEM' /tmp/ecosystem.html
           grep -q 'ATechSpot RemoteCare' /tmp/ecosystem.html
           grep -q 'ATechSpot Tech Guru' /tmp/ecosystem.html
+          curl -fsS "$DEPLOY_URL/payments/" -o /tmp/payments.html
+          grep -q 'Payments &amp; Billing\|Payments & Billing' /tmp/payments.html
           curl -fsS "$DEPLOY_URL/api/form-health" -o /tmp/form-health.json
           cat /tmp/form-health.json
           node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('/tmp/form-health.json','utf8')); if(!j.ok||!j.resendConfigured||!Array.isArray(j.publicInboxes)||j.publicInboxes.length!==6) process.exit(1);"
@@ -92,3 +101,4 @@ jobs:
           curl -sSI https://atechspot.com/ | head -n 20 || true
           curl -sSI https://www.atechspot.com/ | head -n 20 || true
           curl -sSI https://www.atechspot.com/ecosystem.html | head -n 20 || true
+          curl -sSI https://www.atechspot.com/payments/ | head -n 20 || true
