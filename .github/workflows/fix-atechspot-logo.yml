@@ -1,0 +1,124 @@
+name: Fix ATechSpot Core Logo
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-atechspot-logo.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch transparent corporate logo runtime
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('assets/site.js')
+          s = p.read_text()
+          marker = 'function ensureTransparentCorporateLogo()'
+          if marker not in s:
+              anchor = "  normalizeRoutes();ensureSkipLink();ensureAccessibleHeader();enforcePrimaryCtas();wireLivePayments();"
+              fn = r'''
+  function ensureTransparentCorporateLogo(){
+    if(document.documentElement.dataset.atechLogoFixed==='true')return;
+    document.documentElement.dataset.atechLogoFixed='true';
+    const style=document.createElement('style');
+    style.textContent=`
+      .site-header{min-height:88px}
+      .site-header .brand,.footer-brand{background:none!important;filter:none!important;width:286px!important;height:72px!important;flex:0 0 286px!important;display:flex!important;align-items:center!important;overflow:visible!important}
+      .brand.logo-ready .brand-mark,.brand.logo-ready .brand-name{display:none!important}
+      .brand-logo-clean{display:none;width:286px;height:72px;object-fit:contain;object-position:left center;background:transparent!important;border:0!important;box-shadow:none!important;filter:drop-shadow(0 0 15px rgba(76,179,255,.20))}
+      .brand.logo-ready .brand-logo-clean{display:block}
+      .footer-brand{width:300px!important;height:78px!important;flex-basis:300px!important}
+      .footer-brand .brand-logo-clean{width:300px;height:78px}
+      @media(max-width:1020px){.site-header .brand{width:238px!important;height:64px!important;flex-basis:238px!important}.brand-logo-clean{width:238px;height:64px}}
+      @media(max-width:650px){.site-header{min-height:76px}.site-header .brand{width:188px!important;height:54px!important;flex-basis:188px!important}.brand-logo-clean{width:188px;height:54px}.footer-brand{width:220px!important;height:64px!important;flex-basis:220px!important}.footer-brand .brand-logo-clean{width:220px;height:64px}}
+    `;
+    document.head.appendChild(style);
+    const source=new Image();
+    source.decoding='async';
+    source.src='/assets/atechspot-logo.png?v=20260911-transparent';
+    source.onload=()=>{
+      try{
+        const canvas=document.createElement('canvas');
+        const max=900;
+        const scale=Math.min(1,max/source.naturalWidth,max/source.naturalHeight);
+        canvas.width=Math.max(1,Math.round(source.naturalWidth*scale));
+        canvas.height=Math.max(1,Math.round(source.naturalHeight*scale));
+        const ctx=canvas.getContext('2d',{willReadFrequently:true});
+        ctx.drawImage(source,0,0,canvas.width,canvas.height);
+        const image=ctx.getImageData(0,0,canvas.width,canvas.height),d=image.data,W=canvas.width,H=canvas.height;
+        const visited=new Uint8Array(W*H),queue=new Int32Array(W*H);let head=0,tail=0;
+        const nearWhite=i=>{const r=d[i],g=d[i+1],b=d[i+2];return r>214&&g>214&&b>214&&Math.max(r,g,b)-Math.min(r,g,b)<32};
+        const push=(x,y)=>{const pos=y*W+x;if(visited[pos])return;const i=pos*4;if(!nearWhite(i))return;visited[pos]=1;queue[tail++]=pos};
+        for(let x=0;x<W;x++){push(x,0);push(x,H-1)}
+        for(let y=1;y<H-1;y++){push(0,y);push(W-1,y)}
+        while(head<tail){const pos=queue[head++],x=pos%W,y=(pos/W)|0;d[pos*4+3]=0;if(x>0)push(x-1,y);if(x+1<W)push(x+1,y);if(y>0)push(x,y-1);if(y+1<H)push(x,y+1)}
+        ctx.putImageData(image,0,0);
+        let minX=W,minY=H,maxX=-1,maxY=-1;
+        for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>12){if(x<minX)minX=x;if(y<minY)minY=y;if(x>maxX)maxX=x;if(y>maxY)maxY=y}
+        if(maxX<minX||maxY<minY)throw new Error('Logo bounds unavailable');
+        const pad=Math.max(6,Math.round(Math.max(maxX-minX,maxY-minY)*.025));
+        minX=Math.max(0,minX-pad);minY=Math.max(0,minY-pad);maxX=Math.min(W-1,maxX+pad);maxY=Math.min(H-1,maxY+pad);
+        const out=document.createElement('canvas');out.width=maxX-minX+1;out.height=maxY-minY+1;
+        out.getContext('2d').drawImage(canvas,minX,minY,out.width,out.height,0,0,out.width,out.height);
+        const transparentLogo=out.toDataURL('image/png');
+        document.querySelectorAll('.brand').forEach(brand=>{let img=brand.querySelector('.brand-logo-clean');if(!img){img=document.createElement('img');img.className='brand-logo-clean';img.alt='ATechSpot';img.decoding='async';brand.prepend(img)}img.src=transparentLogo;brand.classList.add('logo-ready')});
+      }catch(err){console.warn('ATechSpot transparent logo fallback active.',err)}
+    };
+  }
+'''
+              if anchor not in s:
+                  raise SystemExit('site.js startup anchor not found')
+              s = s.replace(anchor, fn + '\n' + anchor.replace('normalizeRoutes();','ensureTransparentCorporateLogo();normalizeRoutes();'), 1)
+              p.write_text(s)
+
+          # Ensure the three core pages always load the shared runtime.
+          for rel in ['about/index.html','contact/index.html','ecosystem/index.html']:
+              page=Path(rel)
+              html=page.read_text()
+              if '/assets/site.js' not in html:
+                  html=html.replace('</body>','<script src="/assets/site.js" defer></script></body>')
+                  page.write_text(html)
+          PY
+
+          grep -q 'function ensureTransparentCorporateLogo()' assets/site.js
+          for f in about/index.html contact/index.html ecosystem/index.html; do grep -q '/assets/site.js' "$f"; done
+
+      - name: Commit source fix
+        shell: bash
+        run: |
+          git config user.name "ATechSpot Deployment Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add assets/site.js about/index.html contact/index.html ecosystem/index.html
+          if git diff --cached --quiet; then
+            echo "No source changes required."
+          else
+            git commit -m "Fix transparent ATechSpot logo on About Contact Ecosystem"
+            git push origin HEAD:main
+          fi
+
+      - name: Verify Cloudflare credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+
+      - name: Deploy ATechSpot production
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@latest pages deploy . --project-name atechspot --branch main
