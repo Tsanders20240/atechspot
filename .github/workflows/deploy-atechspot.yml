@@ -45,27 +45,76 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx --yes wrangler@latest pages deploy . --project-name atechspot --branch main
 
+      - name: Ensure apex-to-WWW redirect rule
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          api='https://api.cloudflare.com/client/v4'
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+
+          zone_json=$(curl -fsS "${auth[@]}" "$api/zones?name=atechspot.com")
+          zone_id=$(printf '%s' "$zone_json" | jq -r '.result[0].id // empty')
+          if [ -z "$zone_id" ]; then
+            echo 'Could not resolve Cloudflare zone ID for atechspot.com. The token needs Zone:Read.'
+            exit 1
+          fi
+
+          entry=$(curl -sS "${auth[@]}" "$api/zones/$zone_id/rulesets/phases/http_request_dynamic_redirect/entrypoint")
+          ruleset_id=$(printf '%s' "$entry" | jq -r 'if .success then (.result.id // empty) else empty end')
+
+          rule=$(jq -nc '{
+            action:"redirect",
+            expression:"(http.host eq \"atechspot.com\" and not starts_with(http.request.uri.path, \"/.well-known\"))",
+            description:"Apex to WWW",
+            enabled:true,
+            action_parameters:{from_value:{status_code:301,preserve_query_string:true,target_url:{expression:"concat(\"https://www.atechspot.com\", http.request.uri.path)"}}}
+          }')
+
+          if [ -z "$ruleset_id" ]; then
+            payload=$(jq -nc --argjson rule "$rule" '{name:"ATechSpot canonical redirects",description:"Canonical production redirects for ATechSpot",kind:"zone",phase:"http_request_dynamic_redirect",rules:[$rule]}')
+            result=$(curl -fsS -X POST "${auth[@]}" --data "$payload" "$api/zones/$zone_id/rulesets")
+            printf '%s' "$result" | jq -e '.success == true' >/dev/null
+            echo 'Created dynamic redirect ruleset with Apex to WWW rule.'
+          else
+            existing_rule_id=$(printf '%s' "$entry" | jq -r '.result.rules[]? | select(.description == "Apex to WWW") | .id' | head -n1)
+            if [ -n "$existing_rule_id" ]; then
+              result=$(curl -fsS -X PATCH "${auth[@]}" --data "$rule" "$api/zones/$zone_id/rulesets/$ruleset_id/rules/$existing_rule_id")
+              printf '%s' "$result" | jq -e '.success == true' >/dev/null
+              echo 'Updated existing Apex to WWW rule.'
+            else
+              result=$(curl -fsS -X POST "${auth[@]}" --data "$rule" "$api/zones/$zone_id/rulesets/$ruleset_id/rules")
+              printf '%s' "$result" | jq -e '.success == true' >/dev/null
+              echo 'Added Apex to WWW rule.'
+            fi
+          fi
+
       - name: Production smoke tests
         shell: bash
         run: |
           set -euo pipefail
-          sleep 8
+          sleep 12
 
           echo 'Checking apex canonical redirect...'
+          apex_headers=$(curl -sSI https://atechspot.com/)
+          printf '%s\n' "$apex_headers"
           apex_code=$(curl -sS -o /dev/null -w '%{http_code}' https://atechspot.com/)
-          apex_location=$(curl -sSI https://atechspot.com/ | awk 'BEGIN{IGNORECASE=1}/^location:/{gsub("\r",""); print $2; exit}')
+          apex_location=$(printf '%s\n' "$apex_headers" | awk 'BEGIN{IGNORECASE=1}/^location:/{gsub("\r",""); print $2; exit}')
           test "$apex_code" = "301"
           test "$apex_location" = "https://www.atechspot.com/"
 
           echo 'Checking ecosystem legacy redirect...'
+          eco_headers=$(curl -sSI https://www.atechspot.com/ecosystem.html)
           eco_code=$(curl -sS -o /dev/null -w '%{http_code}' https://www.atechspot.com/ecosystem.html)
-          eco_location=$(curl -sSI https://www.atechspot.com/ecosystem.html | awk 'BEGIN{IGNORECASE=1}/^location:/{gsub("\r",""); print $2; exit}')
+          eco_location=$(printf '%s\n' "$eco_headers" | awk 'BEGIN{IGNORECASE=1}/^location:/{gsub("\r",""); print $2; exit}')
           test "$eco_code" = "301"
           test "$eco_location" = "https://www.atechspot.com/ecosystem/"
 
           echo 'Checking production pages...'
           for path in / /ecosystem/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/; do
             code=$(curl -sS -o /dev/null -w '%{http_code}' "https://www.atechspot.com${path}")
+            echo "$path -> $code"
             test "$code" = "200"
           done
 
