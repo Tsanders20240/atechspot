@@ -35,11 +35,12 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || (echo 'Missing CLOUDFLARE_API_TOKEN' && exit 1)
           test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo 'Missing CLOUDFLARE_ACCOUNT_ID' && exit 1)
 
-      - name: Build 26 printable PDFs
+      - name: Build official book assets and 26 printable PDFs
         shell: bash
         run: |
           set -euo pipefail
           python -m pip install --disable-pip-version-check --quiet reportlab pillow
+          python ABC-of-Technology-Website/scripts/decode_book_svg.py
           python ABC-of-Technology-Website/scripts/build_coloring.py
           python ABC-of-Technology-Website/scripts/build_coloring_preview.py
 
