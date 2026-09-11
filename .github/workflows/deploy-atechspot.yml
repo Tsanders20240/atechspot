@@ -44,3 +44,33 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx --yes wrangler@latest pages deploy . --project-name atechspot --branch main
+
+      - name: Production smoke tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 8
+
+          echo 'Checking apex canonical redirect...'
+          apex_code=$(curl -sS -o /dev/null -w '%{http_code}' https://atechspot.com/)
+          apex_location=$(curl -sSI https://atechspot.com/ | awk 'BEGIN{IGNORECASE=1}/^location:/{gsub("\r",""); print $2; exit}')
+          test "$apex_code" = "301"
+          test "$apex_location" = "https://www.atechspot.com/"
+
+          echo 'Checking ecosystem legacy redirect...'
+          eco_code=$(curl -sS -o /dev/null -w '%{http_code}' https://www.atechspot.com/ecosystem.html)
+          eco_location=$(curl -sSI https://www.atechspot.com/ecosystem.html | awk 'BEGIN{IGNORECASE=1}/^location:/{gsub("\r",""); print $2; exit}')
+          test "$eco_code" = "301"
+          test "$eco_location" = "https://www.atechspot.com/ecosystem/"
+
+          echo 'Checking production pages...'
+          for path in / /ecosystem/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' "https://www.atechspot.com${path}")
+            test "$code" = "200"
+          done
+
+          echo 'Checking form service health...'
+          curl -fsS https://www.atechspot.com/api/form-health | tee /tmp/form-health.json
+          node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('/tmp/form-health.json','utf8')); if(!j.ok||!j.resendConfigured||!Array.isArray(j.publicInboxes)||j.publicInboxes.length!==6) process.exit(1);"
+
+          echo 'All ATechSpot production smoke tests passed.'
