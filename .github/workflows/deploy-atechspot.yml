@@ -79,24 +79,35 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          sleep 8
+          check_path() {
+            local path="$1"
+            local code="000"
+            for attempt in 1 2 3 4 5 6 7 8; do
+              code=$(curl -sS -o /dev/null -w '%{http_code}' "$DEPLOY_URL${path}" || true)
+              echo "$path -> $code (attempt $attempt/8)"
+              if [ "$code" = "200" ]; then
+                return 0
+              fi
+              sleep 5
+            done
+            echo "Preview route failed to become ready: $path (last status $code)"
+            return 1
+          }
           echo "Testing $DEPLOY_URL"
           for path in / /ecosystem/ /dji/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /payments/ /commerce-terms/ /payment-success/; do
-            code=$(curl -sS -o /dev/null -w '%{http_code}' "$DEPLOY_URL${path}")
-            echo "$path -> $code"
-            test "$code" = "200"
+            check_path "$path"
           done
-          curl -fsS "$DEPLOY_URL/ecosystem/" -o /tmp/ecosystem.html
+          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/ecosystem/" -o /tmp/ecosystem.html
           grep -q '22-PROPERTY ECOSYSTEM' /tmp/ecosystem.html
           grep -q 'ATechSpot RemoteCare' /tmp/ecosystem.html
           grep -q 'ATechSpot Tech Guru' /tmp/ecosystem.html
-          curl -fsS "$DEPLOY_URL/dji/" -o /tmp/dji.html
+          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/dji/" -o /tmp/dji.html
           grep -q 'Find the right DJI drone for' /tmp/dji.html
           grep -q 'Check price at DJIUSA.com' /tmp/dji.html
           grep -q 'Independent commerce disclosure' /tmp/dji.html
-          curl -fsS "$DEPLOY_URL/payments/" -o /tmp/payments.html
+          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/payments/" -o /tmp/payments.html
           grep -q 'Payments &amp; Billing\|Payments & Billing' /tmp/payments.html
-          curl -fsS "$DEPLOY_URL/api/form-health" -o /tmp/form-health.json
+          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/api/form-health" -o /tmp/form-health.json
           cat /tmp/form-health.json
           node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('/tmp/form-health.json','utf8')); if(!j.ok||!j.resendConfigured||!Array.isArray(j.publicInboxes)||j.publicInboxes.length!==6) process.exit(1);"
           echo 'Deployment preview QA passed.'
