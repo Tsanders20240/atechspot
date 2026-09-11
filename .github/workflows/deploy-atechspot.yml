@@ -58,6 +58,13 @@ jobs:
           ! grep -q 'DJI RS 5' dji/index.html
           ! grep -q 'DJI Mic Mini 2' dji/index.html
           ! grep -q 'DJI Air 3S' dji/index.html
+          test -f dji/real-estate/index.html
+          grep -q 'Best DJI Drone for Real Estate Photography' dji/real-estate/index.html
+          grep -q 'DJI Mini 5 Pro' dji/real-estate/index.html
+          grep -q 'DJI Mavic 4 Pro' dji/real-estate/index.html
+          grep -q 'FAA Part 107' dji/real-estate/index.html
+          grep -q 'Plan my aerial workflow' dji/real-estate/index.html
+          grep -q 'https://www.atechspot.com/dji/real-estate/' sitemap.xml
           grep -q 'data-endpoint="/api/assessment"' assessment/index.html
           grep -q 'data-endpoint="/api/assessment"' ai-readiness/index.html
           grep -q 'data-endpoint="/api/intake"' intake/index.html
@@ -108,7 +115,7 @@ jobs:
             return 1
           }
           echo "Testing $DEPLOY_URL"
-          for path in / /ecosystem/ /dji/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /payments/ /commerce-terms/ /payment-success/; do
+          for path in / /ecosystem/ /dji/ /dji/real-estate/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /payments/ /commerce-terms/ /payment-success/; do
             check_path "$path"
           done
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/ecosystem/" -o /tmp/ecosystem.html
@@ -133,6 +140,12 @@ jobs:
           ! grep -q 'DJI RS 5' /tmp/dji.html
           ! grep -q 'DJI Mic Mini 2' /tmp/dji.html
           ! grep -q 'DJI Air 3S' /tmp/dji.html
+          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/dji/real-estate/" -o /tmp/dji-real-estate.html
+          grep -q 'Best DJI Drone for Real Estate Photography' /tmp/dji-real-estate.html
+          grep -q 'DJI Mini 5 Pro' /tmp/dji-real-estate.html
+          grep -q 'DJI Mavic 4 Pro' /tmp/dji-real-estate.html
+          grep -q 'FAA Part 107' /tmp/dji-real-estate.html
+          grep -q 'Plan my aerial workflow' /tmp/dji-real-estate.html
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/payments/" -o /tmp/payments.html
           grep -q 'Payments &amp; Billing\|Payments & Billing' /tmp/payments.html
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/api/form-health" -o /tmp/form-health.json
@@ -149,4 +162,5 @@ jobs:
           curl -sSI https://www.atechspot.com/ | head -n 20 || true
           curl -sSI https://www.atechspot.com/ecosystem.html | head -n 20 || true
           curl -sSI https://www.atechspot.com/dji/ | head -n 20 || true
+          curl -sSI https://www.atechspot.com/dji/real-estate/ | head -n 20 || true
           curl -sSI https://www.atechspot.com/payments/ | head -n 20 || true
