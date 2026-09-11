@@ -1,3 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /client-portal/
+Disallow: /payment/
+Disallow: /booking/
+Disallow: /intake/
 Sitemap: https://www.atechspot.com/sitemap.xml
