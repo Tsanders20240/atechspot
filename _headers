@@ -3,4 +3,21 @@
   Referrer-Policy: strict-origin-when-cross-origin
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
+  X-Permitted-Cross-Domain-Policies: none
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Strict-Transport-Security: max-age=31536000
+
+/
+  Cache-Control: no-cache, must-revalidate
+/services/*
+  Cache-Control: no-cache, must-revalidate
+/app/*
+  Cache-Control: no-cache, must-revalidate
+/ecosystem/*
+  Cache-Control: no-cache, must-revalidate
+/about/*
+  Cache-Control: no-cache, must-revalidate
+/contact/*
+  Cache-Control: no-cache, must-revalidate
+/intake/*
+  Cache-Control: no-cache, must-revalidate
