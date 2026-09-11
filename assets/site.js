@@ -10,6 +10,55 @@
   function ensureSkipLink(){const main=document.querySelector('main');if(!main)return;if(!main.id)main.id='main';if(!document.querySelector('.skip-link')){const link=document.createElement('a');link.className='skip-link';link.href=`#${main.id}`;link.textContent='Skip to main content';document.body.prepend(link)}}
   function ensureAccessibleHeader(){const current=normalizedPath(location.pathname);document.querySelectorAll('.site-header').forEach((header,index)=>{const nav=header.querySelector('nav');if(!nav)return;if(!nav.id)nav.id=index===0?'nav':`nav-${index+1}`;nav.querySelectorAll('a[href]').forEach(link=>{try{const url=new URL(link.href,location.origin);if(url.origin===location.origin&&normalizedPath(url.pathname)===current)link.setAttribute('aria-current','page')}catch{}});let button=header.querySelector('.menu-btn');if(!button){button=document.createElement('button');button.className='menu-btn';button.type='button';button.id=index===0?'menuBtn':`menuBtn-${index+1}`;button.setAttribute('aria-controls',nav.id);button.setAttribute('aria-expanded','false');button.setAttribute('aria-label','Open navigation');button.textContent='☰';header.appendChild(button)}if(!button.dataset.wired){button.dataset.wired='true';button.addEventListener('click',()=>{const open=nav.classList.toggle('open');button.setAttribute('aria-expanded',String(open));button.setAttribute('aria-label',open?'Close navigation':'Open navigation')});nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');button.setAttribute('aria-expanded','false');button.setAttribute('aria-label','Open navigation')}))}})}
 
+  function ensureTransparentCorporateLogo(){
+    if(document.documentElement.dataset.atechLogoFixed==='true')return;
+    document.documentElement.dataset.atechLogoFixed='true';
+    const style=document.createElement('style');
+    style.textContent=`
+      .site-header{min-height:88px}
+      .site-header .brand,.footer-brand{background:none!important;filter:none!important;width:286px!important;height:72px!important;flex:0 0 286px!important;display:flex!important;align-items:center!important;overflow:visible!important}
+      .brand.logo-ready .brand-mark,.brand.logo-ready .brand-name{display:none!important}
+      .brand-logo-clean{display:none;width:286px;height:72px;object-fit:contain;object-position:left center;background:transparent!important;border:0!important;box-shadow:none!important;filter:drop-shadow(0 0 15px rgba(76,179,255,.20))}
+      .brand.logo-ready .brand-logo-clean{display:block}
+      .footer-brand{width:300px!important;height:78px!important;flex-basis:300px!important}
+      .footer-brand .brand-logo-clean{width:300px;height:78px}
+      @media(max-width:1020px){.site-header .brand{width:238px!important;height:64px!important;flex-basis:238px!important}.brand-logo-clean{width:238px;height:64px}}
+      @media(max-width:650px){.site-header{min-height:76px}.site-header .brand{width:188px!important;height:54px!important;flex-basis:188px!important}.brand-logo-clean{width:188px;height:54px}.footer-brand{width:220px!important;height:64px!important;flex-basis:220px!important}.footer-brand .brand-logo-clean{width:220px;height:64px}}
+    `;
+    document.head.appendChild(style);
+    const source=new Image();
+    source.decoding='async';
+    source.src='/assets/atechspot-logo.png?v=20260911-transparent';
+    source.onload=()=>{
+      try{
+        const canvas=document.createElement('canvas');
+        const max=900;
+        const scale=Math.min(1,max/source.naturalWidth,max/source.naturalHeight);
+        canvas.width=Math.max(1,Math.round(source.naturalWidth*scale));
+        canvas.height=Math.max(1,Math.round(source.naturalHeight*scale));
+        const ctx=canvas.getContext('2d',{willReadFrequently:true});
+        ctx.drawImage(source,0,0,canvas.width,canvas.height);
+        const image=ctx.getImageData(0,0,canvas.width,canvas.height),d=image.data,W=canvas.width,H=canvas.height;
+        const visited=new Uint8Array(W*H),queue=new Int32Array(W*H);let head=0,tail=0;
+        const nearWhite=i=>{const r=d[i],g=d[i+1],b=d[i+2];return r>214&&g>214&&b>214&&Math.max(r,g,b)-Math.min(r,g,b)<32};
+        const push=(x,y)=>{const pos=y*W+x;if(visited[pos])return;const i=pos*4;if(!nearWhite(i))return;visited[pos]=1;queue[tail++]=pos};
+        for(let x=0;x<W;x++){push(x,0);push(x,H-1)}
+        for(let y=1;y<H-1;y++){push(0,y);push(W-1,y)}
+        while(head<tail){const pos=queue[head++],x=pos%W,y=(pos/W)|0;d[pos*4+3]=0;if(x>0)push(x-1,y);if(x+1<W)push(x+1,y);if(y>0)push(x,y-1);if(y+1<H)push(x,y+1)}
+        ctx.putImageData(image,0,0);
+        let minX=W,minY=H,maxX=-1,maxY=-1;
+        for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]>12){if(x<minX)minX=x;if(y<minY)minY=y;if(x>maxX)maxX=x;if(y>maxY)maxY=y}
+        if(maxX<minX||maxY<minY)throw new Error('Logo bounds unavailable');
+        const pad=Math.max(6,Math.round(Math.max(maxX-minX,maxY-minY)*.025));
+        minX=Math.max(0,minX-pad);minY=Math.max(0,minY-pad);maxX=Math.min(W-1,maxX+pad);maxY=Math.min(H-1,maxY+pad);
+        const out=document.createElement('canvas');out.width=maxX-minX+1;out.height=maxY-minY+1;
+        out.getContext('2d').drawImage(canvas,minX,minY,out.width,out.height,0,0,out.width,out.height);
+        const transparentLogo=out.toDataURL('image/png');
+        document.querySelectorAll('.brand').forEach(brand=>{let img=brand.querySelector('.brand-logo-clean');if(!img){img=document.createElement('img');img.className='brand-logo-clean';img.alt='ATechSpot';img.decoding='async';brand.prepend(img)}img.src=transparentLogo;brand.classList.add('logo-ready')});
+      }catch(err){console.warn('ATechSpot transparent logo fallback active.',err)}
+    };
+  }
+
   function enforcePrimaryCtas(){
     document.querySelectorAll('.site-header .desktop-cta').forEach(a=>{a.href='/intake/';a.textContent='Start My Project'});
     if(normalizedPath(location.pathname)!=='/')return;
@@ -44,7 +93,7 @@
 
   function contactRouteFromEmailHref(href){try{const raw=String(href||'');if(!raw.toLowerCase().startsWith('mailto:'))return null;const [addressPart,query='']=raw.slice(7).split('?');let local=(decodeURIComponent(addressPart||'').trim().toLowerCase().split('@')[0]||'hello');const aliases={partnerships:'hello',operations:'hello',info:'hello',contact:'hello'};local=aliases[local]||local;const allowed=new Set(['jason','hello','sales','support','billing','legal']);const department=allowed.has(local)?local:'hello';const source=new URLSearchParams(query),params=new URLSearchParams();params.set('department',department);if(source.get('subject'))params.set('subject',source.get('subject'));return `/contact/?${params.toString()}#contact-form`}catch{return '/contact/'}}
 
-  normalizeRoutes();ensureSkipLink();ensureAccessibleHeader();enforcePrimaryCtas();wireLivePayments();
+  ensureTransparentCorporateLogo();normalizeRoutes();ensureSkipLink();ensureAccessibleHeader();enforcePrimaryCtas();wireLivePayments();
   document.addEventListener('click',event=>{const link=event.target.closest&&event.target.closest('a[href^="mailto:"]');if(!link)return;const route=contactRouteFromEmailHref(link.getAttribute('href'));if(!route)return;event.preventDefault();location.href=route},true);
 
   function formPayload(form){const data=Object.fromEntries(new FormData(form).entries());if(form.dataset.formType)data['Form Type']=form.dataset.formType;return data}
