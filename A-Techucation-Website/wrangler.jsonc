@@ -2,6 +2,12 @@
   "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "icy-dew-8c6c",
   "compatibility_date": "2026-09-09",
+  "routes": [
+    {
+      "pattern": "atechucation.atechspot.com",
+      "custom_domain": true
+    }
+  ],
   "assets": {
     "directory": ".",
     "not_found_handling": "single-page-application"
