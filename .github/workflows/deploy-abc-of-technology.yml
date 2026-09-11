@@ -40,8 +40,7 @@ jobs:
         run: |
           set -euo pipefail
           python -m pip install --disable-pip-version-check --quiet reportlab pillow
-          python ABC-of-Technology-Website/scripts/build_page.py
-          python ABC-of-Technology-Website/scripts/decode_assets.py
+          python ABC-of-Technology-Website/scripts/decode_book_svg.py
           python ABC-of-Technology-Website/scripts/build_coloring.py
 
       - name: Validate children-first 10/10 source
@@ -55,6 +54,14 @@ jobs:
           test -f "$ROOT/wrangler.jsonc"
           node --check "$ROOT/worker.js"
 
+          # Committed source wrappers preserve the supplied official imagery.
+          test -f "$ROOT/public/assets/book/book-cover.svg"
+          test -f "$ROOT/public/assets/book/book-bus-crop.svg"
+          test -f "$ROOT/public/assets/book/book-page-title.svg"
+          test -f "$ROOT/public/assets/book/book-page-best-you.svg"
+          test -f "$ROOT/public/assets/book/book-page-a.svg"
+
+          # Deployment-ready WebP files are deterministically decoded from those sources.
           test -f "$ROOT/public/assets/book/book-cover.webp"
           test -f "$ROOT/public/assets/book/book-bus-crop.webp"
           test -f "$ROOT/public/assets/book/book-page-title.webp"
