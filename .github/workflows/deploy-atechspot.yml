@@ -43,7 +43,13 @@ jobs:
           test -f dji/index.html
           grep -q 'Find the right DJI drone for' dji/index.html
           grep -q 'Check price at DJIUSA.com' dji/index.html
-          grep -q 'Independent commerce disclosure' dji/index.html
+          grep -q 'DJI STORE • AFFILIATE' dji/index.html
+          grep -q 'DJI Mic 3' dji/index.html
+          grep -q 'DJI RS 5' dji/index.html
+          grep -q 'DJI Mic Mini 2' dji/index.html
+          grep -q 'clickpid=8880094' dji/index.html
+          grep -q 'rel="sponsored noopener"' dji/index.html
+          grep -q 'Independent commerce and trademark disclosure' dji/index.html
           grep -q 'data-endpoint="/api/assessment"' assessment/index.html
           grep -q 'data-endpoint="/api/assessment"' ai-readiness/index.html
           grep -q 'data-endpoint="/api/intake"' intake/index.html
@@ -104,7 +110,13 @@ jobs:
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/dji/" -o /tmp/dji.html
           grep -q 'Find the right DJI drone for' /tmp/dji.html
           grep -q 'Check price at DJIUSA.com' /tmp/dji.html
-          grep -q 'Independent commerce disclosure' /tmp/dji.html
+          grep -q 'DJI STORE • AFFILIATE' /tmp/dji.html
+          grep -q 'DJI Mic 3' /tmp/dji.html
+          grep -q 'DJI RS 5' /tmp/dji.html
+          grep -q 'DJI Mic Mini 2' /tmp/dji.html
+          grep -q 'clickpid=8880094' /tmp/dji.html
+          grep -q 'rel="sponsored noopener"' /tmp/dji.html
+          grep -q 'Independent commerce and trademark disclosure' /tmp/dji.html
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/payments/" -o /tmp/payments.html
           grep -q 'Payments &amp; Billing\|Payments & Billing' /tmp/payments.html
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/api/form-health" -o /tmp/form-health.json
@@ -120,4 +132,5 @@ jobs:
           curl -sSI https://atechspot.com/ | head -n 20 || true
           curl -sSI https://www.atechspot.com/ | head -n 20 || true
           curl -sSI https://www.atechspot.com/ecosystem.html | head -n 20 || true
+          curl -sSI https://www.atechspot.com/dji/ | head -n 20 || true
           curl -sSI https://www.atechspot.com/payments/ | head -n 20 || true
