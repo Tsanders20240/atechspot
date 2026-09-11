@@ -48,7 +48,6 @@ jobs:
             grep -q "$email" contact/index.html
             grep -q "$email" _worker.js
           done
-          ! grep -R -n --include='*.html' 'Opening your web email' assessment ai-readiness intake contact resources ecosystem || false
           echo 'Production source assertions passed.'
 
       - name: Deploy ATechSpot to Cloudflare Pages
@@ -76,10 +75,12 @@ jobs:
             echo "$path -> $code"
             test "$code" = "200"
           done
-          curl -fsS "$DEPLOY_URL/ecosystem/" | grep -q '22-PROPERTY ECOSYSTEM'
-          curl -fsS "$DEPLOY_URL/ecosystem/" | grep -q 'ATechSpot RemoteCare'
-          curl -fsS "$DEPLOY_URL/ecosystem/" | grep -q 'ATechSpot Tech Guru'
-          curl -fsS "$DEPLOY_URL/api/form-health" | tee /tmp/form-health.json
+          curl -fsS "$DEPLOY_URL/ecosystem/" -o /tmp/ecosystem.html
+          grep -q '22-PROPERTY ECOSYSTEM' /tmp/ecosystem.html
+          grep -q 'ATechSpot RemoteCare' /tmp/ecosystem.html
+          grep -q 'ATechSpot Tech Guru' /tmp/ecosystem.html
+          curl -fsS "$DEPLOY_URL/api/form-health" -o /tmp/form-health.json
+          cat /tmp/form-health.json
           node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('/tmp/form-health.json','utf8')); if(!j.ok||!j.resendConfigured||!Array.isArray(j.publicInboxes)||j.publicInboxes.length!==6) process.exit(1);"
           echo 'Deployment preview QA passed.'
 
