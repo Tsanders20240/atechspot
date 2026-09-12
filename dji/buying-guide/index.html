@@ -68,8 +68,8 @@
 </main>
 <footer class="footer"><div class="wrap footer-row"><div>ATechSpot DJI • Independent DJI product education and buying guidance.</div><div><a href="/dji/">DJI storefront</a> · <a href="/affiliate-disclosure/">Commerce disclosure</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/contact/">Contact</a></div></div></footer>
 <script>
-document.querySelectorAll('.outbound').forEach(a=>a.addEventListener('click',()=>{window.dataLayer&&window.dataLayer.push({event:'dji_outbound_seller_click',model:a.dataset.model||'Unknown',seller:a.dataset.seller||'External seller',channel:'non_affiliate',placement:a.classList.contains('media')?'product_image':'button',source_page:'complete_buying_guide'});}));
-document.querySelectorAll('.intake').forEach(a=>a.addEventListener('click',()=>{window.dataLayer&&window.dataLayer.push({event:'dji_business_workflow_cta',source_page:'complete_buying_guide'});}));
+document.querySelectorAll('.outbound').forEach(a=>a.addEventListener('click',()=>{typeof window.gtag==='function'&&window.gtag('event','dji_outbound_seller_click',{model:a.dataset.model||'Unknown',seller:a.dataset.seller||'External seller',channel:'non_affiliate',placement:a.classList.contains('media')?'product_image':'button',source_page:'complete_buying_guide'});}));
+document.querySelectorAll('.intake').forEach(a=>a.addEventListener('click',()=>{typeof window.gtag==='function'&&window.gtag('event','dji_business_workflow_cta',{source_page:'complete_buying_guide'});}));
 </script>
 </body>
 </html>

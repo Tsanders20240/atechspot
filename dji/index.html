@@ -98,8 +98,8 @@
   };
   const buttons=[...document.querySelectorAll('.mission-btn')],box=document.getElementById('missionResult'),title=document.getElementById('resultTitle'),text=document.getElementById('resultText'),link=document.getElementById('resultLink');
   function clearRec(){document.querySelectorAll('.product').forEach(p=>p.classList.remove('recommended'))}
-  buttons.forEach(btn=>btn.addEventListener('click',()=>{const m=missions[btn.dataset.mission];buttons.forEach(b=>b.classList.toggle('active',b===btn));title.textContent=m.title;text.textContent=m.text;link.href=m.anchor;box.hidden=false;clearRec();const card=document.querySelector(m.anchor);if(card)card.classList.add('recommended');window.dataLayer&&window.dataLayer.push({event:'dji_mission_select',mission:btn.dataset.mission,recommendation:m.title});}));
-  document.querySelectorAll('.outbound').forEach(a=>a.addEventListener('click',()=>{window.dataLayer&&window.dataLayer.push({event:'dji_outbound_seller_click',model:a.dataset.model,seller:a.dataset.seller||'external',placement:a.classList.contains('product-media')?'product_image':'button',affiliate:'no'});}));
+  buttons.forEach(btn=>btn.addEventListener('click',()=>{const m=missions[btn.dataset.mission];buttons.forEach(b=>b.classList.toggle('active',b===btn));title.textContent=m.title;text.textContent=m.text;link.href=m.anchor;box.hidden=false;clearRec();const card=document.querySelector(m.anchor);if(card)card.classList.add('recommended');typeof window.gtag==='function'&&window.gtag('event','dji_mission_select',{mission:btn.dataset.mission,recommendation:m.title});}));
+  document.querySelectorAll('.outbound').forEach(a=>a.addEventListener('click',()=>{typeof window.gtag==='function'&&window.gtag('event','dji_outbound_seller_click',{model:a.dataset.model,seller:a.dataset.seller||'external',placement:a.classList.contains('product-media')?'product_image':'button',affiliate:'no'});}));
 })();
 </script>
 </body>

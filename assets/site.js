@@ -5,6 +5,16 @@
   const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const LIVE_PAYMENTS={executiveReview:'https://book.stripe.com/3cI3cw1j00aG6X93LA6EU04'};
 
+  function ensureGa4(){
+    const id='G-P5FFL89J6T';
+    if(typeof window.gtag==='function')return;
+    window.dataLayer=window.dataLayer||[];
+    window.gtag=function(){window.dataLayer.push(arguments)};
+    window.gtag('js',new Date());
+    window.gtag('config',id,{send_page_view:true});
+    if(!document.querySelector('script[src*="googletagmanager.com/gtag/js?id='+id+'"]')){const script=document.createElement('script');script.async=true;script.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(id);document.head.appendChild(script)}
+  }
+
   function normalizedPath(pathname){if(!pathname||pathname==='/index.html')return '/';if(pathname.endsWith('/index.html'))return pathname.slice(0,-10)||'/';return pathname.endsWith('/')||pathname.includes('.')?pathname:`${pathname}/`}
   function normalizeRoutes(){document.querySelectorAll('a[href]').forEach(link=>{const href=link.getAttribute('href');if(LEGACY_APP_PATHS.has(href))link.setAttribute('href',CANONICAL_APP);if(['/solutions','/solutions/','/solutions.html'].includes(href))link.setAttribute('href','/services/');if(href==='https://creator.atechspot.com/'||href==='https://creator.atechspot.com')link.setAttribute('href','/creator/');const clean={'/resources.html':'/resources/','/privacy.html':'/privacy/','/terms.html':'/terms/','/accessibility.html':'/accessibility/','/affiliate-disclosure.html':'/affiliate-disclosure/','/remote-support.html':'/remote-support/','/business.html':'/assessment/','/business/':'/assessment/'};if(clean[href])link.setAttribute('href',clean[href])})}
   function ensureSkipLink(){const main=document.querySelector('main');if(!main)return;if(!main.id)main.id='main';if(!document.querySelector('.skip-link')){const link=document.createElement('a');link.className='skip-link';link.href=`#${main.id}`;link.textContent='Skip to main content';document.body.prepend(link)}}
@@ -93,12 +103,12 @@
 
   function contactRouteFromEmailHref(href){try{const raw=String(href||'');if(!raw.toLowerCase().startsWith('mailto:'))return null;const [addressPart,query='']=raw.slice(7).split('?');let local=(decodeURIComponent(addressPart||'').trim().toLowerCase().split('@')[0]||'hello');const aliases={partnerships:'hello',operations:'hello',info:'hello',contact:'hello'};local=aliases[local]||local;const allowed=new Set(['jason','hello','sales','support','billing','legal']);const department=allowed.has(local)?local:'hello';const source=new URLSearchParams(query),params=new URLSearchParams();params.set('department',department);if(source.get('subject'))params.set('subject',source.get('subject'));return `/contact/?${params.toString()}#contact-form`}catch{return '/contact/'}}
 
-  ensureTransparentCorporateLogo();normalizeRoutes();ensureSkipLink();ensureAccessibleHeader();enforcePrimaryCtas();wireLivePayments();
+  ensureGa4();ensureTransparentCorporateLogo();normalizeRoutes();ensureSkipLink();ensureAccessibleHeader();enforcePrimaryCtas();wireLivePayments();
   document.addEventListener('click',event=>{const link=event.target.closest&&event.target.closest('a[href^="mailto:"]');if(!link)return;const route=contactRouteFromEmailHref(link.getAttribute('href'));if(!route)return;event.preventDefault();location.href=route},true);
 
   function formPayload(form){const data=Object.fromEntries(new FormData(form).entries());if(form.dataset.formType)data['Form Type']=form.dataset.formType;return data}
   async function sendWebsiteForm(form){const response=await fetch(form.dataset.endpoint||'/api/contact',{method:'POST',headers:{'content-type':'application/json','accept':'application/json'},body:JSON.stringify(formPayload(form)),credentials:'same-origin'});let result={};try{result=await response.json()}catch{}if(!response.ok){const error=new Error(result.message||`Form delivery failed (${response.status}).`);error.status=response.status;throw error}return result}
-  function trackFormSuccess(form){const formType=form.dataset.formType||'ATechSpot Website Form';if(typeof window.gtag==='function')window.gtag('event','form_submit_success',{form_type:formType,page_location:location.href});if(typeof window.clarity==='function')window.clarity('event','form_submit_success')}
+  function trackFormSuccess(form){const formType=form.dataset.formType||'ATechSpot Website Form';if(typeof window.gtag==='function'){window.gtag('event','form_submit_success',{form_type:formType,page_location:location.href});window.gtag('event','generate_lead',{form_type:formType,page_location:location.href})}if(typeof window.clarity==='function')window.clarity('event','form_submit_success')}
   function wireForm(form){if(form.dataset.formWired)return;form.dataset.formWired='true';const started=form.querySelector('input[name="form_started_at"]');if(started)started.value=String(Date.now());form.addEventListener('submit',async event=>{event.preventDefault();if(!form.reportValidity())return;const status=form.querySelector('[data-status]');const button=form.querySelector('button[type="submit"]');const original=button?.textContent||'';if(status){status.textContent='Sending your request securely…';status.removeAttribute('data-error')}if(button){button.disabled=true;button.setAttribute('aria-busy','true');button.textContent='Sending…'}try{const result=await sendWebsiteForm(form);trackFormSuccess(form);if(status)status.textContent=result.message||'Thank you. Your request was received successfully.';const successUrl=form.dataset.successUrl;if(successUrl){location.assign(successUrl);return}form.reset();if(started)started.value=String(Date.now())}catch(error){console.error('ATechSpot form delivery error',error);if(status){status.textContent='We could not send the form right now. Please try again shortly or call (713) 396-2993.';status.setAttribute('data-error','true')}}finally{if(button){button.disabled=false;button.removeAttribute('aria-busy');button.textContent=original}}})}
   document.querySelectorAll('[data-email-form],[data-secure-form]').forEach(wireForm);
 

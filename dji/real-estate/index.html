@@ -51,7 +51,7 @@
 </main>
 <footer class="footer"><div class="wrap footer-row"><span>ATechSpot DJI • Independent buyer guidance</span><span><a href="/dji/">All DJI picks</a> • <a href="/affiliate-disclosure/">Affiliate disclosure</a> • <a href="/contact/">Contact</a></span></div></footer>
 <script>
-  document.querySelectorAll('.outbound').forEach(function(link){link.addEventListener('click',function(){window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:'dji_real_estate_outbound_click',model:this.dataset.model||'',seller:this.dataset.seller||''});});});
+  document.querySelectorAll('.outbound').forEach(function(link){link.addEventListener('click',function(){typeof window.gtag==='function'&&window.gtag('event','dji_real_estate_outbound_click',{model:this.dataset.model||'',seller:this.dataset.seller||''});});});
 </script>
 </body>
 </html>

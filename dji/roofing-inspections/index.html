@@ -58,8 +58,8 @@
 </main>
 <footer class="footer"><div class="wrap footer-row"><span>ATechSpot DJI • Independent buying and workflow guides</span><span><a href="/dji/">DJI hub</a> • <a href="/dji/real-estate/">Real estate guide</a> • <a href="/affiliate-disclosure/">Disclosure</a></span></div></footer>
 <script>
-document.querySelectorAll('.outbound').forEach(function(a){a.addEventListener('click',function(){window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:'dji_roofing_outbound_click',model:a.dataset.model||'unknown',seller:'DJIUSA.com'});});});
-document.querySelectorAll('.intake-link').forEach(function(a){a.addEventListener('click',function(){window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:'dji_roofing_intake_click',placement:a.textContent.trim()});});});
+document.querySelectorAll('.outbound').forEach(function(a){a.addEventListener('click',function(){typeof window.gtag==='function'&&window.gtag('event','dji_roofing_outbound_click',{model:a.dataset.model||'unknown',seller:'DJIUSA.com'});});});
+document.querySelectorAll('.intake-link').forEach(function(a){a.addEventListener('click',function(){typeof window.gtag==='function'&&window.gtag('event','dji_roofing_intake_click',{placement:a.textContent.trim()});});});
 </script>
 </body>
 </html>
