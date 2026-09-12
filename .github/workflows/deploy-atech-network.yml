@@ -1,0 +1,73 @@
+name: Deploy ATech Network
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'ATech-Network-Website/**'
+      - '.github/workflows/deploy-atech-network.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: atech-network-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validate Website #16 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f ATech-Network-Website/worker.js
+          test -f ATech-Network-Website/wrangler.jsonc
+          grep -q 'Watch. Sponsor.' ATech-Network-Website/worker.js
+          grep -q 'Six launch concepts' ATech-Network-Website/worker.js
+          grep -q 'ATech Network Preview Reel' ATech-Network-Website/worker.js
+          grep -q 'Founding Sponsor' ATech-Network-Website/worker.js
+          grep -q 'Creator submission' ATech-Network-Website/worker.js
+          grep -q 'Streaming / CTV' ATech-Network-Website/worker.js
+          grep -q 'MEDIA KIT' ATech-Network-Website/worker.js
+          grep -q 'G-P5FFL89J6T' ATech-Network-Website/worker.js
+          grep -q '/api/network-inquiry' ATech-Network-Website/worker.js
+          grep -q 'atechnetwork.atechspot.com' ATech-Network-Website/wrangler.jsonc
+          ! grep -q '10M+\|500+\|Roku\|Amazon Fire\|Samsung TV Plus\|LG Channels' ATech-Network-Website/worker.js || (echo 'Unverified audience/distribution claim found' && exit 1)
+          node --check ATech-Network-Website/worker.js
+          echo 'ATech Network source QA passed.'
+
+      - name: Verify Cloudflare credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || (echo 'Missing CLOUDFLARE_API_TOKEN' && exit 1)
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo 'Missing CLOUDFLARE_ACCOUNT_ID' && exit 1)
+
+      - name: Deploy Website #16 custom-domain Worker
+        working-directory: ATech-Network-Website
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@latest deploy
+
+      - name: Diagnose production routes
+        shell: bash
+        continue-on-error: true
+        run: |
+          sleep 8
+          for path in / /watch/ /shows/ /sponsor/ /creators/ /distribute/ /media-kit/ /robots.txt /sitemap.xml /api/health; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' "https://atechnetwork.atechspot.com${path}" || true)
+            echo "$path -> $code"
+          done
+          curl -sSI https://atechnetwork.atechspot.com/ | head -n 25 || true
