@@ -3,6 +3,13 @@
   "name": "atech-network",
   "main": "seo-worker-v3.js",
   "compatibility_date": "2026-09-12",
+  "rules": [
+    {
+      "type": "Text",
+      "globs": ["**/*.b64"],
+      "fallthrough": true
+    }
+  ],
   "routes": [
     {
       "pattern": "atechnetwork.atechspot.com",
