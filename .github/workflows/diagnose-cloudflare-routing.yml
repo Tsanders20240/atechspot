@@ -13,7 +13,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Query Workers, DNS and public route signatures
+      - name: Query Workers, WAF and public route signatures
         shell: bash
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -40,27 +40,28 @@ jobs:
             curl -fsS "https://api.cloudflare.com/client/v4/zones/$zone_id/workers/routes" "${auth[@]}" \
               | jq '{success, errors, result: [.result[]? | select(.pattern|contains("atechspot.com")) | {id,pattern,script}]}'
 
-            echo '=== DNS records for five SEO hosts ==='
-            dns_json=$(curl -sS "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records?per_page=500" "${auth[@]}" || true)
-            if echo "$dns_json" | jq -e '.success == true' >/dev/null 2>&1; then
-              echo "$dns_json" | jq '{success, errors, result: [.result[]? | select(.name=="atechspot.com" or .name=="www.atechspot.com" or .name=="abcoftech.atechspot.com" or .name=="atechucation.atechspot.com" or .name=="creator.atechspot.com" or .name=="abctechproducts.atechspot.com" or .name=="www.abctechproducts.atechspot.com") | {id,type,name,content,proxied,proxiable}]}'
-            else
-              echo "$dns_json" | jq '{success,errors}' || true
+            echo '=== Zone rulesets ==='
+            rulesets_json=$(curl -sS "https://api.cloudflare.com/client/v4/zones/$zone_id/rulesets" "${auth[@]}" || true)
+            echo "$rulesets_json" | jq '{success,errors,result:[.result[]? | {id,name,kind,phase,version,last_updated}]}' || true
+            if echo "$rulesets_json" | jq -e '.success == true' >/dev/null 2>&1; then
+              echo "$rulesets_json" | jq -r '.result[]?.id' | while read -r rid; do
+                [ -n "$rid" ] || continue
+                echo "--- ruleset $rid"
+                curl -sS "https://api.cloudflare.com/client/v4/zones/$zone_id/rulesets/$rid" "${auth[@]}" \
+                  | jq '{success,errors,result:{id:.result.id,name:.result.name,kind:.result.kind,phase:.result.phase,rules:[.result.rules[]? | {id,action,description,enabled,expression,action_parameters}]}}' || true
+              done
             fi
           fi
 
-          echo '=== Pages projects availability ==='
-          pages_json=$(curl -sS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects?per_page=100" "${auth[@]}" || true)
-          echo "$pages_json" | jq '{success,errors,result_count:(.result|length? // 0)}' || true
-
           echo '=== Public route signatures ==='
           for url in \
-            'https://abcoftech.atechspot.com/' \
-            'https://abcoftech.atechspot.com/api/health' \
-            'https://abcoftech.atechspot.com/free-resources/virtual-reality-coloring-page/' \
             'https://creator.atechspot.com/' \
-            'https://www.abctechproducts.atechspot.com/' \
-            'https://www.abctechproducts.atechspot.com/api/health'; do
+            'https://creator.atechspot.com/robots.txt' \
+            'https://creator.atechspot.com/sitemap.xml' \
+            'https://www.atechspot.com/sitemap.xml'; do
             echo "--- $url"
-            curl -sSIL --max-redirs 3 -A 'Mozilla/5.0' "$url" | grep -Ei '^(HTTP/|server:|location:|cf-ray:|cf-mitigated:|content-type:|x-powered-by:|vary:|link:)' | head -n 18 || true
+            for ua in 'Mozilla/5.0' 'Googlebot/2.1 (+http://www.google.com/bot.html)' 'GSCWizard-Bot/1.0 (On-Page SEO Checker)'; do
+              echo "UA: $ua"
+              curl -sSIL --max-redirs 3 -A "$ua" "$url" | grep -Ei '^(HTTP/|server:|location:|cf-ray:|cf-mitigated:|content-type:)' | head -n 12 || true
+            done
           done
