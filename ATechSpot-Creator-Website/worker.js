@@ -8,12 +8,15 @@ async function proxyLead(request,target,extra={}){
   const text=await upstream.text();
   return new Response(text,{status:upstream.status,headers:JSON_HEADERS});
 }
+function enhanceHtml(response){return new HTMLRewriter().on('head',{element(el){el.append('<script src="/analytics.js" defer></script>',{html:true});}}).transform(response)}
 export default{async fetch(request,env){
   const url=new URL(request.url);
-  if(url.pathname==='/api/health')return json(200,{ok:true,property:'ATechSpot Creator',domain:'creator.atechspot.com'});
+  if(url.pathname==='/api/health')return json(200,{ok:true,property:'ATechSpot Creator',domain:'creator.atechspot.com',ga4:'G-P5FFL89J6T'});
   if(url.pathname==='/api/creator-assessment')return proxyLead(request,'/api/assessment',{'Department':'sales'});
   if(url.pathname==='/api/creator-contact')return proxyLead(request,'/api/contact',{'Department':'sales'});
-  const response=await env.ASSETS.fetch(request);
+  let response=await env.ASSETS.fetch(request);
   const headers=new Headers(response.headers);headers.set('x-content-type-options','nosniff');headers.set('referrer-policy','strict-origin-when-cross-origin');headers.set('permissions-policy','camera=(), microphone=(), geolocation=()');
-  return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+  response=new Response(response.body,{status:response.status,statusText:response.statusText,headers});
+  if((response.headers.get('content-type')||'').includes('text/html')&&request.method==='GET')return enhanceHtml(response);
+  return response;
 }};
