@@ -1,0 +1,52 @@
+name: QA DJI Outbound Links
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dji/**'
+      - '.github/workflows/qa-dji-outbound-links.yml'
+  pull_request:
+    paths:
+      - 'dji/**'
+      - '.github/workflows/qa-dji-outbound-links.yml'
+  workflow_dispatch:
+
+jobs:
+  dji-link-safety:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Block broken DJI Mini 5 Pro affiliate destinations
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # The tracked DJI Store Mini 5 Pro destination has returned DJI's
+          # "page does not exist" screen. Never publish it from ATechSpot.
+          if grep -RIn --include='*.html' 'store\.dji\.com/product/dji-mini-5-pro' dji; then
+            echo 'ERROR: broken DJI Store Mini 5 Pro destination found.'
+            exit 1
+          fi
+
+          # Old affiliate parameters are intentionally excluded from the
+          # current DJI editorial cluster until a working U.S. destination is verified.
+          if grep -RIn --include='*.html' -E 'clickaid=|clickpid=8880094|clicksid=' dji; then
+            echo 'ERROR: stale DJI affiliate tracking URL found in DJI pages.'
+            exit 1
+          fi
+
+          # Mini 5 Pro must use the current U.S. seller path everywhere it is shoppable.
+          grep -RIl --include='*.html' 'DJI Mini 5 Pro' dji | while read -r file; do
+            if grep -q 'href="https://www.djiusa.com/products/dji-mini-5-pro"' "$file"; then
+              echo "Mini 5 Pro seller path verified: $file"
+            else
+              echo "INFO: $file mentions Mini 5 Pro without a direct seller CTA; no broken affiliate URL found."
+            fi
+          done
+
+          echo 'DJI outbound-link safety QA passed.'
