@@ -1,0 +1,129 @@
+name: Deploy ATechSpot Email Backend
+
+on:
+  push:
+    paths:
+      - .github/workflows/deploy-atechspot-email-backend.yml
+      - _worker.js
+  workflow_dispatch:
+
+concurrency:
+  group: atechspot-email-backend
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Deploy secured Pages backend using preview secret environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@latest pages deploy . --project-name atechspot --branch email-backend 2>&1 | tee /tmp/email-pages.log
+          deploy_url=$(grep -oE 'https://[a-f0-9]+\.atechspot\.pages\.dev' /tmp/email-pages.log | tail -n1)
+          test -n "$deploy_url"
+          echo "EMAIL_DEPLOY_URL=$deploy_url" >> "$GITHUB_ENV"
+          echo "Email backend deployment: $deploy_url"
+
+      - name: Verify Resend secret on secured backend
+        shell: bash
+        run: |
+          set -euo pipefail
+          code=000
+          for attempt in 1 2 3 4 5 6 7 8; do
+            code=$(curl -sS -o /tmp/email-health.json -w '%{http_code}' "$EMAIL_DEPLOY_URL/api/form-health" || true)
+            echo "Secured backend form-health -> $code (attempt $attempt/8)"
+            if [ "$code" = "200" ]; then break; fi
+            sleep 4
+          done
+          cat /tmp/email-health.json
+          node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/email-health.json','utf8'));if(j.ok!==true||j.resendConfigured!==true)process.exit(1)"
+
+      - name: Deploy custom-domain API proxy Worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/atechspot-email-proxy.js <<'EOF'
+          const BACKEND='https://email-backend.atechspot.pages.dev';
+          const ALLOWED_ORIGINS=new Set(['https://www.atechspot.com','https://atechspot.com']);
+          export default {
+            async fetch(request) {
+              const incoming=new URL(request.url);
+              if(!incoming.pathname.startsWith('/api/')) return new Response('Not found',{status:404});
+              const origin=request.headers.get('Origin');
+              if(origin && !ALLOWED_ORIGINS.has(origin)) return new Response('Forbidden',{status:403});
+              const target=new URL(BACKEND);
+              target.pathname=incoming.pathname;
+              target.search=incoming.search;
+              const headers=new Headers(request.headers);
+              headers.set('X-ATechSpot-API-Proxy','production');
+              headers.set('X-Forwarded-Host',incoming.host);
+              const init={method:request.method,headers,redirect:'manual'};
+              if(request.method!=='GET'&&request.method!=='HEAD') init.body=request.body;
+              const response=await fetch(new Request(target.toString(),init));
+              const outHeaders=new Headers(response.headers);
+              outHeaders.set('X-ATechSpot-API','secure-email-v2');
+              return new Response(response.body,{status:response.status,statusText:response.statusText,headers:outHeaders});
+            }
+          };
+          EOF
+          cat > /tmp/wrangler-email.jsonc <<EOF
+          {
+            "name": "atechspot-email",
+            "main": "atechspot-email-proxy.js",
+            "compatibility_date": "2026-09-12",
+            "account_id": "$CLOUDFLARE_ACCOUNT_ID"
+          }
+          EOF
+          cp /tmp/atechspot-email-proxy.js /tmp/atechspot-email-proxy-deploy.js
+          cd /tmp
+          npx --yes wrangler@latest deploy atechspot-email-proxy-deploy.js --name atechspot-email --compatibility-date 2026-09-12
+
+      - name: Verify custom-domain API and email delivery
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 3
+          health_code=$(curl -sS -o /tmp/prod-health.json -w '%{http_code}' https://www.atechspot.com/api/form-health)
+          echo "Production form-health -> $health_code"
+          cat /tmp/prod-health.json
+          test "$health_code" = "200"
+          node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/prod-health.json','utf8'));if(j.ok!==true||j.resendConfigured!==true)process.exit(1)"
+
+          empty_code=$(curl -sS -o /tmp/empty-intake.json -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{}' https://www.atechspot.com/api/intake)
+          echo "Empty intake validation -> $empty_code"
+          test "$empty_code" = "400"
+
+          started=$(( $(date +%s%3N) - 5000 ))
+          cat > /tmp/qa-intake.json <<EOF
+          {
+            "Full Name":"ATechSpot Production QA",
+            "Email":"aplustechucation@gmail.com",
+            "Topic":"Website Design / Development / Conversion",
+            "Preferred Timeframe":"As soon as practical",
+            "Budget Range":"Not sure — recommend a realistic range",
+            "Message":"Automated production QA test after secure ATechSpot intake routing repair.",
+            "Desired Outcome":"Verify secure intake email delivery through the production website.",
+            "Ecosystem Path":"Websites Apps and Automation",
+            "form_started_at":"$started",
+            "website":""
+          }
+          EOF
+          submit_code=$(curl -sS -o /tmp/qa-result.json -w '%{http_code}' -X POST -H 'content-type: application/json' -H 'Origin: https://www.atechspot.com' --data-binary @/tmp/qa-intake.json https://www.atechspot.com/api/intake)
+          echo "Production QA intake -> $submit_code"
+          cat /tmp/qa-result.json
+          test "$submit_code" = "200"
+          node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/qa-result.json','utf8'));if(j.ok!==true)process.exit(1)"
