@@ -26,22 +26,19 @@ jobs:
 
           ga_id = 'G-P5FFL89J6T'
 
-          # 1) Make GA4 available on every standard ATechSpot page that loads assets/site.js.
           p = Path('assets/site.js')
           s = p.read_text(encoding='utf-8')
           if 'function ensureGa4()' not in s:
               marker = "  const LIVE_PAYMENTS={executiveReview:'https://book.stripe.com/3cI3cw1j00aG6X93LA6EU04'};\n"
-              addition = marker + f"\n  function ensureGa4(){{\n    const id='{ga_id}';\n    if(typeof window.gtag==='function')return;\n    window.dataLayer=window.dataLayer||[];\n    window.gtag=function(){{window.dataLayer.push(arguments)}};\n    window.gtag('js',new Date());\n    window.gtag('config',id,{{send_page_view:true}});\n    if(!document.querySelector(`script[src*=\"googletagmanager.com/gtag/js?id=${{id}}\"]`)){{const script=document.createElement('script');script.async=true;script.src=`https://www.googletagmanager.com/gtag/js?id=${{encodeURIComponent(id)}}`;document.head.appendChild(script)}}\n  }}\n"
+              addition = marker + "\n  function ensureGa4(){\n    const id='G-P5FFL89J6T';\n    if(typeof window.gtag==='function')return;\n    window.dataLayer=window.dataLayer||[];\n    window.gtag=function(){window.dataLayer.push(arguments)};\n    window.gtag('js',new Date());\n    window.gtag('config',id,{send_page_view:true});\n    if(!document.querySelector('script[src*=\"googletagmanager.com/gtag/js?id='+id+'\"]')){const script=document.createElement('script');script.async=true;script.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(id);document.head.appendChild(script)}\n  }\n"
               if marker not in s:
                   raise SystemExit('site.js insertion marker not found')
               s = s.replace(marker, addition, 1)
 
-          # Call GA4 bootstrap before the rest of the shared site behavior.
           startup = '  ensureTransparentCorporateLogo();normalizeRoutes();ensureSkipLink();ensureAccessibleHeader();enforcePrimaryCtas();wireLivePayments();'
           if startup in s and 'ensureGa4();ensureTransparentCorporateLogo()' not in s:
               s = s.replace(startup, '  ensureGa4();ensureTransparentCorporateLogo();normalizeRoutes();ensureSkipLink();ensureAccessibleHeader();enforcePrimaryCtas();wireLivePayments();', 1)
 
-          # Successful form delivery = genuine lead event, not merely form intent.
           old = "function trackFormSuccess(form){const formType=form.dataset.formType||'ATechSpot Website Form';if(typeof window.gtag==='function')window.gtag('event','form_submit_success',{form_type:formType,page_location:location.href});if(typeof window.clarity==='function')window.clarity('event','form_submit_success')}"
           new = "function trackFormSuccess(form){const formType=form.dataset.formType||'ATechSpot Website Form';if(typeof window.gtag==='function'){window.gtag('event','form_submit_success',{form_type:formType,page_location:location.href});window.gtag('event','generate_lead',{form_type:formType,page_location:location.href})}if(typeof window.clarity==='function')window.clarity('event','form_submit_success')}"
           if old in s:
@@ -50,34 +47,28 @@ jobs:
               raise SystemExit('trackFormSuccess marker not found')
           p.write_text(s, encoding='utf-8')
 
-          # 2) DJI pages load gtag.js, so send custom events with gtag() instead of GTM-style object pushes.
           changed = 0
           for p in Path('dji').rglob('index.html'):
               text = p.read_text(encoding='utf-8')
               before = text
 
-              # Convert object pushes whose first key is event:'dji_*' into gtag('event', name, params).
-              pattern = re.compile(r"(?:window\.dataLayer&&)?window\.dataLayer\.push\(\{event:'(dji_[^']+)'(?:,([^}]*))?\}\)")
+              patterns = [
+                  re.compile(r"window\.dataLayer&&window\.dataLayer\.push\(\{event:'(dji_[^']+)'(?:,([^}]*))?\}\)"),
+                  re.compile(r"window\.dataLayer=window\.dataLayer\|\|\[\];window\.dataLayer\.push\(\{event:'(dji_[^']+)'(?:,([^}]*))?\}\)"),
+                  re.compile(r"window\.dataLayer\.push\(\{event:'(dji_[^']+)'(?:,([^}]*))?\}\)")
+              ]
               def repl(m):
                   name = m.group(1)
                   rest = (m.group(2) or '').strip()
                   params = '{' + rest + '}' if rest else '{}'
-                  return f"typeof window.gtag==='function'&&window.gtag('event','{name}',{params})"
-              text = pattern.sub(repl, text)
-
-              # Handle the common guarded form: window.dataLayer&&window.dataLayer.push(...)
-              pattern2 = re.compile(r"window\.dataLayer&&window\.dataLayer\.push\(\{event:'(dji_[^']+)'(?:,([^}]*))?\}\)")
-              text = pattern2.sub(repl, text)
-
-              # Handle pages that first initialize dataLayer and then push the event.
-              pattern3 = re.compile(r"window\.dataLayer=window\.dataLayer\|\|\[\];window\.dataLayer\.push\(\{event:'(dji_[^']+)'(?:,([^}]*))?\}\)")
-              text = pattern3.sub(repl, text)
+                  return "typeof window.gtag==='function'&&window.gtag('event','" + name + "'," + params + ")"
+              for pattern in patterns:
+                  text = pattern.sub(repl, text)
 
               if text != before:
                   p.write_text(text, encoding='utf-8')
                   changed += 1
 
-          # Verify no DJI custom events remain as GTM object pushes.
           leftovers = []
           for p in Path('dji').rglob('index.html'):
               t = p.read_text(encoding='utf-8')
@@ -86,7 +77,6 @@ jobs:
           if leftovers:
               raise SystemExit('Unconverted DJI dataLayer events: ' + ', '.join(leftovers))
 
-          # 3) /intake/ is deliberately noindex; remove it from the XML sitemap instead of sending mixed signals.
           sm = Path('sitemap.xml')
           xml = sm.read_text(encoding='utf-8')
           xml2 = re.sub(r'\s*<url><loc>https://www\.atechspot\.com/intake/</loc></url>', '', xml, count=1)
