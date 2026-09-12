@@ -40,6 +40,33 @@ jobs:
           grep -q '22-PROPERTY ECOSYSTEM' ecosystem/index.html
           grep -q 'ATechSpot RemoteCare' ecosystem/index.html
           grep -q 'ATechSpot Tech Guru' ecosystem/index.html
+          grep -q 'WEDDING &amp; FAMILY LEGACY' ecosystem/index.html
+          grep -q 'INDEPENDENT APPAREL BRAND' ecosystem/index.html
+
+          # Flagship routing and visual-system protections.
+          grep -q 'One place to' index.html
+          grep -q 'journey-grid' index.html
+          grep -q '/remote-support/' index.html
+          grep -q '/assessment/' index.html
+          grep -q '/creator/' index.html
+          grep -q 'https://atechucation.atechspot.com/' index.html
+          grep -q 'https://www.abctechproducts.atechspot.com/' index.html
+          grep -q 'https://atechnetwork.atechspot.com/' index.html
+          test -f flagship.css
+          test -f flagship-fix.css
+          grep -q 'journey-grid' flagship-fix.css
+          grep -q '320px' assets/site.js
+
+          # Secure forms must stay same-origin. Never return to preview-domain or mail-client delivery.
+          grep -q 'data-endpoint="/api/assessment"' assessment/index.html
+          grep -q 'data-endpoint="/api/assessment"' ai-readiness/index.html
+          grep -q 'data-endpoint="/api/intake"' intake/index.html
+          ! grep -q 'atechspot.pages.dev/api/intake' intake/index.html
+          grep -q "fetch('/api/intake'" intake/intake.js
+          grep -q 'stopImmediatePropagation' intake/intake.js
+          grep -q '20260912-secure' intake/index.html
+          grep -q 'normalizedEndpoint' assets/site.js
+
           test -f dji/index.html
           grep -q 'Clear DJI picks for' dji/index.html
           grep -q '02 / FIVE CLEAR PICKS' dji/index.html
@@ -105,9 +132,6 @@ jobs:
           grep -q 'Build my drone workflow' dji/buying-guide/index.html
           grep -q 'https://www.atechspot.com/dji/buying-guide/' sitemap.xml
 
-          grep -q 'data-endpoint="/api/assessment"' assessment/index.html
-          grep -q 'data-endpoint="/api/assessment"' ai-readiness/index.html
-          grep -q 'data-endpoint="https://atechspot.pages.dev/api/intake"' intake/index.html
           grep -q 'https://start.atechspot.com/' resources/index.html
           test -f payments/index.html
           test -f commerce-terms/index.html
@@ -158,6 +182,16 @@ jobs:
           for path in / /ecosystem/ /dji/ /dji/real-estate/ /dji/roofing-inspections/ /dji/mini-5-pro-vs-mavic-4-pro/ /dji/construction/ /dji/buying-guide/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /payments/ /commerce-terms/ /payment-success/; do
             check_path "$path"
           done
+
+          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/" -o /tmp/home.html
+          grep -q 'One place to' /tmp/home.html
+          grep -q 'journey-grid' /tmp/home.html
+
+          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/intake/" -o /tmp/intake.html
+          grep -q 'data-endpoint="/api/intake"' /tmp/intake.html
+          grep -q '20260912-secure' /tmp/intake.html
+          ! grep -q 'atechspot.pages.dev/api/intake' /tmp/intake.html
+
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/ecosystem/" -o /tmp/ecosystem.html
           grep -q '22-PROPERTY ECOSYSTEM' /tmp/ecosystem.html
           grep -q 'ATechSpot RemoteCare' /tmp/ecosystem.html
@@ -244,3 +278,6 @@ jobs:
           curl -sSI https://www.atechspot.com/dji/construction/ | head -n 20 || true
           curl -sSI https://www.atechspot.com/dji/buying-guide/ | head -n 20 || true
           curl -sSI https://www.atechspot.com/payments/ | head -n 20 || true
+          prod_health_code=$(curl -sS -o /tmp/prod-form-health.json -w '%{http_code}' https://www.atechspot.com/api/form-health || true)
+          echo "Production form-health -> $prod_health_code"
+          cat /tmp/prod-form-health.json 2>/dev/null || true
