@@ -162,6 +162,8 @@ jobs:
           grep -q '22-PROPERTY ECOSYSTEM' /tmp/ecosystem.html
           grep -q 'ATechSpot RemoteCare' /tmp/ecosystem.html
           grep -q 'ATechSpot Tech Guru' /tmp/ecosystem.html
+          grep -q 'WEDDING &amp; FAMILY LEGACY' /tmp/ecosystem.html
+          grep -q 'INDEPENDENT APPAREL BRAND' /tmp/ecosystem.html
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/dji/" -o /tmp/dji.html
           grep -q 'Clear DJI picks for' /tmp/dji.html
@@ -217,9 +219,14 @@ jobs:
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/payments/" -o /tmp/payments.html
           grep -q 'Payments &amp; Billing\|Payments & Billing' /tmp/payments.html
-          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/api/form-health" -o /tmp/form-health.json
+
+          # Preview deployments intentionally do not inherit the production-only
+          # RESEND_API_KEY. Validate endpoint structure and routing without
+          # treating MISSING_RESEND_KEY on preview as a broken production site.
+          form_health_code=$(curl -sS --retry 4 --retry-delay 3 --retry-all-errors -o /tmp/form-health.json -w '%{http_code}' "$DEPLOY_URL/api/form-health" || true)
           cat /tmp/form-health.json
-          node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('/tmp/form-health.json','utf8')); if(!j.ok||!j.resendConfigured||!Array.isArray(j.publicInboxes)||j.publicInboxes.length!==6) process.exit(1);"
+          echo "Preview form-health -> $form_health_code"
+          node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('/tmp/form-health.json','utf8')); const code=process.argv[1]; const inboxes=Array.isArray(j.publicInboxes)&&j.publicInboxes.length===6; const healthy=code==='200'&&j.ok===true&&j.resendConfigured===true; const previewExpected=code==='503'&&j.ok===false&&j.resendConfigured===false; if(!inboxes||(!healthy&&!previewExpected)) process.exit(1);" "$form_health_code"
           echo 'Deployment preview QA passed.'
 
       - name: Report custom-domain status
