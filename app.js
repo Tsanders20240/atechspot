@@ -1,4 +1,9 @@
 (() => {
+  const flagshipCss = document.createElement('link');
+  flagshipCss.rel = 'stylesheet';
+  flagshipCss.href = '/flagship.css?v=20260912-1';
+  document.head.appendChild(flagshipCss);
+
   const intro = document.getElementById('microIntro');
   const seen = sessionStorage.getItem('atechspotIntroSeen');
   if (seen) intro?.classList.add('done');
@@ -25,6 +30,26 @@
     }
   }), { threshold: .08 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  const track = (eventName, params = {}) => {
+    if (window.gtag) gtag('event', eventName, { brand: 'ATechSpot', ...params });
+  };
+
+  document.querySelectorAll('[data-ecosystem-route]').forEach(link => {
+    link.addEventListener('click', () => track('ecosystem_route_select', {
+      route: link.dataset.ecosystemRoute,
+      destination: link.href
+    }));
+  });
+  document.querySelectorAll('a[href="/intake/"],a[href^="/intake/?"]').forEach(link => {
+    link.addEventListener('click', () => track('project_intake_start', { destination: link.href }));
+  });
+  document.querySelectorAll('a[href="/remote-support/"]').forEach(link => {
+    link.addEventListener('click', () => track('support_route_select', { destination: '/remote-support/' }));
+  });
+  document.querySelectorAll('a[href="/assessment/"]').forEach(link => {
+    link.addEventListener('click', () => track('assessment_start', { destination: '/assessment/' }));
+  });
 
   const nodeLabel = document.getElementById('activeNode');
   document.querySelectorAll('.node-stack button').forEach(btn => {
@@ -71,7 +96,7 @@
     routeResult.innerHTML = `<div class="route-copy"><strong>Your recommended starting point</strong><span>${recommendation.text}</span></div><div class="route-actions"><a class="btn btn-primary" href="${intakeUrl}">Continue With This Need →</a><a class="btn btn-ghost" href="/contact/">Ask ATechSpot a Question</a></div>`;
     routeResult.classList.add('show');
     routeResult.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    if (window.gtag) gtag('event', 'assessment_route_selected', { route: card.dataset.route, recommended_topic: recommendation.topic });
+    track('assessment_route_selected', { route: card.dataset.route, recommended_topic: recommendation.topic });
   }));
 
   const conversionStyle = document.createElement('style');
@@ -133,10 +158,9 @@
     draw();
   }
 
-  /* Founder portrait: use the validated optimized production asset. */
   const founderImg = document.querySelector('.founder-photo-card img');
   if (founderImg) {
-    founderImg.src = '/assets/atechspot-founder-ceo.webp?v=20260910-10';
+    founderImg.src = '/assets/atechspot-founder-ceo.webp?v=20260912-1';
     founderImg.alt = 'Jason Hughes, Founder and CEO of ATechSpot, in the ATechSpot technology command center';
     founderImg.removeAttribute('srcset');
     founderImg.loading = 'lazy';
@@ -154,7 +178,6 @@
     else founderCopy.appendChild(identity);
   }
 
-  /* Give every offer a clear conversion destination. */
   document.querySelectorAll('.price-card').forEach(card => {
     const title = card.querySelector('h3')?.textContent.trim();
     const link = card.querySelector('a');
@@ -164,8 +187,6 @@
     if (title === 'GrowthCare') link.href = '/intake/?topic=GrowthCare%20Ongoing%20Optimization#project-intake';
   });
 
-  /* Exact ATechSpot logo treatment. Keep the CSS wordmark as a fail-safe, and
-     remove only edge-connected near-white pixels so internal white logo details survive. */
   const logoStyle = document.createElement('style');
   logoStyle.textContent = `
     .site-header{min-height:94px}
@@ -183,7 +204,7 @@
   const processLogo = () => {
     const source = new Image();
     source.decoding = 'async';
-    source.src = '/assets/atechspot-logo.png?v=20260910-10';
+    source.src = '/assets/atechspot-logo.png?v=20260912-1';
     source.onload = () => {
       try {
         const canvas = document.createElement('canvas');
@@ -222,7 +243,6 @@
           if (y + 1 < H) push(x, y + 1);
         }
         ctx.putImageData(image, 0, 0);
-
         let minX = W, minY = H, maxX = -1, maxY = -1;
         for (let y = 0; y < H; y++) {
           for (let x = 0; x < W; x++) {
@@ -243,7 +263,6 @@
         out.height = maxY - minY + 1;
         out.getContext('2d').drawImage(canvas, minX, minY, out.width, out.height, 0, 0, out.width, out.height);
         const transparentLogo = out.toDataURL('image/png');
-
         document.querySelectorAll('.brand').forEach(brand => {
           let img = brand.querySelector('.brand-logo-clean');
           if (!img) {
