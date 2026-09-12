@@ -1,0 +1,37 @@
+name: Diagnose ATech Network WAF
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Discover zone and security APIs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          api='https://api.cloudflare.com/client/v4'
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          echo '== token verify =='
+          curl -fsS "${auth[@]}" "$api/user/tokens/verify" | python -m json.tool || true
+          echo '== zone lookup =='
+          zone_json=$(curl -fsS "${auth[@]}" "$api/zones?name=atechspot.com")
+          echo "$zone_json" | python -m json.tool
+          zone_id=$(python -c 'import json,sys; j=json.load(sys.stdin); print(j["result"][0]["id"] if j.get("result") else "")' <<<"$zone_json")
+          test -n "$zone_id"
+          echo "ZONE_ID=$zone_id"
+          echo '== custom rules entrypoint =='
+          curl -sS -w '\nHTTP_STATUS=%{http_code}\n' "${auth[@]}" "$api/zones/$zone_id/rulesets/phases/http_request_firewall_custom/entrypoint" | tee /tmp/custom.txt
+          echo '== managed phase entrypoint =='
+          curl -sS -w '\nHTTP_STATUS=%{http_code}\n' "${auth[@]}" "$api/zones/$zone_id/rulesets/phases/http_request_firewall_managed/entrypoint" | tee /tmp/managed.txt
+          echo '== bot fight mode setting =='
+          curl -sS -w '\nHTTP_STATUS=%{http_code}\n' "${auth[@]}" "$api/zones/$zone_id/bot_management" | tee /tmp/bot.txt
+          echo '== security level =='
+          curl -sS -w '\nHTTP_STATUS=%{http_code}\n' "${auth[@]}" "$api/zones/$zone_id/settings/security_level" | tee /tmp/security.txt
+          echo '== browser integrity check =='
+          curl -sS -w '\nHTTP_STATUS=%{http_code}\n' "${auth[@]}" "$api/zones/$zone_id/settings/browser_check" | tee /tmp/bic.txt
