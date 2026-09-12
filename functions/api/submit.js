@@ -112,7 +112,7 @@ export async function onRequestPost({ request, env }) {
       from: env.FORM_FROM_EMAIL,
       to: [env.FORM_TO_EMAIL],
       reply_to: email,
-      subject: `[Website Lead] ${clean(body.form_type || "Website Form", 100)} — ${name}`,
+      subject: `[Website Lead] ${clean(body.form_type || body["Form Type"] || "Website Form", 100)} — ${name}`,
       html: `<h2>New website lead</h2><table style="border-collapse:collapse">${rows}</table>`
     })
   });
