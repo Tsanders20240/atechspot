@@ -13,7 +13,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Query Worker custom domains and routes
+      - name: Query Workers, Pages and public route signatures
         shell: bash
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -30,6 +30,25 @@ jobs:
           curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts" "${auth[@]}" \
             | jq '{success, errors, result: [.result[]? | {id,modified_on,created_on}]}'
 
+          echo '=== Pages projects and custom domains ==='
+          pages_json=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects?per_page=100" "${auth[@]}" || true)
+          if [ -n "$pages_json" ]; then
+            echo "$pages_json" | jq '{success, errors, result: [.result[]? | {name,subdomain,production_branch,domains,source_type:(.source.type // null)}]}'
+            echo "$pages_json" | jq -r '.result[]?.name' | while read -r project; do
+              [ -n "$project" ] || continue
+              domains=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$project/domains" "${auth[@]}" || true)
+              if [ -n "$domains" ]; then
+                matches=$(echo "$domains" | jq '[.result[]? | select(.name|contains("atechspot.com")) | {name,status}]')
+                if [ "$matches" != '[]' ]; then
+                  echo "Project: $project"
+                  echo "$matches" | jq .
+                fi
+              fi
+            done
+          else
+            echo 'Pages projects unavailable with current token.'
+          fi
+
           echo '=== Resolve zone and list Worker routes ==='
           zone_json=$(curl -fsS "https://api.cloudflare.com/client/v4/zones?name=atechspot.com&account.id=$CLOUDFLARE_ACCOUNT_ID" "${auth[@]}")
           echo "$zone_json" | jq '{success, errors, result: [.result[]? | {id,name,status}]}'
@@ -37,8 +56,6 @@ jobs:
           if [ -n "$zone_id" ]; then
             curl -fsS "https://api.cloudflare.com/client/v4/zones/$zone_id/workers/routes" "${auth[@]}" \
               | jq '{success, errors, result: [.result[]? | select(.pattern|contains("atechspot.com")) | {id,pattern,script}]}'
-          else
-            echo 'Zone ID unavailable with current token.'
           fi
 
           echo '=== Public route signatures ==='
