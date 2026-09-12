@@ -1,4 +1,4 @@
-const JSON_HEADERS={"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff"};
+const JSON_HEADERS={"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff","access-control-allow-origin":"https://www.atechspot.com","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"content-type,accept"};
 const json=(status,payload)=>new Response(JSON.stringify(payload),{status,headers:JSON_HEADERS});
 const clean=(value,max=4000)=>String(value??"").replace(/\u0000/g,"").trim().slice(0,max);
 const validEmail=value=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(value)&&value.length<=254;
@@ -61,6 +61,7 @@ function transformHtml(response,url){const type=response.headers.get("content-ty
 
 export default{async fetch(request,env){
   const url=new URL(request.url);
+  if(request.method==="OPTIONS"&&url.pathname.startsWith("/api/"))return new Response(null,{status:204,headers:JSON_HEADERS});
   if(url.hostname==='atechspot.com'&&!url.pathname.startsWith('/.well-known/')){url.hostname='www.atechspot.com';return Response.redirect(url.toString(),request.method==='GET'||request.method==='HEAD'?301:308)}
   if(LEGACY_PREFIXES.some(prefix=>url.pathname.startsWith(prefix)))return redirectResponse(request,'/',301);
   if(url.pathname==="/api/form-health"){if(request.method!=="GET")return json(405,{ok:false,message:"Method not allowed."});const resendConfigured=Boolean(env.RESEND_API_KEY);return json(resendConfigured?200:503,{ok:resendConfigured,resendConfigured,deployment:"ATECHSPOT-EMAIL-ASSESSMENT-10OF10",publicInboxes:Object.values(PUBLIC_INBOXES)})}
