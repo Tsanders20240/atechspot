@@ -2,6 +2,9 @@ name: Diagnose ATech Network WAF
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/diagnose-atech-network-waf.yml'
 
 permissions:
   contents: read
