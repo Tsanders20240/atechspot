@@ -14,8 +14,9 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      GITHUB_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
     steps:
-      - name: Inspect Cloudflare routing
+      - name: Inspect Cloudflare routing and email worker
         shell: bash
         run: |
           set -euo pipefail
@@ -23,20 +24,50 @@ jobs:
           zones=$(curl -fsS "${auth[@]}" "https://api.cloudflare.com/client/v4/zones?name=atechspot.com")
           zone_id=$(printf '%s' "$zones" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);const z=j.result&&j.result[0];if(!z)process.exit(2);process.stdout.write(z.id)})")
           echo "Zone: atechspot.com ($zone_id)"
+          if [ -n "${GITHUB_RESEND_API_KEY:-}" ]; then echo 'GitHub RESEND_API_KEY: configured'; else echo 'GitHub RESEND_API_KEY: not configured'; fi
 
           echo '--- Worker routes ---'
           curl -fsS "${auth[@]}" "https://api.cloudflare.com/client/v4/zones/$zone_id/workers/routes" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);console.log(JSON.stringify({success:j.success,routes:(j.result||[]).map(r=>({id:r.id,pattern:r.pattern,script:r.script}))},null,2))})" || true
 
-          echo '--- Pages project ---'
-          curl -fsS "${auth[@]}" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/atechspot" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);const r=j.result||{};console.log(JSON.stringify({success:j.success,name:r.name,subdomain:r.subdomain,production_branch:r.production_branch,domains:r.domains,latest_deployment:r.latest_deployment&&{id:r.latest_deployment.id,url:r.latest_deployment.url,environment:r.latest_deployment.environment,aliases:r.latest_deployment.aliases}},null,2))})" || true
+          echo '--- atechspot-email Worker settings (binding names only) ---'
+          curl -sS "${auth[@]}" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/atechspot-email/settings" -o /tmp/worker-settings.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const j=JSON.parse(fs.readFileSync('/tmp/worker-settings.json','utf8'));
+          const r=j.result||{};
+          console.log(JSON.stringify({success:j.success,compatibility_date:r.compatibility_date,compatibility_flags:r.compatibility_flags,bindings:(r.bindings||[]).map(b=>({name:b.name,type:b.type,namespace_id:b.namespace_id||undefined}))},null,2));
+          NODE
 
-          echo '--- Pages custom domains ---'
-          curl -fsS "${auth[@]}" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/atechspot/domains" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const j=JSON.parse(s);console.log(JSON.stringify({success:j.success,domains:(j.result||[]).map(d=>({name:d.name,status:d.status,zone_tag:d.zone_tag}))},null,2))})" || true
+          echo '--- atechspot-email Worker source response metadata ---'
+          worker_code=$(curl -sS -o /tmp/worker-source -w '%{http_code}' -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/atechspot-email")
+          echo "Worker source API -> $worker_code; bytes=$(wc -c </tmp/worker-source)"
+          if [ "$worker_code" = "200" ]; then
+            grep -aoE '/api/[A-Za-z0-9_-]+' /tmp/worker-source | sort -u || true
+            grep -aoE 'RESEND_API_KEY|FORM_TO_EMAIL|FORM_FROM_EMAIL|api\.resend\.com' /tmp/worker-source | sort -u || true
+          fi
+
+          echo '--- Pages project binding names ---'
+          curl -fsS "${auth[@]}" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/atechspot" -o /tmp/project.json
+          node - <<'NODE'
+          const fs=require('fs');
+          const j=JSON.parse(fs.readFileSync('/tmp/project.json','utf8'));
+          const r=j.result||{};
+          const summarize=c=>({env_vars:Object.keys((c&&c.env_vars)||{}),kv_namespaces:Object.keys((c&&c.kv_namespaces)||{}),d1_databases:Object.keys((c&&c.d1_databases)||{}),r2_buckets:Object.keys((c&&c.r2_buckets)||{})});
+          console.log(JSON.stringify({success:j.success,name:r.name,domains:r.domains,production:summarize(r.deployment_configs&&r.deployment_configs.production),preview:summarize(r.deployment_configs&&r.deployment_configs.preview)},null,2));
+          NODE
 
           echo '--- Production route probes ---'
           for u in https://www.atechspot.com/ https://www.atechspot.com/api/form-health https://atechspot.pages.dev/api/form-health; do
             code=$(curl -sS -o /tmp/body -w '%{http_code}' "$u" || true)
             echo "$u -> $code"
             head -c 700 /tmp/body || true
+            echo
+          done
+
+          echo '--- Safe empty POST probes (must not send email) ---'
+          for path in /api/intake /api/contact /api/assessment; do
+            code=$(curl -sS -o /tmp/postbody -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{}' "https://www.atechspot.com$path" || true)
+            echo "$path -> $code"
+            head -c 700 /tmp/postbody || true
             echo
           done
