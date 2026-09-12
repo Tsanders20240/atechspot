@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "atech-network",
-  "main": "worker.js",
+  "main": "seo-worker.js",
   "compatibility_date": "2026-09-12",
   "routes": [
     {
