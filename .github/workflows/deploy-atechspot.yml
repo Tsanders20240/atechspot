@@ -107,7 +107,7 @@ jobs:
 
           grep -q 'data-endpoint="/api/assessment"' assessment/index.html
           grep -q 'data-endpoint="/api/assessment"' ai-readiness/index.html
-          grep -q 'data-endpoint="/api/intake"' intake/index.html
+          grep -q 'data-endpoint="https://atechspot.pages.dev/api/intake"' intake/index.html
           grep -q 'https://start.atechspot.com/' resources/index.html
           test -f payments/index.html
           test -f commerce-terms/index.html
