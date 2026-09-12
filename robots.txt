@@ -6,3 +6,7 @@ Disallow: /payment/
 Disallow: /booking/
 Disallow: /intake/
 Sitemap: https://www.atechspot.com/sitemap.xml
+Sitemap: https://abcoftech.atechspot.com/sitemap.xml
+Sitemap: https://atechucation.atechspot.com/sitemap.xml
+Sitemap: https://creator.atechspot.com/sitemap.xml
+Sitemap: https://www.abctechproducts.atechspot.com/sitemap.xml
