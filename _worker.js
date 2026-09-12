@@ -5,7 +5,8 @@ const validEmail=value=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(value)&&value.leng
 const escapeHtml=value=>String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
 
 const PUBLIC_INBOXES={jason:"jason@atechspot.com",hello:"hello@atechspot.com",sales:"sales@atechspot.com",support:"support@atechspot.com",billing:"billing@atechspot.com",legal:"legal@atechspot.com"};
-const RESEND_SANDBOX_SENDER="ATechSpot Website <onboarding@resend.dev>";
+const PRODUCTION_SENDER="ATechSpot Website <forms@atechspot.com>";
+const PRODUCTION_RECIPIENT="aplustechucation@gmail.com";
 const UI_HARDENING_STYLE=`<style id="atechspot-ui-hardening">
 [hidden]{display:none!important}
 html body .site-header{height:78px!important;min-height:78px!important}
@@ -47,16 +48,12 @@ const LINK_REWRITES=new Map([
 
 function redirectResponse(request,url,status=301){const target=new URL(url,request.url);return Response.redirect(target.toString(),status)}
 async function parseBody(request){const type=request.headers.get("content-type")||"";if(type.includes("application/json"))return request.json();return Object.fromEntries((await request.formData()).entries())}
-async function resend(env,payload){const response=await fetch("https://api.resend.com/emails",{method:"POST",headers:{authorization:`Bearer ${env.RESEND_API_KEY}`,"content-type":"application/json"},body:JSON.stringify(payload)});if(!response.ok){const detail=await response.text();throw new Error(`Resend ${response.status}: ${detail.slice(0,400)}`)}return response.json()}
-async function resendWithFallback(env,payload){
-  const configured=clean(env.FORM_FROM_EMAIL||"",254);
-  const senders=[configured,RESEND_SANDBOX_SENDER].filter((sender,index,array)=>sender&&array.indexOf(sender)===index);
-  let lastError=null;
-  for(const sender of senders){
-    try{return{result:await resend(env,{...payload,from:sender}),sender}}
-    catch(error){lastError=error;console.warn(`ATechSpot Resend sender failed: ${sender}`,error)}
-  }
-  throw lastError||new Error("No Resend sender is available.");
+async function resend(env,payload){
+  const response=await fetch("https://api.resend.com/emails",{method:"POST",headers:{authorization:`Bearer ${env.RESEND_API_KEY}`,"content-type":"application/json"},body:JSON.stringify(payload)});
+  const text=await response.text();
+  let parsed={};try{parsed=JSON.parse(text)}catch{}
+  if(!response.ok){const error=new Error(`Resend request failed with HTTP ${response.status}`);error.status=response.status;error.providerCode=clean(parsed.name||parsed.code||"RESEND_ERROR",80);error.providerMessage=clean(parsed.message||text||"Unknown Resend error",240);throw error}
+  return parsed;
 }
 function publicInboxFor(leadType,fields){const department=clean(fields.Department||"",40).toLowerCase();if(PUBLIC_INBOXES[department])return PUBLIC_INBOXES[department];if(leadType.includes("Support"))return PUBLIC_INBOXES.support;if(leadType.includes("Assessment"))return PUBLIC_INBOXES.jason;if(leadType.includes("Project"))return PUBLIC_INBOXES.sales;return PUBLIC_INBOXES.hello}
 
@@ -71,14 +68,11 @@ async function deliverLead(request,env,leadType,requiredFields,{confirmation=tru
   const combined=Object.values(fields).join("\n");if((combined.match(/https?:\/\/|www\./gi)||[]).length>5||/<\s*(script|iframe|object|embed)/i.test(combined))return json(400,{ok:false,message:"Submission rejected."});
   const publicInbox=publicInboxFor(leadType,fields);fields["ATechSpot Routing Identity"]=publicInbox;
   const rows=Object.entries(fields).map(([key,value])=>`<tr><th style="text-align:left;vertical-align:top;padding:9px;border:1px solid #d8e0e8;background:#f4f7fa">${escapeHtml(key)}</th><td style="padding:9px;border:1px solid #d8e0e8">${escapeHtml(value).replace(/\n/g,"<br>")}</td></tr>`).join("");
-  const recipient=env.FORM_TO_EMAIL||"aplustechucation@gmail.com";
-  let senderUsed=RESEND_SANDBOX_SENDER;
   try{
-    const delivery=await resendWithFallback(env,{to:[recipient],reply_to:email,subject:`[ATechSpot / ${publicInbox}] ${leadType} — ${name}`,html:`<h2>${escapeHtml(leadType)}</h2><p>A new request was submitted through ATechSpot.com and routed under <strong>${escapeHtml(publicInbox)}</strong>.</p><table style="border-collapse:collapse;width:100%;max-width:850px">${rows}</table><p>Reply to this email to respond directly to ${escapeHtml(name)} at ${escapeHtml(email)}.</p>`});
-    senderUsed=delivery.sender;
-  }catch(error){console.error("ATechSpot internal email delivery failed",error);return json(503,{ok:false,code:"EMAIL_DELIVERY_FAILED",message:"We could not send your request right now. Please try again shortly or call (713) 396-2993."})}
-  let confirmationSent=false;if(confirmation){try{await resend(env,{from:senderUsed,to:[email],reply_to:publicInbox,subject:"We received your ATechSpot request",html:`<p>Hi ${escapeHtml(name)},</p><p>Thank you for contacting ATechSpot. We received your request and routed it to <strong>${escapeHtml(publicInbox)}</strong>.</p><p>We will review the business problem, desired outcome, timing and fit before recommending the appropriate next step.</p><p>Submitting the form does not create a client relationship, establish a final price, guarantee project acceptance or reserve a schedule. Any scope, pricing or scheduling commitment will be confirmed separately in writing.</p><p>— ATechSpot<br><small>Operated by A+ Techucation LLC</small></p>`});confirmationSent=true}catch(error){console.warn("ATechSpot confirmation email was not sent",error)}}
-  return json(200,{ok:true,confirmationSent,routedTo:publicInbox,message:"Thank you. Your request was received successfully."});
+    await resend(env,{from:PRODUCTION_SENDER,to:[PRODUCTION_RECIPIENT],reply_to:email,subject:`[ATechSpot / ${publicInbox}] ${leadType} — ${name}`,html:`<h2>${escapeHtml(leadType)}</h2><p>A new request was submitted through ATechSpot.com and routed under <strong>${escapeHtml(publicInbox)}</strong>.</p><table style="border-collapse:collapse;width:100%;max-width:850px">${rows}</table><p>Reply to this email to respond directly to ${escapeHtml(name)} at ${escapeHtml(email)}.</p>`});
+  }catch(error){console.error("ATechSpot internal email delivery failed",{status:error?.status,providerCode:error?.providerCode,providerMessage:error?.providerMessage});return json(503,{ok:false,code:"EMAIL_DELIVERY_FAILED",providerStatus:error?.status||null,providerCode:error?.providerCode||"UNKNOWN",message:"We could not send your request right now. Please try again shortly or call (713) 396-2993."})}
+  let confirmationSent=false;if(confirmation){try{await resend(env,{from:PRODUCTION_SENDER,to:[email],reply_to:publicInbox,subject:"We received your ATechSpot request",html:`<p>Hi ${escapeHtml(name)},</p><p>Thank you for contacting ATechSpot. We received your request and routed it to <strong>${escapeHtml(publicInbox)}</strong>.</p><p>We will review the business problem, desired outcome, timing and fit before recommending the appropriate next step.</p><p>Submitting the form does not create a client relationship, establish a final price, guarantee project acceptance or reserve a schedule. Any scope, pricing or scheduling commitment will be confirmed separately in writing.</p><p>— ATechSpot<br><small>Operated by A+ Techucation LLC</small></p>`});confirmationSent=true}catch(error){console.warn("ATechSpot confirmation email was not sent",{status:error?.status,providerCode:error?.providerCode})}}
+  return json(200,{ok:true,confirmationSent,routedTo:publicInbox,deliveredTo:PRODUCTION_RECIPIENT,message:"Thank you. Your request was received successfully."});
 }
 
 function transformHtml(response,url){
@@ -104,7 +98,7 @@ export default{async fetch(request,env){
   if(request.method==="OPTIONS"&&url.pathname.startsWith("/api/"))return new Response(null,{status:204,headers:JSON_HEADERS});
   if(url.hostname==='atechspot.com'&&!url.pathname.startsWith('/.well-known/')){url.hostname='www.atechspot.com';return Response.redirect(url.toString(),request.method==='GET'||request.method==='HEAD'?301:308)}
   if(LEGACY_PREFIXES.some(prefix=>url.pathname.startsWith(prefix)))return redirectResponse(request,'/',301);
-  if(url.pathname==="/api/form-health"){if(request.method!=="GET")return json(405,{ok:false,message:"Method not allowed."});const resendConfigured=Boolean(env.RESEND_API_KEY);return json(resendConfigured?200:503,{ok:resendConfigured,resendConfigured,deployment:"ATECHSPOT-RESEND-FALLBACK-UI-HARDENED-20260912",publicInboxes:Object.values(PUBLIC_INBOXES)})}
+  if(url.pathname==="/api/form-health"){if(request.method!=="GET")return json(405,{ok:false,message:"Method not allowed."});const resendConfigured=Boolean(env.RESEND_API_KEY);return json(resendConfigured?200:503,{ok:resendConfigured,resendConfigured,deployment:"ATECHSPOT-PRODUCTION-MAIL-20260912",sender:PRODUCTION_SENDER,recipient:PRODUCTION_RECIPIENT,publicInboxes:Object.values(PUBLIC_INBOXES)})}
   if(url.pathname==="/api/contact"){if(request.method!=="POST")return json(405,{ok:false,message:"Method not allowed."});return deliverLead(request,env,"Contact Request",["Message"],{confirmation:true})}
   if(url.pathname==="/api/intake"){if(request.method!=="POST")return json(405,{ok:false,message:"Method not allowed."});return deliverLead(request,env,"Project Intake",["Topic","Preferred Timeframe","Budget Range","Message","Desired Outcome"],{confirmation:true})}
   if(url.pathname==="/api/assessment"){if(request.method!=="POST")return json(405,{ok:false,message:"Method not allowed."});return deliverLead(request,env,"Business Growth Assessment",["Assessment Type","Primary Goal","Current Challenge","Desired Outcome"],{confirmation:true})}
