@@ -1,0 +1,1 @@
+ATechSpot production redeploy refresh after updating RESEND_API_KEY in Cloudflare Pages. This commit intentionally forces a fresh production deployment so the current environment secrets are applied.
