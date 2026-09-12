@@ -21,3 +21,23 @@
   Cache-Control: no-cache, must-revalidate
 /intake/*
   Cache-Control: no-cache, must-revalidate
+/assets/site.js
+  Cache-Control: no-cache, must-revalidate
+/app.js
+  Cache-Control: no-cache, must-revalidate
+/app-core.js
+  Cache-Control: no-cache, must-revalidate
+/command-a.css
+  Cache-Control: no-cache, must-revalidate
+/command-b.css
+  Cache-Control: no-cache, must-revalidate
+/flagship.css
+  Cache-Control: no-cache, must-revalidate
+/flagship-fix.css
+  Cache-Control: no-cache, must-revalidate
+/intake/intake.js
+  Cache-Control: no-cache, must-revalidate
+/intake/intake.css
+  Cache-Control: no-cache, must-revalidate
+/assets/atechspot-logo.png
+  Cache-Control: no-cache, must-revalidate
