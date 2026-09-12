@@ -1,0 +1,54 @@
+name: Diagnose Cloudflare Routing
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/diagnose-cloudflare-routing.yml'
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Query Worker custom domains and routes
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+
+          echo '=== Worker custom domains matching ATechSpot ==='
+          curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}" \
+            | jq '{success, errors, result: [.result[]? | select(.hostname|contains("atechspot.com")) | {hostname,service,environment,zone_id,id}]}'
+
+          echo '=== Worker scripts ==='
+          curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts" "${auth[@]}" \
+            | jq '{success, errors, result: [.result[]? | {id,modified_on,created_on}]}'
+
+          echo '=== Resolve zone and list Worker routes ==='
+          zone_json=$(curl -fsS "https://api.cloudflare.com/client/v4/zones?name=atechspot.com&account.id=$CLOUDFLARE_ACCOUNT_ID" "${auth[@]}")
+          echo "$zone_json" | jq '{success, errors, result: [.result[]? | {id,name,status}]}'
+          zone_id=$(echo "$zone_json" | jq -r '.result[0].id // empty')
+          if [ -n "$zone_id" ]; then
+            curl -fsS "https://api.cloudflare.com/client/v4/zones/$zone_id/workers/routes" "${auth[@]}" \
+              | jq '{success, errors, result: [.result[]? | select(.pattern|contains("atechspot.com")) | {id,pattern,script}]}'
+          else
+            echo 'Zone ID unavailable with current token.'
+          fi
+
+          echo '=== Public route signatures ==='
+          for url in \
+            'https://abcoftech.atechspot.com/' \
+            'https://abcoftech.atechspot.com/api/health' \
+            'https://abcoftech.atechspot.com/free-resources/virtual-reality-coloring-page/' \
+            'https://creator.atechspot.com/' \
+            'https://www.abctechproducts.atechspot.com/' \
+            'https://www.abctechproducts.atechspot.com/api/health'; do
+            echo "--- $url"
+            curl -sSIL --max-redirs 3 -A 'Mozilla/5.0' "$url" | grep -Ei '^(HTTP/|server:|location:|cf-ray:|cf-mitigated:|content-type:|x-powered-by:|vary:|link:)' | head -n 18 || true
+          done
