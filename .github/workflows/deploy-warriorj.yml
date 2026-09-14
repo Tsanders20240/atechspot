@@ -33,7 +33,9 @@ jobs:
           test -f WarriorJ-Website/worker.js
           test -f WarriorJ-Website/wrangler.jsonc
           grep -q 'warriorj.atechspot.com' WarriorJ-Website/wrangler.jsonc
-          grep -q 'WarriorJ' WarriorJ-Website/worker.js
+          grep -q 'ENTER WARRIOR J' WarriorJ-Website/worker.js
+          grep -q "href=\"/shop.html\"" WarriorJ-Website/worker.js
+          ! grep -q 'Explore the ATechSpot Ecosystem' WarriorJ-Website/worker.js
           node --check WarriorJ-Website/worker.js
           echo 'WarriorJ source QA passed.'
 
@@ -55,8 +57,14 @@ jobs:
       - name: Verify production
         shell: bash
         run: |
+          set -euo pipefail
           sleep 8
-          curl -fsS https://warriorj.atechspot.com/ > /tmp/warriorj.html
-          grep -q 'WARRIORJ' /tmp/warriorj.html
-          curl -fsS https://warriorj.atechspot.com/api/health | grep -q '"ok":true'
-          echo 'WarriorJ production verification passed.'
+          curl -fsS https://warriorj.atechspot.com/ > /tmp/warriorj-intro.html
+          grep -q 'ENTER WARRIOR J' /tmp/warriorj-intro.html
+          grep -q 'href="/shop.html"' /tmp/warriorj-intro.html
+          ! grep -q 'Explore the ATechSpot Ecosystem' /tmp/warriorj-intro.html
+          curl -fsS https://warriorj.atechspot.com/shop.html > /tmp/warriorj-shop.html
+          grep -q '25 CUSTOM PRODUCTS' /tmp/warriorj-shop.html
+          grep -q 'Wear a bigger' /tmp/warriorj-shop.html
+          curl -fsS https://warriorj.atechspot.com/api/health | grep -q '"enterTarget":"/shop.html"'
+          echo 'WarriorJ Enter flow and production website verification passed.'
