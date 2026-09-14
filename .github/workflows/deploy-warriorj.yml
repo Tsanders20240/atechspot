@@ -1,0 +1,62 @@
+name: Deploy WarriorJ
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'WarriorJ-Website/**'
+      - '.github/workflows/deploy-warriorj.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: warriorj-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validate WarriorJ source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f WarriorJ-Website/worker.js
+          test -f WarriorJ-Website/wrangler.jsonc
+          grep -q 'warriorj.atechspot.com' WarriorJ-Website/wrangler.jsonc
+          grep -q 'WarriorJ' WarriorJ-Website/worker.js
+          node --check WarriorJ-Website/worker.js
+          echo 'WarriorJ source QA passed.'
+
+      - name: Verify Cloudflare credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || (echo 'Missing CLOUDFLARE_API_TOKEN' && exit 1)
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo 'Missing CLOUDFLARE_ACCOUNT_ID' && exit 1)
+
+      - name: Deploy WarriorJ custom-domain Worker
+        working-directory: WarriorJ-Website
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@latest deploy
+
+      - name: Verify production
+        shell: bash
+        run: |
+          sleep 8
+          curl -fsS https://warriorj.atechspot.com/ > /tmp/warriorj.html
+          grep -q 'WARRIORJ' /tmp/warriorj.html
+          curl -fsS https://warriorj.atechspot.com/api/health | grep -q '"ok":true'
+          echo 'WarriorJ production verification passed.'
