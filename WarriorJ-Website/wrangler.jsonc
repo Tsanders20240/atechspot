@@ -1,0 +1,12 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "warriorj",
+  "main": "worker.js",
+  "compatibility_date": "2026-09-13",
+  "routes": [
+    {
+      "pattern": "warriorj.atechspot.com",
+      "custom_domain": true
+    }
+  ]
+}
