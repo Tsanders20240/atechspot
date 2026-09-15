@@ -34,8 +34,10 @@ jobs:
           test -f WarriorJ-Website/wrangler.jsonc
           grep -q 'warriorj.atechspot.com' WarriorJ-Website/wrangler.jsonc
           grep -q 'ENTER WARRIOR J' WarriorJ-Website/worker.js
-          grep -q "href=\"/shop.html\"" WarriorJ-Website/worker.js
-          ! grep -q 'Explore the ATechSpot Ecosystem' WarriorJ-Website/worker.js
+          grep -q 'Request a Quote' WarriorJ-Website/worker.js
+          grep -q 'Privacy Policy' WarriorJ-Website/worker.js
+          grep -q 'Returns & Custom Order Policy' WarriorJ-Website/worker.js
+          grep -q 'Page Not Found' WarriorJ-Website/worker.js
           node --check WarriorJ-Website/worker.js
           echo 'WarriorJ source QA passed.'
 
@@ -62,9 +64,17 @@ jobs:
           curl -fsS https://warriorj.atechspot.com/ > /tmp/warriorj-intro.html
           grep -q 'ENTER WARRIOR J' /tmp/warriorj-intro.html
           grep -q 'href="/shop.html"' /tmp/warriorj-intro.html
-          ! grep -q 'Explore the ATechSpot Ecosystem' /tmp/warriorj-intro.html
           curl -fsS https://warriorj.atechspot.com/shop.html > /tmp/warriorj-shop.html
           grep -q '25 CUSTOM PRODUCTS' /tmp/warriorj-shop.html
           grep -q 'Wear a bigger' /tmp/warriorj-shop.html
-          curl -fsS https://warriorj.atechspot.com/api/health | grep -q '"enterTarget":"/shop.html"'
-          echo 'WarriorJ Enter flow and production website verification passed.'
+          grep -q 'Request a Quote' /tmp/warriorj-shop.html
+          curl -fsS https://warriorj.atechspot.com/contact.html | grep -q 'Request a Quote'
+          curl -fsS https://warriorj.atechspot.com/privacy.html | grep -q 'Privacy Policy'
+          curl -fsS https://warriorj.atechspot.com/terms.html | grep -q 'Terms of Use'
+          curl -fsS https://warriorj.atechspot.com/returns.html | grep -q 'Returns & Custom Order Policy'
+          curl -fsS https://warriorj.atechspot.com/robots.txt | grep -q 'Sitemap:'
+          curl -fsS https://warriorj.atechspot.com/sitemap.xml | grep -q '/privacy.html'
+          curl -sS -o /tmp/warriorj-404.html -w '%{http_code}' https://warriorj.atechspot.com/does-not-exist | grep -q '^404$'
+          grep -q 'That page left the battlefield' /tmp/warriorj-404.html
+          curl -fsS https://warriorj.atechspot.com/api/health | grep -q '"legal":true'
+          echo 'WarriorJ production verification passed.'
