@@ -1,4 +1,4 @@
-import { appFromHostname } from "./_lib/platform.js";
+import { appFromUrl } from "./_lib/platform.js";
 import { getSession } from "./_lib/auth.js";
 import { rolesFor } from "./_lib/access.js";
 import {
@@ -16,7 +16,7 @@ function redirectToLogin(url){
 
 export async function onRequest(context){
   const url=new URL(context.request.url);
-  const app=appFromHostname(url.hostname);
+  const app=appFromUrl(url);
 
   if(!app) return context.next();
   if(url.pathname.startsWith("/api/")) return context.next();
