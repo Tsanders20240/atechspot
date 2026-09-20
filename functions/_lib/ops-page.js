@@ -19,24 +19,24 @@ return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="v
 export function opsControlCenterPage(session){
 const body=`
 <div class="toolbar"><span class="badge"><span class="dot"></span>Private executive system</span><span class="pill">Role-based access</span></div>
-<h1>ATechSpot Operations</h1>
+<h1 data-build="ops-2026-09-20">ATechSpot Operations</h1>
 <p class="lead">Executive control center for the ATechSpot ecosystem. Monitor revenue, sales, brands, projects, support, incidents, content, affiliates, compliance, vendors, launches and operating procedures from one private system.</p>
 <section id="executive"><h2 style="margin:24px 0 10px">Executive Dashboard</h2><div class="section-meta">Company-wide operating health and priority metrics.</div><div id="metrics" class="metrics"></div></section>
 <div class="modules">
 <section id="properties" class="card wide"><h2>Property Directory</h2><div class="section-meta">Registered ATechSpot properties, operating status and access level.</div><div id="propertyDirectory"></div></section>\n<section id="domains" class="card wide"><h2>Domain Status</h2><div class="section-meta">DNS, SSL and HTTP health for each registered hostname.</div><div id="domainStatus"></div></section>
 <section id="sales" class="card"><h2>Sales Pipeline</h2><div id="pipeline"></div></section>
-<section id="revenue" class="card"><h2>Revenue by Brand</h2><div id="revenue"></div></section>
-<section id="leads" class="card"><h2>Leads by Brand</h2><div id="leads"></div></section>
-<section id="projects" class="card"><h2>Active Projects</h2><div id="projects"></div></section>
-<section id="invoices" class="card"><h2>Outstanding Invoices</h2><div id="invoices"></div></section>
-<section id="support" class="card"><h2>Support Volume</h2><div id="support"></div></section>
-<section id="incidents" class="card"><h2>Website Incidents</h2><div id="incidents"></div></section>
-<section id="content" class="card"><h2>Content Calendar</h2><div id="content"></div></section>
-<section id="affiliates" class="card"><h2>Affiliate Performance</h2><div id="affiliates"></div></section>
-<section id="compliance" class="card"><h2>Compliance Calendar</h2><div id="compliance"></div></section>
-<section id="vendors" class="card"><h2>Vendor Records</h2><div id="vendors"></div></section>
-<section id="launches" class="card"><h2>Launch Checklists</h2><div id="launches"></div></section>
-<section id="sops" class="card"><h2>Standard Operating Procedures</h2><div id="sops"></div></section>
+<section id="revenue-section" class="card"><h2>Revenue by Brand</h2><div id="revenue"></div></section>
+<section id="leads-section" class="card"><h2>Leads by Brand</h2><div id="leads"></div></section>
+<section id="projects-section" class="card"><h2>Active Projects</h2><div id="projects"></div></section>
+<section id="invoices-section" class="card"><h2>Outstanding Invoices</h2><div id="invoices"></div></section>
+<section id="support-section" class="card"><h2>Support Volume</h2><div id="support"></div></section>
+<section id="incidents-section" class="card"><h2>Website Incidents</h2><div id="incidents"></div></section>
+<section id="content-section" class="card"><h2>Content Calendar</h2><div id="content"></div></section>
+<section id="affiliates-section" class="card"><h2>Affiliate Performance</h2><div id="affiliates"></div></section>
+<section id="compliance-section" class="card"><h2>Compliance Calendar</h2><div id="compliance"></div></section>
+<section id="vendors-section" class="card"><h2>Vendor Records</h2><div id="vendors"></div></section>
+<section id="launches-section" class="card"><h2>Launch Checklists</h2><div id="launches"></div></section>
+<section id="sops-section" class="card"><h2>Standard Operating Procedures</h2><div id="sops"></div></section>
 </div>
 <p class="muted">Signed in as ${esc(session?.email || "authorized user")}.</p>
 <script>
