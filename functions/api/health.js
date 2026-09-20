@@ -1,8 +1,8 @@
-import { appFromHostname } from "../_lib/platform.js";
+import { appFromUrl } from "../_lib/platform.js";
 
 export function onRequestGet(context) {
   const url = new URL(context.request.url);
-  const app = appFromHostname(url.hostname);
+  const app = appFromUrl(url);
 
   return Response.json({
     ok: true,
