@@ -24,11 +24,12 @@ export function appFromHostname(hostname = "") {
   return PHASE2_APPS[label] ? { key: label, ...PHASE2_APPS[label] } : null;
 }
 
+const FUNCTIONAL = new Set(["ops","account","book","intake","pay","clients","support","help","status","shop","partners","vendors"]);
 export function platformSnapshot() {
   return Object.entries(PHASE2_APPS).map(([key, app]) => ({
     key,
     hostname: `${key}.atechspot.com`,
     ...app,
-    implementation: "foundation"
+    implementation: FUNCTIONAL.has(key) ? "functional-module" : "content-foundation"
   }));
 }
