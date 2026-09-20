@@ -160,6 +160,8 @@ CREATE TABLE IF NOT EXISTS invoices (
   customer_id TEXT NOT NULL,
   property_id TEXT NOT NULL,
   provider_invoice_id TEXT,
+  description TEXT,
+  payment_url TEXT,
   amount_cents INTEGER NOT NULL,
   currency TEXT NOT NULL DEFAULT 'USD',
   status TEXT NOT NULL DEFAULT 'draft',
