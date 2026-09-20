@@ -4,6 +4,16 @@ function json(body, status = 200) {
   return Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
 }
 
+function safeReturnTo(value) {
+  if (typeof value !== "string" || !value) return "/";
+  if (value.startsWith("/") && !value.startsWith("//")) return value;
+  try {
+    const url = new URL(value);
+    if (url.protocol === "https:" && (url.hostname === "atechspot.com" || url.hostname.endsWith(".atechspot.com"))) return url.toString();
+  } catch {}
+  return "/";
+}
+
 export async function onRequestPost(context) {
   if (!context.env.DB) return json({ ok: false, error: "Identity database is not configured." }, 503);
   if (!context.env.RESEND_API_KEY || !context.env.AUTH_FROM_EMAIL) {
@@ -33,9 +43,8 @@ export async function onRequestPost(context) {
     `INSERT INTO auth_magic_links (token_hash, email, expires_at) VALUES (?, ?, ?)`
   ).bind(tokenHash, email, expiresAt).run();
 
-  const url = new URL(context.request.url);
   const authHost = context.env.AUTH_BASE_URL || "https://account.atechspot.com";
-  const returnTo = typeof payload.returnTo === "string" && payload.returnTo.startsWith("/") ? payload.returnTo : "/";
+  const returnTo = safeReturnTo(payload.returnTo);
   const verifyUrl = `${authHost}/api/auth/verify?token=${encodeURIComponent(token)}&returnTo=${encodeURIComponent(returnTo)}`;
 
   const mail = await fetch("https://api.resend.com/emails", {
@@ -53,7 +62,7 @@ export async function onRequestPost(context) {
   });
 
   if (!mail.ok) {
-    console.error("auth_email_failed", { status: mail.status, hostname: url.hostname });
+    console.error("auth_email_failed", { status: mail.status });
     return json({ ok: false, error: "Sign-in email could not be sent." }, 502);
   }
 
