@@ -35,6 +35,14 @@ export async function onRequestGet(context) {
       .bind(now, now, user.id).run();
   }
 
+  const bootstrapEmail = String(context.env.BOOTSTRAP_ADMIN_EMAIL || "").trim().toLowerCase();
+  if (bootstrapEmail && bootstrapEmail === String(link.email).toLowerCase()) {
+    await context.env.DB.batch([
+      context.env.DB.prepare("INSERT OR IGNORE INTO user_roles (user_id, role_id) VALUES (?, 'executive')").bind(user.id),
+      context.env.DB.prepare("INSERT OR IGNORE INTO user_roles (user_id, role_id) VALUES (?, 'system_admin')").bind(user.id)
+    ]);
+  }
+
   await context.env.DB.prepare("UPDATE auth_magic_links SET used_at = ? WHERE token_hash = ?").bind(now, tokenHash).run();
 
   const sessionToken = randomToken();
