@@ -45,8 +45,6 @@ CREATE TABLE IF NOT EXISTS order_items (
   FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
-ALTER TABLE invoices ADD COLUMN payment_url TEXT;
-ALTER TABLE invoices ADD COLUMN description TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_data_requests_customer ON data_requests(customer_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_orders_customer ON orders(customer_id, created_at);
