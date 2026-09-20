@@ -24,6 +24,22 @@ export function appFromHostname(hostname = "") {
   return PHASE2_APPS[label] ? { key: label, ...PHASE2_APPS[label] } : null;
 }
 
+export function appFromUrl(urlLike) {
+  const url = urlLike instanceof URL ? urlLike : new URL(urlLike);
+  const productionApp = appFromHostname(url.hostname);
+  if (productionApp) return productionApp;
+
+  // Cloudflare Pages branch previews do not use *.atechspot.com hostnames.
+  // Allow an explicit app selector only on pages.dev so Preview can test
+  // the same host-aware application routes without weakening production.
+  if (url.hostname.endsWith(".pages.dev")) {
+    const key = (url.searchParams.get("app") || "").toLowerCase();
+    if (PHASE2_APPS[key]) return { key, ...PHASE2_APPS[key], preview: true };
+  }
+
+  return null;
+}
+
 const FUNCTIONAL = new Set(["ops","account","book","intake","pay","clients","support","help","status","shop","partners","vendors"]);
 export function platformSnapshot() {
   return Object.entries(PHASE2_APPS).map(([key, app]) => ({
