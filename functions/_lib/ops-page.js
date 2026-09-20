@@ -21,7 +21,7 @@ const body=`
 <div class="toolbar"><span class="badge"><span class="dot"></span>Private executive system</span><span class="pill">Role-based access</span></div>
 <h1>ATechSpot Operations</h1>
 <p class="lead">Executive control center for the ATechSpot ecosystem. Monitor revenue, sales, brands, projects, support, incidents, content, affiliates, compliance, vendors, launches and operating procedures from one private system.</p>
-<div id="metrics" class="metrics"></div>
+<section id="executive"><h2 style="margin:24px 0 10px">Executive Dashboard</h2><div class="section-meta">Company-wide operating health and priority metrics.</div><div id="metrics" class="metrics"></div></section>
 <div class="modules">
 <section id="properties" class="card wide"><h2>Property Directory</h2><div class="section-meta">Registered ATechSpot properties, operating status and access level.</div><div id="propertyDirectory"></div></section>\n<section id="domains" class="card wide"><h2>Domain Status</h2><div class="section-meta">DNS, SSL and HTTP health for each registered hostname.</div><div id="domainStatus"></div></section>
 <section id="sales" class="card"><h2>Sales Pipeline</h2><div id="pipeline"></div></section>
