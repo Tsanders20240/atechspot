@@ -1,0 +1,131 @@
+{
+  "academy": {
+    "id": "ACA-BFA-001",
+    "name": "A+ Techucation Business & Funding Academy",
+    "parent": "A+ Techucation",
+    "status": "planned_launch",
+    "domain": "https://atechucation.atechspot.com/business-funding/"
+  },
+  "memberships": [
+    {
+      "id": "MEM-STARTER",
+      "name": "A+ Starter",
+      "monthly_usd": 19,
+      "academy_access": "previews_selected_resources"
+    },
+    {
+      "id": "MEM-PRO",
+      "name": "A+ Pro",
+      "monthly_usd": 39,
+      "academy_access": "selected_business_tools"
+    },
+    {
+      "id": "MEM-BUSINESS",
+      "name": "A+ Business",
+      "monthly_usd": 79,
+      "academy_access": "full"
+    }
+  ],
+  "bundle": {
+    "id": "BND-BFA-001",
+    "name": "Business & Funding Academy Flagship Bundle",
+    "price_usd": 249,
+    "status": "suggested_launch"
+  },
+  "courses": [
+    {
+      "id": "CRS-FUND-GRANT-AI-001",
+      "slug": "ai-grant-funding-accelerator",
+      "title": "AI Grant Funding Accelerator",
+      "price_usd": 99,
+      "status": "flagship",
+      "track": "funding"
+    },
+    {
+      "id": "CRS-BUS-PLAN-001",
+      "slug": "business-planning-blueprint",
+      "title": "Business Planning Blueprint",
+      "price_usd": 99,
+      "status": "flagship",
+      "track": "business"
+    },
+    {
+      "id": "CRS-NP-501C3-001",
+      "slug": "501c3-nonprofit-startup-blueprint",
+      "title": "501(c)(3) Nonprofit Startup Blueprint",
+      "price_usd": 129,
+      "status": "flagship",
+      "track": "nonprofit"
+    },
+    {
+      "id": "CRS-BUS-START-AI-001",
+      "slug": "start-your-business-with-ai",
+      "title": "Start Your Business With AI",
+      "status": "planned",
+      "track": "business"
+    },
+    {
+      "id": "CRS-FUND-GRANT-WRITE-001",
+      "slug": "grant-writing-with-ai",
+      "title": "Grant Writing With AI",
+      "status": "planned",
+      "track": "funding"
+    },
+    {
+      "id": "CRS-FUND-CAPITAL-001",
+      "slug": "business-funding-capital-readiness",
+      "title": "Business Funding & Capital Readiness",
+      "status": "planned",
+      "track": "funding"
+    },
+    {
+      "id": "CRS-NP-PLAN-001",
+      "slug": "nonprofit-business-planning",
+      "title": "Nonprofit Business Planning",
+      "status": "planned",
+      "track": "nonprofit"
+    },
+    {
+      "id": "CRS-NP-GRANTS-001",
+      "slug": "grant-funding-for-nonprofits",
+      "title": "Grant Funding for Nonprofits",
+      "status": "planned",
+      "track": "nonprofit"
+    },
+    {
+      "id": "CRS-NP-FUNDRAISING-001",
+      "slug": "fundraising-sponsorships",
+      "title": "Fundraising & Sponsorships",
+      "status": "planned",
+      "track": "nonprofit"
+    },
+    {
+      "id": "CRS-NP-COMPLIANCE-001",
+      "slug": "nonprofit-operations-compliance",
+      "title": "Nonprofit Operations & Compliance",
+      "status": "planned",
+      "track": "nonprofit"
+    },
+    {
+      "id": "CRS-BUS-AUTOMATION-001",
+      "slug": "business-automation",
+      "title": "Business Automation",
+      "status": "planned",
+      "track": "business"
+    },
+    {
+      "id": "CRS-BUS-AI-MARKETING-001",
+      "slug": "ai-marketing-for-business",
+      "title": "AI Marketing for Business",
+      "status": "planned",
+      "track": "business"
+    },
+    {
+      "id": "CRS-BUS-SCALE-AI-001",
+      "slug": "scaling-your-business-with-ai",
+      "title": "Scaling Your Business With AI",
+      "status": "planned",
+      "track": "business"
+    }
+  ]
+}
