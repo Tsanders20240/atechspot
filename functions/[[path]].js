@@ -1,8 +1,9 @@
 import { appFromUrl } from "./_lib/platform.js";
 import { getSession } from "./_lib/auth.js";
 import { rolesFor } from "./_lib/access.js";
+import { opsControlCenterPage } from "./_lib/ops-page.js";
 import {
-  accountPage, opsPage, bookingPage, intakePage, clientPage, payPage,
+  accountPage, bookingPage, intakePage, clientPage, payPage,
   supportPage, helpPage, statusPage, shopPage, partnerPage, vendorPage, publicInfoPage
 } from "./_lib/pages.js";
 
@@ -38,7 +39,7 @@ export async function onRequest(context){
   let html;
   switch(app.key){
     case "account": html=accountPage(); break;
-    case "ops": html=opsPage(session); break;
+    case "ops": html=opsControlCenterPage(session); break;
     case "book": html=bookingPage(); break;
     case "intake": html=intakePage(); break;
     case "pay": html=payPage(); break;
