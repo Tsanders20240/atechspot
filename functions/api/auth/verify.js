@@ -1,7 +1,14 @@
 import { audit, customerId, randomToken, sessionCookie, sessionExpiry, sessionId, sha256, userId } from "../../_lib/auth.js";
 
 function safeReturnTo(value) {
-  return typeof value === "string" && value.startsWith("/") && !value.startsWith("//") ? value : "/";
+  const fallback = "https://account.atechspot.com/";
+  if (typeof value !== "string" || !value) return fallback;
+  if (value.startsWith("/") && !value.startsWith("//")) return new URL(value, fallback).toString();
+  try {
+    const url = new URL(value);
+    if (url.protocol === "https:" && (url.hostname === "atechspot.com" || url.hostname.endsWith(".atechspot.com"))) return url.toString();
+  } catch {}
+  return fallback;
 }
 
 export async function onRequestGet(context) {
@@ -55,11 +62,10 @@ export async function onRequestGet(context) {
 
   await audit(context, { actorUserId: user.id, action: "auth.login", objectType: "user", objectId: user.id });
 
-  const redirect = new URL(returnTo, context.env.AUTH_BASE_URL || "https://account.atechspot.com");
   return new Response(null, {
     status: 302,
     headers: {
-      Location: redirect.toString(),
+      Location: returnTo,
       "Set-Cookie": sessionCookie(sessionToken, expiresAt),
       "Cache-Control": "no-store"
     }
