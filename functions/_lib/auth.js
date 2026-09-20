@@ -94,7 +94,7 @@ export async function getSession(context) {
 
 export async function audit(context, { actorUserId = null, action, objectType = null, objectId = null, metadata = null }) {
   if (!context.env.DB) return;
-  const requestId = context.request.headers.get("X-ATechSpot-Request-ID") || crypto.randomUUID();
+  const requestId = context.data?.requestId || context.request.headers.get("X-ATechSpot-Request-ID") || crypto.randomUUID();
   await context.env.DB.prepare(
     `INSERT INTO audit_logs (id, actor_user_id, action, object_type, object_id, request_id, metadata_json)
      VALUES (?, ?, ?, ?, ?, ?, ?)`
