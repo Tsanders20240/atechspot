@@ -26,12 +26,34 @@ async function api(url,options={}){const r=await fetch(url,{...options,headers:{
 export function accountPage(){
 const body=`<h1>ATechSpot Account</h1><p class="lead">One secure identity for participating ATechSpot services. Sign in with a time-limited email link.</p>
 <section id="out"><form id="login"><label>Email address<input id="email" type="email" autocomplete="email" maxlength="254" required></label><button type="submit">Email me a secure sign-in link</button><div id="msg" class="status" role="status"></div></form></section>
-<section id="in" class="hidden"><div class="grid two"><div class="card"><b>Customer ID</b><span id="cid"></span></div><div class="card"><b>Email</b><span id="mail"></span></div><div class="card"><b>Name</b><span id="name"></span></div><div class="card"><b>Roles</b><span id="roles"></span></div></div><div class="toolbar"><a class="btn secondary" href="https://clients.atechspot.com/">Client Portal</a><a class="btn secondary" href="https://support.atechspot.com/">Support</a><button id="logout" class="danger">Sign out</button></div></section>`;
-const script=`
+<section id="in" class="hidden">
+<div class="grid two"><div class="card"><b>Customer ID</b><span id="cid"></span></div><div class="card"><b>Email</b><span id="mail"></span></div><div class="card"><b>Roles</b><span id="roles"></span></div><div class="card"><b>Account status</b><span class="good">Active</span></div></div>
+<div class="grid two">
+<section class="card"><h2>Profile</h2><form id="profileForm"><label>Name<input id="profileName" maxlength="120"></label><label>Phone<input id="profilePhone" maxlength="40"></label><label>Organization<input id="profileOrg" maxlength="200"></label><label>Time zone<input id="profileTz" maxlength="100"></label><button>Save profile</button><div id="profileMsg" class="status"></div></form></section>
+<section class="card"><h2>Communication preferences</h2><form id="prefsForm"><label><input id="marketing" type="checkbox" style="width:auto"> Marketing email</label><label><input id="updates" type="checkbox" style="width:auto"> Product & service updates</label><p class="muted">Transactional account, security and billing messages remain enabled when required to provide the service.</p><button>Save preferences</button><div id="prefsMsg" class="status"></div></form></section>
+<section class="card"><h2>Privacy & data controls</h2><form id="dataForm"><label>Request type<select id="requestType"><option value="access">Access my data</option><option value="correction">Correct my data</option><option value="deletion">Request account/data deletion</option></select></label><label>Notes<textarea id="requestNotes"></textarea></label><button>Submit request</button><div id="dataMsg" class="status"></div></form><div id="dataRequests" class="list"></div></section>
+<section class="card"><h2>Purchase history</h2><div id="orders" class="list"></div></section>
+</div>
+<div class="toolbar"><a class="btn secondary" href="https://clients.atechspot.com/">Client Portal</a><a class="btn secondary" href="https://support.atechspot.com/">Support</a><button id="logout" class="danger">Sign out</button></div>
+</section>`;
+const script=authRedirect+`
 const out=document.getElementById('out'),inside=document.getElementById('in'),msg=document.getElementById('msg');
 const returnTo=new URLSearchParams(location.search).get('returnTo')||'/';
-async function load(){const r=await fetch('/api/auth/me');if(!r.ok)return;const d=await r.json();out.classList.add('hidden');inside.classList.remove('hidden');cid.textContent=d.user.customerId||'Pending';mail.textContent=d.user.email||'';name.textContent=d.user.displayName||'Not set';roles.textContent=(d.user.roles||[]).map(x=>x.name).join(', ')||'Customer'}
+async function load(){
+ const r=await fetch('/api/auth/me');if(!r.ok)return;
+ const d=await r.json();out.classList.add('hidden');inside.classList.remove('hidden');cid.textContent=d.user.customerId||'Pending';mail.textContent=d.user.email||'';roles.textContent=(d.user.roles||[]).map(x=>x.name).join(', ')||'Customer';
+ try{
+  const [p,pr,dr,ord]=await Promise.all([api('/api/account/profile'),api('/api/account/preferences'),api('/api/account/data-request'),api('/api/orders')]);
+  profileName.value=p.profile?.display_name||'';profilePhone.value=p.profile?.phone||'';profileOrg.value=p.profile?.organization_name||'';profileTz.value=p.profile?.timezone||Intl.DateTimeFormat().resolvedOptions().timeZone;
+  marketing.checked=!!pr.preferences?.marketing_email;updates.checked=!!pr.preferences?.product_updates;
+  dataRequests.innerHTML=(dr.requests||[]).map(x=>'<div class="row"><div><b>'+x.request_type+'</b><div class="muted">'+new Date(x.created_at).toLocaleDateString()+'</div></div><div>'+x.status+'</div></div>').join('')||'<p class="muted">No privacy requests.</p>';
+  orders.innerHTML=(ord.orders||[]).map(x=>'<div class="row"><div><b>'+x.id+'</b><div class="muted">'+new Date(x.created_at).toLocaleDateString()+'</div></div><div class="right">$'+(x.total_cents/100).toFixed(2)+' · '+x.status+'</div></div>').join('')||'<p class="muted">No orders yet.</p>';
+ }catch(e){profileMsg.textContent=e.message}
+}
 login.addEventListener('submit',async e=>{e.preventDefault();msg.textContent='Sending…';try{const r=await fetch('/api/auth/request-link',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email.value,returnTo})});const d=await r.json();msg.textContent=d.message||d.error||'Request completed.'}catch{msg.textContent='Could not send sign-in link.'}});
+profileForm?.addEventListener('submit',async e=>{e.preventDefault();try{await api('/api/account/profile',{method:'PATCH',body:JSON.stringify({displayName:profileName.value,phone:profilePhone.value,organizationName:profileOrg.value,timezone:profileTz.value})});profileMsg.textContent='Profile saved.'}catch(err){profileMsg.textContent=err.message}});
+prefsForm?.addEventListener('submit',async e=>{e.preventDefault();try{await api('/api/account/preferences',{method:'PUT',body:JSON.stringify({marketingEmail:marketing.checked,productUpdates:updates.checked})});prefsMsg.textContent='Preferences saved.'}catch(err){prefsMsg.textContent=err.message}});
+dataForm?.addEventListener('submit',async e=>{e.preventDefault();try{const d=await api('/api/account/data-request',{method:'POST',body:JSON.stringify({requestType:requestType.value,notes:requestNotes.value})});dataMsg.textContent='Request '+d.id+' submitted.';requestNotes.value='';await load()}catch(err){dataMsg.textContent=err.message}});
 logout?.addEventListener('click',async()=>{await fetch('/api/auth/logout',{method:'POST'});location.href='/'});
 load();`;
 return frame("Account","Central identity",body,script);
@@ -69,9 +91,9 @@ return frame("Client Portal","Projects & billing",body,script);
 }
 
 export function payPage(){
-const body=`<h1>ATechSpot Pay</h1><p class="lead">Review billing records and use only ATechSpot-approved payment links. Card details are processed by the authorized payment provider, not stored in this portal.</p><div id="invoices" class="list"></div><p class="muted">If an invoice requires payment but no secure payment link is shown, contact ATechSpot before sending funds.</p>`;
+const body=`<h1>ATechSpot Pay</h1><p class="lead">Review invoices and use only ATechSpot-approved secure payment-provider links. ATechSpot does not store raw card details in this portal.</p><div id="invoices" class="list"></div><p class="muted">If an invoice requires payment but no secure payment link is available, contact ATechSpot before sending funds.</p>`;
 const script=authRedirect+`
-async function load(){try{const d=await api('/api/invoices');invoices.innerHTML=d.invoices.map(x=>'<div class="row"><div><b>'+x.id+'</b><div class="muted">Due '+(x.due_at?new Date(x.due_at).toLocaleDateString():'—')+'</div></div><div class="right"><div class="money">$'+(x.amount_cents/100).toFixed(2)+'</div><small>'+x.status+'</small></div></div>').join('')||'<p class="muted">No invoices are currently associated with your account.</p>'}catch(e){invoices.innerHTML='<p class="bad">'+e.message+'</p>'}}load();`;
+async function load(){try{const d=await api('/api/invoices');invoices.innerHTML=d.invoices.map(x=>'<div class="row"><div><b>'+x.id+'</b><div class="muted">'+(x.description||'ATechSpot invoice')+' · Due '+(x.due_at?new Date(x.due_at).toLocaleDateString():'—')+'</div></div><div class="right"><div class="money">$'+(x.amount_cents/100).toFixed(2)+'</div><small>'+x.status+'</small>'+(x.payment_url&&x.status!=='paid'?'<div style="margin-top:8px"><a class="btn" rel="noopener noreferrer" href="'+x.payment_url+'">Pay securely</a></div>':'')+'</div></div>').join('')||'<p class="muted">No invoices are currently associated with your account.</p>'}catch(e){invoices.innerHTML='<p class="bad">'+e.message+'</p>'}}load();`;
 return frame("Pay","Secure billing",body,script);
 }
 
