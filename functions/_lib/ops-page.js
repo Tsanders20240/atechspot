@@ -8,12 +8,12 @@ main{padding:28px;border:1px solid var(--line);border-radius:24px;background:lin
 .badge{display:inline-flex;gap:8px;align-items:center;border:1px solid #1d5b80;border-radius:999px;padding:8px 12px;color:var(--cyan);font-size:.76rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}.dot{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 14px var(--good)}
 h1{font-size:clamp(2rem,5vw,4rem);line-height:1;margin:20px 0 12px;letter-spacing:-.05em}h2{font-size:1.2rem;margin:0 0 12px}p{color:var(--muted);line-height:1.55}.lead{max-width:860px}.muted{color:var(--muted)}.good{color:var(--good)}.warn{color:var(--warn)}.bad{color:var(--bad)}
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0}.metric,.card{border:1px solid var(--line);border-radius:15px;padding:16px;background:var(--panel2);min-width:0}.metric b,.card b{display:block}.metric strong{display:block;font-size:1.55rem;margin-top:7px}.metric small{color:var(--muted)}
-.modules{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.wide{grid-column:1/-1}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:.88rem;white-space:nowrap}.table th{color:var(--muted);font-weight:700}.empty{color:var(--muted);padding:12px 0}.section-meta{font-size:.8rem;color:var(--muted);margin-top:-4px;margin-bottom:10px}.pill{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:.74rem}.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.modules{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.wide{grid-column:1/-1}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:10px;border-bottom:1px solid var(--line);font-size:.88rem;white-space:nowrap}.table th{color:var(--muted);font-weight:700}.empty{color:var(--muted);padding:12px 0}.section-meta{font-size:.8rem;color:var(--muted);margin-top:-4px;margin-bottom:10px}.pill{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:.74rem}.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.opsnav{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 24px;padding:12px;border:1px solid var(--line);border-radius:14px;background:#07111c}.opsnav a{padding:7px 10px;border-radius:8px;text-decoration:none;color:var(--muted);font-size:.82rem}.opsnav a:hover{background:#102235;color:var(--text)}
 @media(max-width:1000px){.metrics{grid-template-columns:repeat(2,1fr)}.modules{grid-template-columns:1fr}.wide{grid-column:auto}}@media(max-width:600px){main{padding:18px}.metrics{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}}
 `;
 
 function frame(body){
-return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Operations | ATechSpot</title><style>${css}</style></head><body><div class="shell"><header class="top"><a class="brand" href="https://www.atechspot.com/">A+ <span>ATECHSPOT</span></a><nav class="nav"><a href="https://account.atechspot.com/">Account</a><a href="https://clients.atechspot.com/">Clients</a><a href="https://support.atechspot.com/">Support</a><a href="https://status.atechspot.com/">Status</a></nav></header><main>${body}</main></div></body></html>`
+return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>ATechSpot Executive Operating System</title><style>${css}</style></head><body><div class="shell"><header class="top"><a class="brand" href="https://www.atechspot.com/">A+ <span>ATECHSPOT</span></a><nav class="nav"><a href="https://account.atechspot.com/">Account</a><a href="https://clients.atechspot.com/">Clients</a><a href="https://support.atechspot.com/">Support</a><a href="https://status.atechspot.com/">Status</a></nav></header><main>${body}</main></div></body></html>`
 }
 
 export function opsControlCenterPage(session){
@@ -23,20 +23,20 @@ const body=`
 <p class="lead">Executive control center for the ATechSpot ecosystem. Monitor revenue, sales, brands, projects, support, incidents, content, affiliates, compliance, vendors, launches and operating procedures from one private system.</p>
 <div id="metrics" class="metrics"></div>
 <div class="modules">
-<section class="card wide"><h2>Property Directory & Domain Status</h2><div class="section-meta">All registered ATechSpot properties and current health records.</div><div id="properties"></div></section>
-<section class="card"><h2>Sales Pipeline</h2><div id="pipeline"></div></section>
-<section class="card"><h2>Revenue by Brand</h2><div id="revenue"></div></section>
-<section class="card"><h2>Leads by Brand</h2><div id="leads"></div></section>
-<section class="card"><h2>Active Projects</h2><div id="projects"></div></section>
-<section class="card"><h2>Outstanding Invoices</h2><div id="invoices"></div></section>
-<section class="card"><h2>Support Volume</h2><div id="support"></div></section>
-<section class="card"><h2>Website Incidents</h2><div id="incidents"></div></section>
-<section class="card"><h2>Content Calendar</h2><div id="content"></div></section>
-<section class="card"><h2>Affiliate Performance</h2><div id="affiliates"></div></section>
-<section class="card"><h2>Compliance Calendar</h2><div id="compliance"></div></section>
-<section class="card"><h2>Vendor Records</h2><div id="vendors"></div></section>
-<section class="card"><h2>Launch Checklists</h2><div id="launches"></div></section>
-<section class="card"><h2>Standard Operating Procedures</h2><div id="sops"></div></section>
+<section id="properties" class="card wide"><h2>Property Directory</h2><div class="section-meta">Registered ATechSpot properties, operating status and access level.</div><div id="propertyDirectory"></div></section>\n<section id="domains" class="card wide"><h2>Domain Status</h2><div class="section-meta">DNS, SSL and HTTP health for each registered hostname.</div><div id="domainStatus"></div></section>
+<section id="sales" class="card"><h2>Sales Pipeline</h2><div id="pipeline"></div></section>
+<section id="revenue" class="card"><h2>Revenue by Brand</h2><div id="revenue"></div></section>
+<section id="leads" class="card"><h2>Leads by Brand</h2><div id="leads"></div></section>
+<section id="projects" class="card"><h2>Active Projects</h2><div id="projects"></div></section>
+<section id="invoices" class="card"><h2>Outstanding Invoices</h2><div id="invoices"></div></section>
+<section id="support" class="card"><h2>Support Volume</h2><div id="support"></div></section>
+<section id="incidents" class="card"><h2>Website Incidents</h2><div id="incidents"></div></section>
+<section id="content" class="card"><h2>Content Calendar</h2><div id="content"></div></section>
+<section id="affiliates" class="card"><h2>Affiliate Performance</h2><div id="affiliates"></div></section>
+<section id="compliance" class="card"><h2>Compliance Calendar</h2><div id="compliance"></div></section>
+<section id="vendors" class="card"><h2>Vendor Records</h2><div id="vendors"></div></section>
+<section id="launches" class="card"><h2>Launch Checklists</h2><div id="launches"></div></section>
+<section id="sops" class="card"><h2>Standard Operating Procedures</h2><div id="sops"></div></section>
 </div>
 <p class="muted">Signed in as ${esc(session?.email || "authorized user")}.</p>
 <script>
@@ -50,7 +50,7 @@ async function load(){
  const d=await r.json();if(!r.ok)throw new Error(d.error||'Unable to load operations data.');
  const labels={customers:'Customers',openLeads:'Open Leads',pipelineValueCents:'Pipeline Value',activeProjects:'Active Projects',outstandingInvoiceCents:'Outstanding',openTickets:'Open Tickets',revenueCents:'Recorded Revenue',openIncidents:'Open Incidents'};
  metrics.innerHTML=Object.entries(d.metrics).map(([k,v])=>'<div class="metric"><small>'+safe(labels[k]||k)+'</small><strong class="'+((k==='openIncidents'&&v)?'bad':'')+'">'+((k.endsWith('Cents'))?money(v):Number(v).toLocaleString())+'</strong></div>').join('');
- properties.innerHTML=table(['Property','Hostname','Status','DNS','SSL','HTTP'],(d.properties||[]).map(x=>'<tr><td>'+safe(x.name)+'</td><td>'+safe(x.hostname)+'</td><td>'+safe(x.status)+'</td><td>'+safe(x.dns_status||'unknown')+'</td><td>'+safe(x.ssl_status||'unknown')+'</td><td>'+safe(x.http_status||'—')+'</td></tr>'));
+ propertyDirectory.innerHTML=table(['Property','Hostname','Status','Access'],(d.properties||[]).map(x=>'<tr><td>'+safe(x.name)+'</td><td>'+safe(x.hostname)+'</td><td>'+safe(x.status)+'</td><td>'+safe(x.access_level||'—')+'</td></tr>'));domainStatus.innerHTML=table(['Hostname','DNS','SSL','HTTP','Last Checked'],(d.properties||[]).map(x=>'<tr><td>'+safe(x.hostname)+'</td><td>'+safe(x.dns_status||'unknown')+'</td><td>'+safe(x.ssl_status||'unknown')+'</td><td>'+safe(x.http_status||'—')+'</td><td>'+fmt(x.last_checked_at)+'</td></tr>'));
  pipeline.innerHTML=table(['Stage','Leads','Value'],(d.pipeline||[]).map(x=>'<tr><td>'+safe(x.stage)+'</td><td>'+safe(x.lead_count)+'</td><td>'+money(x.value_cents)+'</td></tr>'));
  revenue.innerHTML=table(['Brand','Revenue'],(d.revenueByBrand||[]).map(x=>'<tr><td>'+safe(x.brand_name)+'</td><td>'+money(x.revenue_cents)+'</td></tr>'));
  leads.innerHTML=table(['Brand','Leads'],(d.leadsByBrand||[]).map(x=>'<tr><td>'+safe(x.brand_name)+'</td><td>'+safe(x.lead_count)+'</td></tr>'));
