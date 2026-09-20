@@ -23,7 +23,10 @@ export async function onRequestGet(context){
     outstandingInvoiceCents:await firstValue(db,"SELECT COALESCE(SUM(amount_cents),0) AS value FROM invoices WHERE status NOT IN ('paid','cancelled','refunded')"),
     openTickets:await firstValue(db,"SELECT COUNT(*) AS value FROM tickets WHERE status NOT IN ('resolved','closed')"),
     revenueCents:await firstValue(db,"SELECT COALESCE(SUM(amount_cents),0) AS value FROM payments WHERE status='paid'"),
-    openIncidents:await firstValue(db,"SELECT COUNT(*) AS value FROM incidents WHERE status!='resolved'")
+    openIncidents:await firstValue(db,"SELECT COUNT(*) AS value FROM incidents WHERE status!='resolved'"),
+    overdueInvoices:await firstValue(db,"SELECT COUNT(*) AS value FROM invoices WHERE status NOT IN ('paid','cancelled','refunded') AND due_at IS NOT NULL AND due_at < CURRENT_TIMESTAMP"),
+    complianceDue30:await firstValue(db,"SELECT COUNT(*) AS value FROM compliance_calendar WHERE status NOT IN ('completed','cancelled') AND due_at <= datetime('now','+30 days')"),
+    launchesDue30:await firstValue(db,"SELECT COUNT(*) AS value FROM launch_checklists WHERE status NOT IN ('completed','cancelled') AND target_launch_at IS NOT NULL AND target_launch_at <= datetime('now','+30 days')")
   };
 
   let properties=await all(db,"SELECT p.id,p.hostname,p.name,p.status,p.access_level,h.dns_status,h.ssl_status,h.http_status,h.last_checked_at,h.incident_note FROM properties p LEFT JOIN property_health h ON h.property_id=p.id ORDER BY p.name");
@@ -44,6 +47,8 @@ export async function onRequestGet(context){
   const vendorRecords=await all(db,"SELECT vr.id,vr.service_category,vr.contact_name,vr.contact_email,vr.contract_status,vr.renewal_at,vr.annual_cost_cents,vr.risk_level,COALESCE(v.organization_name,vr.contact_name,vr.id) AS organization_name FROM vendor_records vr LEFT JOIN vendors v ON v.id=vr.vendor_id ORDER BY CASE WHEN vr.renewal_at IS NULL THEN 1 ELSE 0 END,vr.renewal_at LIMIT 30");
   const launchChecklists=await all(db,"SELECT lc.id,lc.name,lc.status,lc.target_launch_at,p.name AS property_name,COUNT(li.id) AS item_count,SUM(CASE WHEN li.status='completed' THEN 1 ELSE 0 END) AS completed_items FROM launch_checklists lc LEFT JOIN properties p ON p.id=lc.property_id LEFT JOIN launch_checklist_items li ON li.checklist_id=lc.id WHERE lc.status NOT IN ('completed','cancelled') GROUP BY lc.id,lc.name,lc.status,lc.target_launch_at,p.name ORDER BY CASE WHEN lc.target_launch_at IS NULL THEN 1 ELSE 0 END,lc.target_launch_at LIMIT 30");
   const sops=await all(db,"SELECT id,title,category,status,version,review_due_at FROM standard_operating_procedures WHERE status!='archived' ORDER BY CASE WHEN review_due_at IS NULL THEN 1 ELSE 0 END,review_due_at,title LIMIT 30");
+  const brands=await all(db,"SELECT id,name,status FROM brands ORDER BY name");
+  const recentAudit=await all(db,"SELECT a.id,a.action,a.object_type,a.object_id,a.created_at,u.email AS actor_email FROM audit_logs a LEFT JOIN users u ON u.id=a.actor_user_id ORDER BY a.created_at DESC LIMIT 20");
 
   return json({
     ok:true,
@@ -62,6 +67,8 @@ export async function onRequestGet(context){
     complianceCalendar,
     vendorRecords,
     launchChecklists,
-    sops
+    sops,
+    brands,
+    recentAudit
   });
 }
