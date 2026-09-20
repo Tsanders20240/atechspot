@@ -1,4 +1,5 @@
 import { appFromHostname } from "./_lib/platform.js";
+import { getSession } from "./_lib/auth.js";
 
 function escapeHtml(value = "") {
   return value.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[c]));
@@ -48,6 +49,31 @@ function genericShell(app, hostname) {
 </html>`;
 }
 
+function opsShell(session) {
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>ATechSpot Operations</title>
+<style>${baseStyles()}</style>
+</head>
+<body>
+<main>
+  <span class="badge"><span class="dot"></span>Private executive system</span>
+  <h1>ATechSpot Operations</h1>
+  <p>Authenticated access confirmed. This is the protected Phase 2 operations surface for the executive dashboard, ecosystem registry, CRM, projects, finance, support, incidents and launch control.</p>
+  <div class="meta">
+    <div class="card"><b>Signed in</b><span>${escapeHtml(session.email || "Authorized user")}</span></div>
+    <div class="card"><b>Customer ID</b><span>${escapeHtml(session.customer_id || "Internal")}</span></div>
+    <div class="card"><b>Health</b><span><a href="/api/health">/api/health</a></span></div>
+  </div>
+</main>
+</body>
+</html>`;
+}
+
 function accountShell() {
   return `<!doctype html>
 <html lang="en">
@@ -63,7 +89,6 @@ function accountShell() {
   <span class="badge"><span class="dot"></span>Central identity</span>
   <h1>ATechSpot Account</h1>
   <p>One secure identity for participating ATechSpot services. Sign in with a time-limited email link—ATechSpot does not store an account password for this flow.</p>
-
   <section id="signedOut">
     <form id="loginForm">
       <label for="email">Email address</label>
@@ -72,7 +97,6 @@ function accountShell() {
       <div id="loginStatus" class="status" role="status" aria-live="polite"></div>
     </form>
   </section>
-
   <section id="signedIn" class="hidden">
     <div class="account-grid">
       <div class="card"><b>Customer ID</b><span id="customerId">—</span></div>
@@ -82,7 +106,6 @@ function accountShell() {
     </div>
     <form id="logoutForm"><button type="submit">Sign out</button></form>
   </section>
-
   <div class="meta">
     <div class="card"><b>Identity</b><span>Passwordless magic link</span></div>
     <div class="card"><b>Session</b><span>Secure HttpOnly cookie</span></div>
@@ -123,18 +146,43 @@ loadSession();
 </html>`;
 }
 
+async function hasOpsRole(context, userId) {
+  const result = await context.env.DB.prepare(
+    `SELECT 1 AS allowed FROM user_roles
+     WHERE user_id = ? AND role_id IN ('executive','system_admin','manager')
+     LIMIT 1`
+  ).bind(userId).first();
+  return Boolean(result?.allowed);
+}
+
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const app = appFromHostname(url.hostname);
 
-  // Preserve the existing www/apex static website exactly as-is.
   if (!app) return context.next();
-
-  // Keep API routes handled by their specific Pages Functions.
   if (url.pathname.startsWith("/api/")) return context.next();
 
-  const html = app.key === "account" ? accountShell() : genericShell(app, url.hostname);
+  if (app.key === "ops") {
+    const session = await getSession(context);
+    if (!session) {
+      const login = new URL("https://account.atechspot.com/");
+      login.searchParams.set("returnTo", "https://ops.atechspot.com/");
+      return Response.redirect(login.toString(), 302);
+    }
+    if (!context.env.DB || !(await hasOpsRole(context, session.user_id))) {
+      return new Response("Forbidden", { status: 403, headers: { "Cache-Control": "no-store" } });
+    }
+    return new Response(opsShell(session), {
+      headers: {
+        "Content-Type": "text/html; charset=UTF-8",
+        "Cache-Control": "no-store",
+        "Content-Security-Policy": "default-src 'none'; style-src 'unsafe-inline'; img-src 'self'; connect-src 'self'; base-uri 'none'; frame-ancestors 'none'",
+        "X-Robots-Tag": "noindex, nofollow"
+      }
+    });
+  }
 
+  const html = app.key === "account" ? accountShell() : genericShell(app, url.hostname);
   return new Response(html, {
     headers: {
       "Content-Type": "text/html; charset=UTF-8",
