@@ -96,6 +96,10 @@ export default{async fetch(request,env){
   const url=new URL(request.url);
   if(request.method==="OPTIONS"&&url.pathname.startsWith("/api/"))return new Response(null,{status:204,headers:JSON_HEADERS});
   if(url.hostname==='atechspot.com'&&!url.pathname.startsWith('/.well-known/')){url.hostname='www.atechspot.com';return Response.redirect(url.toString(),request.method==='GET'||request.method==='HEAD'?301:308)}
+  if(url.hostname==='account.atechspot.com'){
+    if(url.pathname==='/'||url.pathname===''){url.pathname='/clients/';return Response.redirect(url.toString(),302)}
+    if(url.pathname==='/dashboard'||url.pathname==='/dashboard/'){url.pathname='/clients/dashboard/';return Response.redirect(url.toString(),302)}
+  }
   if(LEGACY_PREFIXES.some(prefix=>url.pathname.startsWith(prefix)))return redirectResponse(request,'/',301);
 
   if(url.pathname==="/api/client-access"){
