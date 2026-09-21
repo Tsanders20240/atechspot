@@ -1,5 +1,5 @@
 name: Configure ATechSpot Client Portal Environment
-# portal activation retry after keep_vars
+# portal activation retry with Pages project config as source of truth
 
 on:
   push:
