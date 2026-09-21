@@ -66,6 +66,17 @@ jobs:
             fi
           fi
 
+          echo '=== Flagship origin signatures ==='
+          for url in \
+            'https://atechspot.pages.dev/' \
+            'https://www.atechspot.com/'; do
+            echo "--- $url"
+            body=$(curl -sSL -A 'Mozilla/5.0' "$url" || true)
+            echo "status: $(curl -sSIL -A 'Mozilla/5.0' "$url" | head -n1 || true)"
+            if echo "$body" | grep -q 'Turn business problems into'; then echo 'hero=current-b2b'; else echo 'hero=old-or-other'; fi
+            if echo "$body" | grep -q 'https://abctechproducts.atechspot.com/'; then echo 'abc-link=canonical'; else echo 'abc-link=other'; fi
+          done
+
           echo '=== Public route signatures ==='
           for url in \
             'https://creator.atechspot.com/' \
