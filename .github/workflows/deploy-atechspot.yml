@@ -354,7 +354,8 @@ jobs:
                 if [ "$portal_code" = "200" ] && [ "$(jq -r '.configured' /tmp/prod-portal.json)" = "true" ]; then
                   dash_code=$(curl -sS -o /dev/null -w '%{http_code}' "https://www.atechspot.com/portal/dashboard/" || true)
                   echo "Unauthenticated client dashboard -> $dash_code"
-                  if [ "$dash_code" = "302" ]; then
+                  if [ "$dash_code" = "302" ] || [ "$dash_code" = "403" ]; then
+                    echo "Protected client dashboard denied unauthenticated access with HTTP $dash_code."
                     echo 'Production ATechSpot + DriveSavers + Client Portal verification passed.'
                     exit 0
                   fi
