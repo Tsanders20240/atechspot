@@ -17,7 +17,7 @@ const CANONICAL_REDIRECTS=new Map([
   ["/business","/assessment/"],["/business/","/assessment/"],["/business.html","/assessment/"],
   ["/ecosystem","/ecosystem/"],["/ecosystem.html","/ecosystem/"],["/resources","/resources/"],["/resources.html","/resources/"],
   ["/privacy","/privacy/"],["/privacy.html","/privacy/"],["/terms","/terms/"],["/terms.html","/terms/"],["/accessibility","/accessibility/"],["/accessibility.html","/accessibility/"],
-  ["/affiliate-disclosure","/affiliate-disclosure/"],["/affiliate-disclosure.html","/affiliate-disclosure/"],["/booking","/booking/"],["/booking.html","/booking/"],["/remote-support","/remote-support/"],["/remote-support.html","/remote-support/"],["/creator","/creator/"],["/creator.html","/creator/"]
+  ["/affiliate-disclosure","/affiliate-disclosure/"],["/affiliate-disclosure.html","/affiliate-disclosure/"],["/booking","/booking/"],["/booking.html","/booking/"],["/clients","/clients/"],["/clients.html","/clients/"],["/remote-support","/remote-support/"],["/remote-support.html","/remote-support/"],["/creator","/creator/"],["/creator.html","/creator/"]
 ]);
 
 const LEGACY_PREFIXES=[
@@ -35,6 +35,17 @@ const LINK_REWRITES=new Map([
   ["/resources.html","/resources/"],["/privacy.html","/privacy/"],["/terms.html","/terms/"],["/accessibility.html","/accessibility/"],["/affiliate-disclosure.html","/affiliate-disclosure/"],["/remote-support.html","/remote-support/"],
   ["/apps/","/app/"],["/apps","/app/"],["/apps.html","/app/"],["/business.html","/assessment/"],["/business/","/assessment/"]
 ]);
+
+
+const bytesToB64u=bytes=>{let s="";for(const b of bytes)s+=String.fromCharCode(b);return btoa(s).replaceAll("+","-").replaceAll("/","_").replace(/=+$/,"")};
+const b64uToBytes=value=>{const pad=value.replaceAll("-","+").replaceAll("_","/");const raw=atob(pad+"=".repeat((4-pad.length%4)%4));return Uint8Array.from(raw,c=>c.charCodeAt(0))};
+const textToB64u=value=>bytesToB64u(new TextEncoder().encode(value));
+const b64uToText=value=>new TextDecoder().decode(b64uToBytes(value));
+async function portalKey(env){if(!env.PORTAL_SIGNING_SECRET)return null;return crypto.subtle.importKey("raw",new TextEncoder().encode(env.PORTAL_SIGNING_SECRET),{name:"HMAC",hash:"SHA-256"},false,["sign","verify"])}
+async function signPortalToken(env,payload){const key=await portalKey(env);if(!key)throw new Error("PORTAL_SIGNING_SECRET missing");const data=textToB64u(JSON.stringify(payload));const sig=await crypto.subtle.sign("HMAC",key,new TextEncoder().encode(data));return data+"."+bytesToB64u(new Uint8Array(sig))}
+async function verifyPortalToken(env,token,purpose){try{const [data,sig]=String(token||"").split(".");if(!data||!sig)return null;const key=await portalKey(env);if(!key)return null;const ok=await crypto.subtle.verify("HMAC",key,b64uToBytes(sig),new TextEncoder().encode(data));if(!ok)return null;const payload=JSON.parse(b64uToText(data));if(payload.purpose!==purpose||!payload.email||Number(payload.exp)<Date.now())return null;return payload}catch{return null}}
+function clientAllowlist(env){const raw=clean(env.CLIENT_PORTAL_USERS||"",10000);if(!raw)return new Set();try{const parsed=JSON.parse(raw);if(Array.isArray(parsed))return new Set(parsed.map(x=>clean(x,254).toLowerCase()).filter(validEmail))}catch{}return new Set(raw.split(",").map(x=>x.trim().toLowerCase()).filter(validEmail))}
+function cookieValue(request,name){const raw=request.headers.get("cookie")||"";for(const item of raw.split(";")){const [k,...rest]=item.trim().split("=");if(k===name)return rest.join("=")}return""}
 
 function redirectResponse(request,url,status=301){const target=new URL(url,request.url);return Response.redirect(target.toString(),status)}
 async function parseBody(request){const type=request.headers.get("content-type")||"";if(type.includes("application/json"))return request.json();return Object.fromEntries((await request.formData()).entries())}
@@ -86,6 +97,47 @@ export default{async fetch(request,env){
   if(request.method==="OPTIONS"&&url.pathname.startsWith("/api/"))return new Response(null,{status:204,headers:JSON_HEADERS});
   if(url.hostname==='atechspot.com'&&!url.pathname.startsWith('/.well-known/')){url.hostname='www.atechspot.com';return Response.redirect(url.toString(),request.method==='GET'||request.method==='HEAD'?301:308)}
   if(LEGACY_PREFIXES.some(prefix=>url.pathname.startsWith(prefix)))return redirectResponse(request,'/',301);
+
+  if(url.pathname==="/api/client-access"){
+    if(request.method!=="POST")return json(405,{ok:false,message:"Method not allowed."});
+    let body;try{body=await parseBody(request)}catch{return json(400,{ok:false,message:"Invalid request."})}
+    const email=clean(body.Email||body.email,254).toLowerCase();
+    const started=Number(body.form_started_at||0),elapsed=Date.now()-started;
+    if(!validEmail(email)||!started||elapsed<900||elapsed>86400000)return json(400,{ok:false,message:"Enter a valid email and try again."});
+    const configured=Boolean(env.RESEND_API_KEY&&env.PORTAL_SIGNING_SECRET&&env.CLIENT_PORTAL_USERS);
+    const allowed=configured&&clientAllowlist(env).has(email);
+    if(allowed){
+      try{
+        const token=await signPortalToken(env,{email,purpose:"magic",exp:Date.now()+20*60*1000});
+        const link=new URL("/api/client-login",url.origin);link.searchParams.set("token",token);
+        await resend(env,{from:PRODUCTION_SENDER,to:[email],reply_to:PUBLIC_INBOXES.support,subject:"Your secure ATechSpot Client Portal link",html:`<p>Your secure ATechSpot Client Portal sign-in link is ready.</p><p><a href="${escapeHtml(link.toString())}">Open Client Portal</a></p><p>This link expires in 20 minutes. If you did not request it, you can ignore this email.</p><p>For your security, do not forward this link.</p>`});
+      }catch(error){console.error("Client portal magic-link delivery failed",{status:error?.status,providerCode:error?.providerCode})}
+    }
+    return json(200,{ok:true,configured,message:"If this email is authorized for an active ATechSpot client account, a secure sign-in link will be sent."});
+  }
+  if(url.pathname==="/api/client-login"){
+    if(request.method!=="GET")return json(405,{ok:false,message:"Method not allowed."});
+    const payload=await verifyPortalToken(env,url.searchParams.get("token"),"magic");
+    if(!payload)return redirectResponse(request,"/clients/?error=expired",302);
+    if(!clientAllowlist(env).has(String(payload.email).toLowerCase()))return redirectResponse(request,"/clients/?error=access",302);
+    const session=await signPortalToken(env,{email:payload.email,purpose:"session",exp:Date.now()+8*60*60*1000});
+    return new Response(null,{status:302,headers:{location:"/clients/dashboard/","set-cookie":`atechspot_client=${session}; Path=/; Max-Age=28800; HttpOnly; Secure; SameSite=Lax`,"cache-control":"no-store","x-robots-tag":"noindex,nofollow"}});
+  }
+  if(url.pathname==="/api/client-logout"){
+    return new Response(null,{status:302,headers:{location:"/clients/","set-cookie":"atechspot_client=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax","cache-control":"no-store","x-robots-tag":"noindex,nofollow"}});
+  }
+  if(url.pathname==="/clients/dashboard/"||url.pathname==="/clients/dashboard"){
+    if(request.method!=="GET"&&request.method!=="HEAD")return new Response("Method not allowed",{status:405});
+    const payload=await verifyPortalToken(env,cookieValue(request,"atechspot_client"),"session");
+    if(!payload||!clientAllowlist(env).has(String(payload.email).toLowerCase()))return redirectResponse(request,"/clients/",302);
+    const assetUrl=new URL("/clients/dashboard/index.html",request.url);
+    const asset=await env.ASSETS.fetch(new Request(assetUrl.toString(),request));
+    const headers=new Headers(asset.headers);headers.set("cache-control","no-store");headers.set("x-robots-tag","noindex,nofollow,noarchive");headers.set("referrer-policy","no-referrer");
+    let response=new Response(asset.body,{status:asset.status,statusText:asset.statusText,headers});
+    if((headers.get("content-type")||"").includes("text/html"))response=new HTMLRewriter().on("[data-client-email]",{element(el){el.setInnerContent(payload.email)}}).transform(response);
+    return response;
+  }
+
   if(url.pathname==="/api/form-health"){if(request.method!=="GET")return json(405,{ok:false,message:"Method not allowed."});const resendConfigured=Boolean(env.RESEND_API_KEY);return json(resendConfigured?200:503,{ok:resendConfigured,resendConfigured,deployment:"ATECHSPOT-PRODUCTION-MAIL-20260912",sender:PRODUCTION_SENDER,recipient:PRODUCTION_RECIPIENT,publicInboxes:Object.values(PUBLIC_INBOXES)})}
   if(url.pathname==="/api/contact"){if(request.method!=="POST")return json(405,{ok:false,message:"Method not allowed."});return deliverLead(request,env,"Contact Request",["Message"],{confirmation:true})}
   if(url.pathname==="/api/intake"){if(request.method!=="POST")return json(405,{ok:false,message:"Method not allowed."});return deliverLead(request,env,"Project Intake",["Topic","Preferred Timeframe","Budget Range","Message","Desired Outcome"],{confirmation:true})}
