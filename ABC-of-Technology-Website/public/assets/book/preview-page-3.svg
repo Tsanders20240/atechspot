@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1244 1262" role="img" aria-labelledby="t d">
+<title id="t">Best You page from ABC's of Technology</title>
+<desc id="d">Clean vector preview of the supplied Best You page.</desc>
+<defs><radialGradient id="bg" cx="50%" cy="48%" r="75%"><stop offset="0" stop-color="#79a5e2"/><stop offset="1" stop-color="#91afe1"/></radialGradient></defs>
+<rect width="1244" height="1262" fill="url(#bg)"/>
+<g font-family="Arial Rounded MT Bold, Arial, sans-serif" text-anchor="middle">
+<text x="622" y="355" font-size="73" fill="#111">and be the</text>
+<text x="622" y="600" font-size="178" font-weight="900" fill="#fff">BEST</text>
+<text x="622" y="845" font-size="193" font-weight="900" fill="#fff200">YOU!</text>
+</g>
+</svg>
