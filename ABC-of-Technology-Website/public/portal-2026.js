@@ -67,7 +67,11 @@ function closeIntro(withSound=true){
   const intro=document.getElementById('siteIntro');if(!intro)return;
   intro.classList.add('leaving');document.body.classList.remove('intro-open');
   if(withSound&&soundEnabled)startTheme();
-  setTimeout(()=>{intro.hidden=true;intro.classList.remove('leaving')},650);
+  setTimeout(()=>{
+    intro.hidden=true;intro.classList.remove('leaving');
+    document.getElementById('siteControlBar')?.classList.add('ready');
+    document.querySelector('#siteControlBar a[href="#home"]')?.focus({preventScroll:true});
+  },650);
 }
 function playLyricVideo(){
   const btn=document.getElementById('playLyric');
@@ -108,7 +112,7 @@ function renderQuiz(){
 const colorGrid=document.getElementById('colorGrid');
 function renderColor(){
  if(!colorGrid)return;colorGrid.innerHTML='';
- WORDS.forEach(w=>{const a=document.createElement('a');a.className='color-card';a.href='/downloads/coloring-pages/'+w[6];a.target='_blank';a.rel='noopener';a.innerHTML='<div class="color-preview"><span class="color-letter">'+w[0]+w[0].toLowerCase()+'</span><span class="color-icon">'+w[5]+'</span></div><b>'+w[0]+' — '+wordName(w)+'</b><small>'+(lang==='es'?'Abrir PDF ↗':'Open PDF ↗')+'</small>';colorGrid.appendChild(a)});
+ WORDS.forEach((w,i)=>{const a=document.createElement('a');a.className='color-card'+(i<6?' featured-color':'');a.dataset.letter=w[0];a.href='/downloads/coloring-pages/'+w[6];a.target='_blank';a.rel='noopener';a.innerHTML='<div class="color-preview"><span class="color-letter">'+w[0]+w[0].toLowerCase()+'</span><span class="color-icon">'+w[5]+'</span></div><b>'+w[0]+' — '+wordName(w)+'</b><small>'+(lang==='es'?'Abrir PDF ↗':'Open PDF ↗')+'</small>';colorGrid.appendChild(a)});
 }
 
 const pages=[...document.querySelectorAll('#bookFrame img')];let page=0;
@@ -156,7 +160,31 @@ document.getElementById('playTheme')?.addEventListener('click',toggleTheme);
 document.getElementById('playLyric')?.addEventListener('click',playLyricVideo);
 document.getElementById('jumpLyric')?.addEventListener('click',()=>document.getElementById('lyricStage')?.scrollIntoView({behavior:'smooth',block:'center'}));
 document.getElementById('introLights')?.addEventListener('click',e=>{const intro=document.getElementById('siteIntro');const off=intro?.classList.toggle('lights-off');e.currentTarget.setAttribute('aria-pressed',String(!off));e.currentTarget.textContent=off?'💡 Bus Lights Off':'💡 Bus Lights On';});
-document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',()=>{const id=a.getAttribute('href').slice(1);if(id)requestAnimationFrame(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}));}));
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{
+  const id=a.getAttribute('href').slice(1);
+  const target=id&&document.getElementById(id);
+  if(target){
+    e.preventDefault();
+    history.replaceState(null,'','#'+id);
+    target.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}));
+document.querySelectorAll('[data-color-letter]').forEach(a=>a.addEventListener('click',()=>{
+  const letter=a.dataset.colorLetter;
+  setTimeout(()=>document.querySelector('.color-card[data-letter="'+letter+'"]')?.classList.add('color-pulse'),450);
+  setTimeout(()=>document.querySelector('.color-card[data-letter="'+letter+'"]')?.classList.remove('color-pulse'),1800);
+}));
+const navLinks=[...document.querySelectorAll('#siteControlBar a[href^="#"]')];
+const navTargets=navLinks.map(a=>document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+if('IntersectionObserver'in window){
+  const navObserver=new IntersectionObserver(entries=>{
+    const visible=entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+    if(!visible)return;
+    navLinks.forEach(a=>a.classList.toggle('active-section',a.getAttribute('href')==='#'+visible.target.id));
+  },{rootMargin:'-18% 0px -65% 0px',threshold:[0,.15,.35,.6]});
+  navTargets.forEach(el=>navObserver.observe(el));
+}
 updateSoundUI();
+document.getElementById('siteControlBar')?.classList.add('ready');
 renderWord();renderColor();renderSpell();showPage();renderWorld('explore');
 })();
