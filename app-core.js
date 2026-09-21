@@ -1,7 +1,7 @@
 (() => {
   const flagshipCss = document.createElement('link');
   flagshipCss.rel = 'stylesheet';
-  flagshipCss.href = '/flagship.css?v=20260912-1';
+  flagshipCss.href = '/flagship.css?v=20260921-b2b';
   document.head.appendChild(flagshipCss);
 
   const intro = document.getElementById('microIntro');
@@ -204,7 +204,7 @@
   const processLogo = () => {
     const source = new Image();
     source.decoding = 'async';
-    source.src = '/assets/atechspot-logo.png?v=20260912-1';
+    source.src = '/assets/atechspot-logo.png?v=20260921-glossy';
     source.onload = () => {
       try {
         const canvas = document.createElement('canvas');

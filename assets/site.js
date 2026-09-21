@@ -115,7 +115,7 @@
 
     const source=new Image();
     source.decoding='async';
-    source.src='/assets/atechspot-logo.png?v=20260912-unified';
+    source.src='/assets/atechspot-logo.png?v=20260921-glossy';
     source.onload=()=>{
       try{
         const canvas=document.createElement('canvas');
@@ -161,10 +161,10 @@
   }
 
   function enforcePrimaryCtas(){
-    document.querySelectorAll('.site-header .desktop-cta').forEach(a=>{a.href='/intake/';a.textContent='Start My Project'});
+    document.querySelectorAll('.site-header .desktop-cta').forEach(a=>{a.href='/intake/?client=b2b#project-intake';a.textContent='Request B2B Consultation'});
     if(normalizedPath(location.pathname)!=='/')return;
     const heroPrimary=document.querySelector('.hero-actions .btn-primary');
-    if(heroPrimary){heroPrimary.href='/intake/';heroPrimary.textContent='Start My Project →'}
+    if(heroPrimary){heroPrimary.href='/intake/?client=b2b#project-intake';heroPrimary.textContent='Request a B2B Consultation →'}
     const growthPrimary=document.querySelector('.growth-copy .btn-primary');
     if(growthPrimary){growthPrimary.href='/assessment/';growthPrimary.textContent='Start With My Business Assessment'}
   }

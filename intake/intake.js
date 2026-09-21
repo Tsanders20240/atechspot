@@ -13,6 +13,21 @@
   let current=0;
   let sending=false;
 
+  const query=new URLSearchParams(location.search);
+  if(query.get('client')==='b2b'){
+    const segment=document.createElement('input');
+    segment.type='hidden';
+    segment.name='Lead Segment';
+    segment.value='Qualified B2B Inquiry';
+    form.appendChild(segment);
+    const heroKicker=document.querySelector('.intake-hero .sys-kicker');
+    const heroTitle=document.querySelector('.intake-hero h1');
+    const heroCopy=document.querySelector('.intake-hero p');
+    if(heroKicker)heroKicker.textContent='ATechSpot Qualified B2B Intake';
+    if(heroTitle)heroTitle.innerHTML='Tell us the business goal. <em>We’ll evaluate the fit.</em>';
+    if(heroCopy)heroCopy.textContent='Designed for established businesses and funded projects considering a $997 strategy review, $2,500+ implementation or ongoing GrowthCare engagement.';
+  }
+
   // Always use the production same-origin API. Never hand the lead off to a mail client.
   form.dataset.endpoint='/api/intake';
   if(started)started.value=String(Date.now());
