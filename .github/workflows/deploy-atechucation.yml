@@ -53,6 +53,13 @@ jobs:
           grep -q 'Business Plan Course' A-Techucation-Website/app.js
           grep -q 'Ecommerce Course' A-Techucation-Website/app.js
           grep -q 'Reseller Course' A-Techucation-Website/app.js
+          grep -q 'id="contact"' A-Techucation-Website/app.js
+          grep -q 'https://www.atechspot.com/api/intake' A-Techucation-Website/app.js
+          test -f A-Techucation-Website/ecosystem-2026.css
+          grep -q 'ecosystem-2026.css' A-Techucation-Website/index.html
+          grep -q '22-property ATechSpot ecosystem' A-Techucation-Website/app.js
+          grep -q 'https://www.atechspot.com/ecosystem/' A-Techucation-Website/app.js
+          grep -q 'https://www.atechspot.com/creator/' A-Techucation-Website/app.js
           test -f A-Techucation-Website/courses/grant-writing/index.html
           test -f A-Techucation-Website/courses/business-plan/index.html
           test -f A-Techucation-Website/courses/ecommerce/index.html
@@ -65,7 +72,7 @@ jobs:
           grep -q 'https://atechucation.atechspot.com/courses/business-plan/' A-Techucation-Website/sitemap.xml
           grep -q 'https://atechucation.atechspot.com/courses/ecommerce/' A-Techucation-Website/sitemap.xml
           grep -q 'https://atechucation.atechspot.com/courses/reseller/' A-Techucation-Website/sitemap.xml
-          echo 'A+ Techucation 10/10 source assertions passed.'
+          echo 'A+ Techucation modern ecosystem, route, payment, policy and contact assertions passed.'
 
       - name: Deploy to Cloudflare Worker
         working-directory: A-Techucation-Website
