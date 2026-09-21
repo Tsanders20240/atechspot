@@ -155,6 +155,12 @@ jobs:
           grep -q 'https://start.atechspot.com/' resources/index.html
           test -f payments/index.html
           test -f booking/index.html
+          test -f clients/index.html
+          test -f clients/dashboard/index.html
+          grep -q 'SECURE CLIENT ACCESS' clients/index.html
+          grep -q 'AUTHENTICATED CLIENT DASHBOARD' clients/dashboard/index.html
+          grep -q 'PORTAL_SIGNING_SECRET' _worker.js
+          grep -q 'CLIENT_PORTAL_USERS' _worker.js
           grep -q 'ATechSpot Booking' booking/index.html
           grep -q 'https://scheduler.zoom.us/a-plus-techucation/30-mins-with-a-plus' booking/index.html
           grep -q 'https://scheduler.zoom.us' _headers
@@ -222,7 +228,7 @@ jobs:
             return 1
           }
           echo "Testing $DEPLOY_URL"
-          for path in / /ecosystem/ /dji/ /dji/real-estate/ /dji/roofing-inspections/ /dji/mini-5-pro-vs-mavic-4-pro/ /dji/construction/ /dji/buying-guide/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /data-recovery/ /booking/ /payments/ /commerce-terms/ /payment-success/; do
+          for path in / /ecosystem/ /dji/ /dji/real-estate/ /dji/roofing-inspections/ /dji/mini-5-pro-vs-mavic-4-pro/ /dji/construction/ /dji/buying-guide/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /data-recovery/ /booking/ /clients/ /payments/ /commerce-terms/ /payment-success/; do
             check_path "$path"
           done
 
@@ -314,6 +320,9 @@ jobs:
           grep -q 'ATechSpot Booking' /tmp/booking.html
           grep -q 'https://scheduler.zoom.us/a-plus-techucation/30-mins-with-a-plus' /tmp/booking.html
 
+          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/clients/" -o /tmp/clients.html
+          grep -q 'SECURE CLIENT ACCESS' /tmp/clients.html
+
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/payments/" -o /tmp/payments.html
           grep -q 'Payments &amp; Billing\|Payments & Billing' /tmp/payments.html
 
@@ -339,8 +348,16 @@ jobs:
               dr_code=$(curl -sS -L -H 'Cache-Control: no-cache' -o /tmp/prod-data-recovery.html -w '%{http_code}' "https://www.atechspot.com/data-recovery/?deploy=$GITHUB_SHA&attempt=$attempt" || true)
               echo "Production data recovery -> $dr_code (attempt $attempt/10)"
               if [ "$dr_code" = "200" ]                 && grep -q 'ATECH<span>SPOT</span>' /tmp/prod-data-recovery.html                 && grep -q 'DS25379' /tmp/prod-data-recovery.html                 && grep -q 'https://quote.drivesavers.com/' /tmp/prod-data-recovery.html                 && grep -q 'Get DriveSavers Quote' /tmp/prod-data-recovery.html; then
-                echo 'Production ATechSpot + DriveSavers verification passed.'
-                exit 0
+                portal_started="$(node -e 'console.log(Date.now()-2500)')"
+                portal_code=$(curl -sS -o /tmp/prod-portal.json -w '%{http_code}' -X POST "https://www.atechspot.com/api/client-access" -H "Content-Type: application/json" --data "{\"Email\":\"portal-qa-not-authorized@atechspot.invalid\",\"form_started_at\":\"$portal_started\"}" || true)
+                echo "Production portal configuration -> $portal_code"
+                if [ "$portal_code" = "200" ] && [ "$(jq -r '.configured' /tmp/prod-portal.json)" = "true" ]; then
+                  dash_code=$(curl -sS -o /dev/null -w '%{http_code}' -L --max-redirs 0 "https://www.atechspot.com/clients/dashboard/" || true)
+                  if [ "$dash_code" = "302" ]; then
+                    echo 'Production ATechSpot + DriveSavers + Client Portal verification passed.'
+                    exit 0
+                  fi
+                fi
               fi
             fi
             sleep 6
