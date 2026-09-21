@@ -45,12 +45,15 @@ jobs:
 
           # Flagship routing and visual-system protections.
           grep -q 'Turn business problems into' index.html
+          grep -q 'THE FLAGSHIP OF A 22-PROPERTY DIGITAL ECOSYSTEM' index.html
           grep -q 'journey-grid' index.html
+          grep -q '/assets/atechspot-mark.svg' index.html
+          ! grep -q '/assets/atechspot-logo.png' index.html
           grep -q '/remote-support/' index.html
           grep -q '/assessment/' index.html
           grep -q '/creator/' index.html
           grep -q 'https://atechucation.atechspot.com/' index.html
-          grep -q 'https://www.abctechproducts.atechspot.com/' index.html
+          grep -q 'https://abctechproducts.atechspot.com/' index.html
           grep -q 'https://atechnetwork.atechspot.com/' index.html
           test -f flagship.css
           test -f flagship-fix.css
@@ -145,6 +148,24 @@ jobs:
             grep -q "$email" _worker.js
           done
           echo 'Production source assertions passed.'
+
+      - name: Ensure Cloudflare Pages production branch is main
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          project_url="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/atechspot"
+          project_json=$(curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" "$project_url")
+          production_branch=$(echo "$project_json" | jq -r '.result.production_branch // empty')
+          echo "Current Pages production branch: $production_branch"
+          if [ "$production_branch" != "main" ]; then
+            echo "Updating Pages production branch to main"
+            curl -fsS --fail-with-body -X PATCH "$project_url"               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"               -H "Content-Type: application/json"               --data '{"production_branch":"main"}' > /tmp/pages-project-update.json
+            cat /tmp/pages-project-update.json
+            test "$(jq -r '.success' /tmp/pages-project-update.json)" = "true"
+          fi
 
       - name: Deploy ATechSpot to Cloudflare Pages
         id: deploy
@@ -262,6 +283,25 @@ jobs:
           echo "Preview form-health -> $form_health_code"
           node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('/tmp/form-health.json','utf8')); const code=process.argv[1]; const inboxes=Array.isArray(j.publicInboxes)&&j.publicInboxes.length===6; const healthy=code==='200'&&j.ok===true&&j.resendConfigured===true; const previewExpected=code==='503'&&j.ok===false&&j.resendConfigured===false; if(!inboxes||(!healthy&&!previewExpected)) process.exit(1);" "$form_health_code"
           echo 'Deployment preview QA passed.'
+
+      - name: Verify production custom domain serves B2B flagship
+        shell: bash
+        run: |
+          set -euo pipefail
+          code="000"
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            url="https://www.atechspot.com/?deploy=$GITHUB_SHA&attempt=$attempt"
+            code=$(curl -sS -L -H 'Cache-Control: no-cache' -o /tmp/prod-home.html -w '%{http_code}' "$url" || true)
+            echo "Production homepage -> $code (attempt $attempt/10)"
+            if [ "$code" = "200" ]               && grep -q 'Turn business problems into' /tmp/prod-home.html               && grep -q 'THE FLAGSHIP OF A 22-PROPERTY DIGITAL ECOSYSTEM' /tmp/prod-home.html               && grep -q 'Request B2B Consultation' /tmp/prod-home.html; then
+              echo 'Production B2B flagship verification passed.'
+              exit 0
+            fi
+            sleep 6
+          done
+          echo 'Production custom domain is not serving the current B2B flagship.'
+          head -n 80 /tmp/prod-home.html 2>/dev/null || true
+          exit 1
 
       - name: Report custom-domain status
         shell: bash
