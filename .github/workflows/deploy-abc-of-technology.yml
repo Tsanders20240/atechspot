@@ -90,8 +90,8 @@ jobs:
           grep -q 'A–Z Quiz' "$HTML"
           grep -q 'SPELLING BEE' "$HTML"
           grep -q '26 printable pages' "$HTML"
-          grep -q 'English' "$HTML"
-          grep -q 'Español' "$HTML"
+          grep -q 'id="enBtn"' "$HTML"
+          grep -q 'id="esBtn"' "$HTML"
           grep -q 'april-sanders-original-crop.webp' "$HTML"
 
           test -f "$ROOT/public/assets/book/book-cover.webp"
