@@ -97,10 +97,10 @@ jobs:
           echo "Valid magic login -> $login_code"
           cat /tmp/login-headers.txt | grep -Ei '^(HTTP/|location:|set-cookie:)' | sed -E 's/(atechspot_client=)[^;]+/\1[REDACTED]/g'
           test "$login_code" = "302"
-          grep -Eiq '^location: /clients/dashboard/' /tmp/login-headers.txt
+          grep -Eiq '^location: /portal/dashboard/' /tmp/login-headers.txt
           grep -Eiq '^set-cookie: atechspot_client=' /tmp/login-headers.txt
 
-          dashboard_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/dashboard-headers.txt             -o /tmp/dashboard.html             -w '%{http_code}'             "https://www.atechspot.com/clients/dashboard/" || true)
+          dashboard_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/dashboard-headers.txt             -o /tmp/dashboard.html             -w '%{http_code}'             "https://www.atechspot.com/portal/dashboard/" || true)
           echo "Authenticated dashboard -> $dashboard_code"
           test "$dashboard_code" = "200"
           grep -q 'AUTHENTICATED CLIENT DASHBOARD' /tmp/dashboard.html
@@ -113,7 +113,7 @@ jobs:
           test "$logout_code" = "302"
           grep -Eiq '^location: /clients/' /tmp/logout-headers.txt
 
-          after_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/after-headers.txt             -o /tmp/after-body.txt             -w '%{http_code}'             "https://www.atechspot.com/clients/dashboard/" || true)
+          after_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/after-headers.txt             -o /tmp/after-body.txt             -w '%{http_code}'             "https://www.atechspot.com/portal/dashboard/" || true)
           echo "Dashboard after logout -> $after_code"
           cat /tmp/after-headers.txt | grep -Ei '^(HTTP/|location:)' || true
           test "$after_code" = "302"
