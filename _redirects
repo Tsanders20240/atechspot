@@ -41,8 +41,10 @@
 /about/ /about/index.html 200
 /data-recovery /data-recovery/index.html 200
 /data-recovery/ /data-recovery/index.html 200
-/payment /payment/index.html 200
-/payment/ /payment/index.html 200
+/payment /payments/ 301
+/payment/ /payments/ 301
+/payment.html /payments/ 301
+/payment/index.html /payments/ 301
 /privacy /privacy/index.html 200
 /privacy/ /privacy/index.html 200
 /terms.html /terms/ 301
