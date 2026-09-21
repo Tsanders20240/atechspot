@@ -99,13 +99,7 @@ export default{
     }
     if(path.startsWith('/authors/')) return redirect(request,'/#about',301);
     if(SECTION_REDIRECTS.has(path)) return redirect(request,SECTION_REDIRECTS.get(path),301);
-    let assetRequest=request;
-    if(path==='/' || path==='/index.html'){
-      const assetUrl=new URL('/index.html',request.url);
-      assetUrl.search='';
-      assetRequest=new Request(assetUrl.toString(),request);
-    }
-    const response=await env.ASSETS.fetch(assetRequest);
+    const response=await env.ASSETS.fetch(request);
     const type=response.headers.get('content-type')||'';
     if(type.includes('text/html')&&request.method==='GET') return enhanceHtml(response);
     if(type.includes('text/html')) return new Response(response.body,{status:response.status,statusText:response.statusText,headers:secureHeaders(response.headers)});
