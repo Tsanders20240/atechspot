@@ -82,7 +82,7 @@ jobs:
           grep -q 'https://abctechproducts.atechspot.com/' "$HTML"
 
           # Standalone external purchase portal.
-          grep -q 'This portal uses external purchase links' "$HTML"
+          grep -q 'Purchases open on the seller' "$HTML"
           grep -q 'amazon.com' "$HTML"
           grep -q 'audible.com' "$HTML"
           grep -q 'store.bookbaby.com' "$HTML"
@@ -169,5 +169,5 @@ jobs:
           grep -q 'https://abctechproducts.atechspot.com/' /tmp/abc-live.html
           grep -q 'portal-2026.css' /tmp/abc-live.html
           grep -q 'portal-2026.js' /tmp/abc-live.html
-          grep -q 'This portal uses external purchase links' /tmp/abc-live.html
+          grep -q 'Purchases open on the seller' /tmp/abc-live.html
           echo 'Live standalone ABC of Technology portal verified.'
