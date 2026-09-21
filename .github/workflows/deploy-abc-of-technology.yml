@@ -93,6 +93,25 @@ jobs:
           fi
 
           grep -q 'abcoftech.atechspot.com' "$ROOT/wrangler.jsonc"
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          html=Path("ABC-of-Technology-Website/public/index.html").read_text(encoding="utf-8")
+          class P(HTMLParser):
+              def __init__(self):
+                  super().__init__(); self.ids=set(); self.hashrefs=[]
+              def handle_starttag(self,tag,attrs):
+                  d=dict(attrs)
+                  if d.get("id"): self.ids.add(d["id"])
+                  href=d.get("href","")
+                  if href.startswith("#") and len(href)>1: self.hashrefs.append(href[1:])
+          p=P(); p.feed(html)
+          missing=sorted(set(p.hashrefs)-p.ids)
+          if missing:
+              raise SystemExit("Broken internal anchors: "+", ".join(missing))
+          print(f"Internal anchor validation passed: {len(p.hashrefs)} hash links, {len(p.ids)} ids.")
+          PY
+
           echo 'ABC of Technology animated A-Z ecosystem, bilingual learning, activities and grown-up product funnel assertions passed.'
 
       - name: Deploy dedicated custom-domain Worker
@@ -111,3 +130,17 @@ jobs:
             code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://abcoftech.atechspot.com${path}" || true)
             echo "$path -> $code"
           done
+
+      - name: Verify live ABC adventure experience
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -L -sS -A 'Mozilla/5.0' https://abcoftech.atechspot.com/ -o /tmp/abc-live.html
+          grep -q 'THE A–Z ADVENTURE WORLD' /tmp/abc-live.html
+          grep -q 'COMPLETE THE LEARNING EXPERIENCE' /tmp/abc-live.html
+          grep -q 'Website 4 of the 22-property ATechSpot ecosystem' /tmp/abc-live.html
+          grep -q 'https://creator.atechspot.com/' /tmp/abc-live.html
+          grep -q 'https://abctechproducts.atechspot.com/' /tmp/abc-live.html
+          grep -q 'abc-adventure-2026.css' /tmp/abc-live.html
+          grep -q 'abc-adventure-2026.js' /tmp/abc-live.html
+          echo 'Live ABC of Technology adventure experience verified.'
