@@ -1,81 +1,253 @@
-/* A+ Techucation 2026 ecosystem experience */
+/* A+ Techucation — clean premium ecosystem refinement */
 :root{
-  --eco-navy:#06172d;--eco-navy-2:#0b2d50;--eco-blue:#0d6fd3;--eco-cyan:#36b7ff;
-  --eco-red:#ef2b2d;--eco-ice:#f4f9fd;--eco-line:#d8e6f2;--eco-glow:0 18px 55px rgba(9,54,98,.13)
+  --edu-navy:#071a32;
+  --edu-blue:#1478df;
+  --edu-red:#ef2b2d;
+  --edu-soft:#f5f9fc;
+  --edu-line:#d9e5ef;
+  --edu-shadow:0 16px 40px rgba(8,34,65,.08);
 }
-body{background:
-  radial-gradient(circle at 12% 3%,rgba(54,183,255,.08),transparent 24rem),
-  linear-gradient(180deg,#f8fbfe 0,#f4f9fd 100%);overflow-x:hidden}
-.topbar{background:linear-gradient(90deg,#04152a,#0b3560 55%,#071d38);border-bottom:1px solid rgba(121,195,255,.16)}
-.topbar .wrap:before{content:"●";color:#50c6ff;font-size:8px;box-shadow:0 0 16px #35a8ff}
-.site-header{background:rgba(248,251,254,.88);border-bottom:1px solid rgba(82,126,164,.18);box-shadow:0 10px 34px rgba(6,23,45,.07)}
-.navin{position:relative}
-.brand{flex:0 0 auto}
-.brand img{filter:drop-shadow(0 8px 18px rgba(5,44,82,.10))!important}
-.links{gap:16px}
-.links>a:not(.btn){position:relative;font-weight:720}
-.links>a:not(.btn):after{content:"";position:absolute;left:0;right:100%;bottom:-7px;height:2px;border-radius:99px;background:linear-gradient(90deg,var(--eco-blue),var(--eco-red));transition:right .18s}
-.links>a:not(.btn):hover:after{right:0}
-.btn{border-radius:999px;letter-spacing:-.01em}
-.btn.primary{box-shadow:0 12px 28px rgba(239,43,45,.22)}
-.hero{min-height:680px;display:flex;align-items:center;background:
-  radial-gradient(circle at 78% 24%,rgba(49,177,255,.34),transparent 24rem),
-  radial-gradient(circle at 18% 90%,rgba(239,43,45,.18),transparent 23rem),
-  linear-gradient(135deg,#04152b 0,#082c50 48%,#0d4d7f 100%)}
-.hero:after{content:"";position:absolute;right:-130px;bottom:-120px;width:460px;height:460px;border-radius:50%;border:1px solid rgba(126,206,255,.15);box-shadow:0 0 0 58px rgba(126,206,255,.04),0 0 0 116px rgba(126,206,255,.025)}
-.heroLogo img{filter:drop-shadow(0 16px 34px rgba(0,0,0,.2))!important}
-.dashboard{backdrop-filter:blur(16px);border-color:rgba(255,255,255,.8);box-shadow:0 36px 100px rgba(0,18,38,.32)}
-.proofStrip{background:rgba(255,255,255,.92);box-shadow:0 18px 50px rgba(8,44,80,.04)}
-section{position:relative}
-.card{border-color:#d4e4f1;box-shadow:0 12px 34px rgba(8,54,96,.07);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
-.card:hover{transform:translateY(-5px);border-color:#b9d8ee;box-shadow:0 22px 56px rgba(8,54,96,.13)}
-.schoolCard:before{width:5px}
-.softSection{background:linear-gradient(180deg,#f7fbfe,#edf6fc)}
-.darkSection,.ecosystemSection{background:
-  radial-gradient(circle at 85% 20%,rgba(37,145,230,.20),transparent 24rem),
-  linear-gradient(135deg,#06172d,#0b2d50)}
-.assistantCard{box-shadow:0 14px 36px rgba(0,0,0,.15)}
-.ecosystemSection:before{content:"22";position:absolute;right:7vw;top:18px;font-size:180px;line-height:1;font-weight:950;color:rgba(255,255,255,.025);letter-spacing:-.08em}
-.ecosystemNav{background:linear-gradient(90deg,#041426,#082846,#041426)}
-.ecoHub{border:1px solid rgba(94,190,255,.28);padding:9px 16px;border-radius:999px;background:rgba(63,166,235,.08)}
-.supportSection{background:linear-gradient(180deg,#fff,#f4f9fd)}
-.supportCards a{transition:.18s;border-color:#d4e5f1}
-.supportCards a:hover{transform:translateY(-2px);border-color:#86bce2;box-shadow:0 12px 30px rgba(11,78,132,.08)}
-.footer{background:
-  radial-gradient(circle at 10% 0,rgba(20,120,223,.12),transparent 25rem),
-  #041426}
+body{
+  background:#f8fbfd;
+}
+.topbar{
+  background:#06172d;
+}
+.site-header{
+  background:rgba(248,251,253,.97);
+  border-bottom:1px solid rgba(145,169,189,.28);
+  box-shadow:0 6px 18px rgba(8,34,65,.05);
+}
+.navin{
+  min-height:92px;
+}
+.brand img{
+  height:70px;
+  filter:none!important;
+}
+.links{
+  gap:18px;
+}
+.links>a:not(.btn){
+  font-weight:700;
+  color:#334861;
+}
+.btn{
+  border-radius:12px;
+}
+.btn.primary{
+  box-shadow:none;
+}
+.hero{
+  min-height:auto;
+  background:
+    radial-gradient(circle at 82% 18%,rgba(38,154,255,.18),transparent 32%),
+    linear-gradient(145deg,#06172d 0,#0b284a 58%,#0d3b68 100%);
+}
+.hero:after{
+  display:none;
+}
+.heroLogo img{
+  filter:none!important;
+}
+.dashboard{
+  box-shadow:0 24px 70px rgba(8,34,65,.16);
+  backdrop-filter:none;
+}
+.card{
+  border:1px solid var(--edu-line);
+  box-shadow:0 10px 28px rgba(8,34,65,.055);
+}
+.card:hover{
+  transform:none;
+  border-color:var(--edu-line);
+  box-shadow:0 10px 28px rgba(8,34,65,.055);
+}
+.schoolCard:before{
+  width:4px;
+}
+.softSection{
+  background:linear-gradient(180deg,#f6f9fc,#edf5fb);
+}
+.darkSection,
+.ecosystemSection{
+  background:linear-gradient(145deg,#07182e,#0b294b);
+}
+.ecosystemSection:before{
+  display:none;
+}
+.ecosystemNav{
+  background:#06172d;
+}
+.ecoHub{
+  border:0;
+  padding:0;
+  border-radius:0;
+  background:transparent;
+}
+.supportSection{
+  background:#fff;
+}
+.supportCards a{
+  box-shadow:none;
+}
+.supportCards a:hover{
+  transform:none;
+  box-shadow:none;
+}
 
-/* Direct education contact / enrollment form */
-.contactExperience{background:
-  radial-gradient(circle at 90% 10%,rgba(53,168,255,.13),transparent 22rem),
-  linear-gradient(180deg,#edf6fc,#f9fcff)}
-.contactExperience .sectionHead{align-items:start}
-.contactShell{display:grid;grid-template-columns:.86fr 1.14fr;gap:22px;align-items:stretch}
-.contactPromise{border-radius:24px;padding:34px;background:linear-gradient(145deg,#061a32,#0b3763);color:#fff;box-shadow:0 26px 70px rgba(6,31,56,.2);position:relative;overflow:hidden}
-.contactPromise:after{content:"A+";position:absolute;right:-20px;bottom:-48px;font-size:190px;font-weight:950;color:rgba(255,255,255,.035);letter-spacing:-.08em}
-.contactPromise h3{font-size:32px;line-height:1.08;margin:8px 0 14px}
-.contactPromise p{color:#c8d8e7;line-height:1.75}
-.contactPromise ul{padding:0;margin:24px 0 0;list-style:none;display:grid;gap:12px}
-.contactPromise li{display:flex;gap:10px;align-items:flex-start;color:#e7f3fc;font-size:14px}
-.contactPromise li:before{content:"✓";display:grid;place-items:center;flex:0 0 22px;height:22px;border-radius:50%;background:#1685e5;color:#fff;font-weight:900}
-.eduContactForm{background:#fff;border:1px solid #cfe0ed;border-radius:24px;padding:30px;box-shadow:var(--eco-glow)}
-.eduContactForm .formGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.eduContactForm label{display:grid;gap:7px;font-size:12px;font-weight:850;color:#18324d}
-.eduContactForm input,.eduContactForm select,.eduContactForm textarea{width:100%;border:1px solid #c9d9e6;border-radius:12px;background:#fbfdff;color:#13243a;padding:13px 14px;outline:none;transition:.18s}
-.eduContactForm input:focus,.eduContactForm select:focus,.eduContactForm textarea:focus{border-color:#1685e5;box-shadow:0 0 0 4px rgba(20,120,223,.09)}
-.eduContactForm textarea{min-height:145px;resize:vertical}
-.eduContactForm .full{grid-column:1/-1}
-.eduContactForm .formFoot{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:16px}
-.eduContactForm small{color:#6d7f90;line-height:1.5}
-.formStatus{margin-top:14px;padding:12px 14px;border-radius:12px;font-size:13px;font-weight:760;display:none}
+/* Clean direct education contact experience */
+.contactExperience{
+  background:#f4f8fb;
+  border-top:1px solid var(--edu-line);
+  border-bottom:1px solid var(--edu-line);
+}
+.contactShell{
+  display:grid;
+  grid-template-columns:.9fr 1.1fr;
+  gap:24px;
+  align-items:stretch;
+}
+.contactPromise{
+  border-radius:20px;
+  padding:32px;
+  background:#0a2645;
+  color:#fff;
+  box-shadow:none;
+}
+.contactPromise:after{
+  display:none;
+}
+.contactPromise h3{
+  font-size:30px;
+  line-height:1.12;
+  margin:10px 0 14px;
+}
+.contactPromise p{
+  color:#c4d3e0;
+  line-height:1.7;
+}
+.contactPromise ul{
+  list-style:none;
+  padding:0;
+  margin:24px 0 0;
+  display:grid;
+  gap:12px;
+}
+.contactPromise li{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  color:#eef5fb;
+  font-size:14px;
+}
+.contactPromise li:before{
+  content:"✓";
+  display:grid;
+  place-items:center;
+  flex:0 0 21px;
+  height:21px;
+  border-radius:50%;
+  background:#1478df;
+  color:#fff;
+  font-weight:900;
+}
+.courseRouteBadge{
+  display:inline-block;
+  padding:6px 9px;
+  border-radius:999px;
+  background:#eaf4fd;
+  color:#0d6fd3;
+  font-size:11px;
+  font-weight:900;
+}
+.eduContactForm{
+  background:#fff;
+  border:1px solid var(--edu-line);
+  border-radius:20px;
+  padding:30px;
+  box-shadow:var(--edu-shadow);
+}
+.eduContactForm .formGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.eduContactForm label{
+  display:grid;
+  gap:7px;
+  font-size:12px;
+  font-weight:800;
+  color:#18324d;
+}
+.eduContactForm input,
+.eduContactForm select,
+.eduContactForm textarea{
+  width:100%;
+  border:1px solid #c9d9e6;
+  border-radius:10px;
+  background:#fff;
+  color:#13243a;
+  padding:12px 13px;
+}
+.eduContactForm input:focus,
+.eduContactForm select:focus,
+.eduContactForm textarea:focus{
+  border-color:#1478df;
+  outline:3px solid rgba(20,120,223,.09);
+  outline-offset:0;
+}
+.eduContactForm textarea{
+  min-height:140px;
+  resize:vertical;
+}
+.eduContactForm .full{
+  grid-column:1/-1;
+}
+.eduContactForm .formFoot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-top:16px;
+}
+.eduContactForm small{
+  color:#6b7c8c;
+  line-height:1.5;
+}
+.formStatus{
+  display:none;
+  margin-top:14px;
+  padding:12px 14px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:750;
+}
 .formStatus.show{display:block}
-.formStatus.ok{background:#e9f8f0;color:#11643a;border:1px solid #bce8cf}
-.formStatus.err{background:#fff0f0;color:#8f2026;border:1px solid #f0c2c5}
+.formStatus.ok{
+  background:#eaf7ef;
+  color:#165f39;
+  border:1px solid #c5e7d2;
+}
+.formStatus.err{
+  background:#fff1f1;
+  color:#8c2329;
+  border:1px solid #efc7ca;
+}
 
-/* Ecosystem-friendly route badges */
-.courseRouteBadge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(20,120,223,.18);background:#eef7fe;color:#0d6fd3;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:900}
-
-@media(max-width:1100px){.links{gap:12px;font-size:13px}.brand img{height:64px}}
-@media(max-width:1020px){.contactShell{grid-template-columns:1fr}.site-header{background:rgba(248,251,254,.97)}}
-@media(max-width:700px){.hero{min-height:auto}.eduContactForm .formGrid{grid-template-columns:1fr}.eduContactForm .full{grid-column:auto}.eduContactForm .formFoot{display:block}.eduContactForm .formFoot .btn{width:100%;margin-top:12px}.contactPromise,.eduContactForm{padding:24px;border-radius:18px}}
-@media(prefers-reduced-motion:reduce){.card:hover,.supportCards a:hover{transform:none}}
+@media(max-width:1100px){
+  .brand img{height:62px}
+  .links{gap:13px;font-size:13px}
+}
+@media(max-width:1020px){
+  .contactShell{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .brand img{height:48px}
+  .navin{min-height:72px}
+  .eduContactForm .formGrid{grid-template-columns:1fr}
+  .eduContactForm .full{grid-column:auto}
+  .eduContactForm .formFoot{display:block}
+  .eduContactForm .formFoot .btn{width:100%;margin-top:12px}
+  .contactPromise,.eduContactForm{padding:24px}
+}
