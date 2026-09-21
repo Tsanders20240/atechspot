@@ -86,3 +86,28 @@ jobs:
             echo "$path -> $code"
           done
           curl -sSI https://creator.atechspot.com/ | head -n 25 || true
+
+      - name: Verify Creator production inquiry and email delivery
+        shell: bash
+        run: |
+          set -euo pipefail
+          started=$(( $(date +%s%3N) - 3000 ))
+          cat > /tmp/creator-qa.json <<EOF
+          {
+            "Full Name":"ATechSpot Creator Production QA",
+            "Email":"aplustechucation@gmail.com",
+            "Company":"ATechSpot",
+            "Product Interest":"Custom B2B Digital Product",
+            "Message":"Automated production QA for ATechSpot Creator custom digital product inquiry and email delivery.",
+            "Preferred Timeframe":"Planning / exploring",
+            "Budget Range":"Not sure yet",
+            "Request Type":"ATechSpot Creator Digital Product Inquiry",
+            "form_started_at":"$started",
+            "website":""
+          }
+          EOF
+          code=$(curl -sS -o /tmp/creator-qa-result.json -w '%{http_code}' -X POST -H 'content-type: application/json' --data-binary @/tmp/creator-qa.json https://creator.atechspot.com/api/creator-contact)
+          echo "Creator production inquiry -> $code"
+          cat /tmp/creator-qa-result.json
+          test "$code" = "200"
+          node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/creator-qa-result.json','utf8'));if(j.ok!==true||j.confirmationSent!==true)process.exit(1)"
