@@ -162,7 +162,7 @@ jobs:
           echo "Current Pages production branch: $production_branch"
           if [ "$production_branch" != "main" ]; then
             echo "Updating Pages production branch to main"
-            curl -fsS --fail-with-body -X PATCH "$project_url"               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"               -H "Content-Type: application/json"               --data '{"production_branch":"main"}' > /tmp/pages-project-update.json
+            curl -sS --fail-with-body -X PATCH "$project_url"               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"               -H "Content-Type: application/json"               --data '{"production_branch":"main"}' > /tmp/pages-project-update.json
             cat /tmp/pages-project-update.json
             test "$(jq -r '.success' /tmp/pages-project-update.json)" = "true"
           fi
