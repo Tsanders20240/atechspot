@@ -93,11 +93,21 @@ jobs:
           UA='Mozilla/5.0 (ATechSpot Portal QA) AppleWebKit/537.36 Chrome/142 Safari/537.36'
           rm -f /tmp/portal-cookies.txt
 
-          login_code=$(curl -sS             -A "$UA"             -D /tmp/login-headers.txt             -c /tmp/portal-cookies.txt             -o /tmp/login-body.txt             -w '%{http_code}'             "https://www.atechspot.com/api/client-login?token=$PORTAL_MAGIC_TOKEN" || true)
-          echo "Valid magic login -> $login_code"
+          login_code="000"
+          login_ready="false"
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+            rm -f /tmp/login-headers.txt /tmp/login-body.txt /tmp/portal-cookies.txt
+            login_code=$(curl -sS             -A "$UA"             -D /tmp/login-headers.txt             -c /tmp/portal-cookies.txt             -o /tmp/login-body.txt             -w '%{http_code}'             "https://www.atechspot.com/api/client-login?token=$PORTAL_MAGIC_TOKEN" || true)
+            location=$(grep -i '^location:' /tmp/login-headers.txt | tr -d '\r' | head -n1 || true)
+            echo "Valid magic login -> $login_code $location (attempt $attempt/12)"
+            if [ "$login_code" = "302" ] && echo "$location" | grep -q '/portal/dashboard/'; then
+              login_ready="true"
+              break
+            fi
+            sleep 5
+          done
           cat /tmp/login-headers.txt | grep -Ei '^(HTTP/|location:|set-cookie:)' | sed -E 's/(atechspot_client=)[^;]+/\1[REDACTED]/g'
-          test "$login_code" = "302"
-          grep -Eiq '^location: /portal/dashboard/' /tmp/login-headers.txt
+          test "$login_ready" = "true"
           grep -Eiq '^set-cookie: atechspot_client=' /tmp/login-headers.txt
 
           dashboard_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/dashboard-headers.txt             -o /tmp/dashboard.html             -w '%{http_code}'             "https://www.atechspot.com/portal/dashboard/" || true)
