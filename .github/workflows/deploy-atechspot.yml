@@ -154,6 +154,11 @@ jobs:
 
           grep -q 'https://start.atechspot.com/' resources/index.html
           test -f payments/index.html
+          test -f booking/index.html
+          grep -q 'ATechSpot Booking' booking/index.html
+          grep -q 'https://scheduler.zoom.us/a-plus-techucation/30-mins-with-a-plus' booking/index.html
+          grep -q 'https://scheduler.zoom.us' _headers
+          grep -q 'https://www.atechspot.com/booking/' sitemap.xml
           test -f commerce-terms/index.html
           test -f payment-success/index.html
           grep -q 'https://book.stripe.com/3cI3cw1j00aG6X93LA6EU04' assets/site.js
@@ -217,7 +222,7 @@ jobs:
             return 1
           }
           echo "Testing $DEPLOY_URL"
-          for path in / /ecosystem/ /dji/ /dji/real-estate/ /dji/roofing-inspections/ /dji/mini-5-pro-vs-mavic-4-pro/ /dji/construction/ /dji/buying-guide/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /data-recovery/ /payments/ /commerce-terms/ /payment-success/; do
+          for path in / /ecosystem/ /dji/ /dji/real-estate/ /dji/roofing-inspections/ /dji/mini-5-pro-vs-mavic-4-pro/ /dji/construction/ /dji/buying-guide/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /data-recovery/ /booking/ /payments/ /commerce-terms/ /payment-success/; do
             check_path "$path"
           done
 
@@ -304,6 +309,10 @@ jobs:
           grep -q 'DJI Avata 360' /tmp/dji-buying-guide.html
           grep -q 'Remote ID' /tmp/dji-buying-guide.html
           grep -q 'Build my drone workflow' /tmp/dji-buying-guide.html
+
+          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/booking/" -o /tmp/booking.html
+          grep -q 'ATechSpot Booking' /tmp/booking.html
+          grep -q 'https://scheduler.zoom.us/a-plus-techucation/30-mins-with-a-plus' /tmp/booking.html
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/payments/" -o /tmp/payments.html
           grep -q 'Payments &amp; Billing\|Payments & Billing' /tmp/payments.html
