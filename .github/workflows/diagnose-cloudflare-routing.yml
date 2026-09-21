@@ -1,5 +1,5 @@
 name: Diagnose Cloudflare Routing
-# Production routing audit: 2026-09-21 B2B launch.
+# Production routing audit: 2026-09-21 B2B launch. Re-run after Pages production branch repair.
 
 on:
   push:
