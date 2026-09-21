@@ -204,8 +204,6 @@ jobs:
           grep -q 'Purchases open on the seller' /tmp/abc-live.html
           grep -q 'battery-hunt.pdf' /tmp/abc-live.html
           grep -q 'phone-stand.pdf' /tmp/abc-live.html
-          grep -q 'coloring-preview-sheet.webp' /tmp/abc-live.html
-          grep -q 'preview-page-1.svg' /tmp/abc-live.html
           grep -q 'id="siteIntro"' /tmp/abc-live.html
           grep -q 'A+ TECHUCATION PRESENTS' /tmp/abc-live.html
           grep -q 'id="soundDock"' /tmp/abc-live.html
@@ -227,4 +225,6 @@ jobs:
           grep -q 'g-game-controller-activity.pdf' /tmp/abc-live.html
           grep -q 'h-headphones-activity.pdf' /tmp/abc-live.html
           if grep -q 'live-tool-dock' /tmp/abc-live.html; then echo 'Duplicate bottom menu is live' && exit 1; fi
-          echo 'Live ABC portal verified with persistent navigation, intro, sound, lyric video, activities, book and Coloring World.'
+          grep -q '/assets/coloring-pages/a-analog-phone.webp' /tmp/abc-live.html
+          grep -q '/assets/coloring-pages/i-internet.webp' /tmp/abc-live.html
+          echo 'Live ABC portal verified with single top navigation, F/G/H book preview, matching activity PDFs, lyric video and 26-page coloring gallery.'
