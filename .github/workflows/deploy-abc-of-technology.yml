@@ -97,7 +97,7 @@ jobs:
           grep -q 'coloring-preview-sheet.webp' "$HTML"
           grep -q 'A–Z Quiz' "$HTML"
           grep -q 'SPELLING BEE' "$HTML"
-          grep -q '26 printable pages' "$HTML"
+          grep -q '26 printable technology pages' "$HTML"
           grep -q 'id="enBtn"' "$HTML"
           grep -q 'id="esBtn"' "$HTML"
           grep -q 'april-sanders-original-crop.webp' "$HTML"
