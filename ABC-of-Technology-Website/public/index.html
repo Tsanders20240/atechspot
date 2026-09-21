@@ -13,47 +13,29 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
-<div class="ecosystem-top">
-  <div class="shell">
-    <span>Website 4 of 22 · ATechSpot Ecosystem</span>
-    <a href="https://www.atechspot.com/ecosystem/">Explore the ecosystem →</a>
-  </div>
-</div>
-
-<header class="site-header">
-  <div class="shell nav-row">
-    <a class="brand" href="#home" aria-label="ABC's of Technology home">
-      <span class="brand-mark">ABC</span>
-      <span><strong>ABC's of Technology</strong><small>LEARN · PLAY · EXPLORE · DISCOVER</small></span>
-    </a>
-    <button id="menuBtn" class="menu-btn" type="button" aria-expanded="false" aria-controls="mainNav">☰</button>
-    <nav id="mainNav">
-      <a href="#book">Book</a><a href="#play">Play</a><a href="#color">Color</a><a href="#watch">Watch</a>
-      <a href="#stem">STEM</a><a href="#spelling">Spelling Bee</a><a href="#about">About</a>
-    </nav>
-    <div class="lang-switch"><button id="enBtn" class="active" type="button">EN</button><button id="esBtn" type="button">ES</button></div>
-    <a class="btn orange desktop-buy" href="#shop">Get the Book →</a>
-  </div>
-</header>
-
 <main id="main">
-<section id="home" class="hero">
-  <div class="hero-art" role="img" aria-label="ABC's of Technology learning world with ABC Tech Bus"></div>
-  <div class="hero-shade"></div>
-  <div class="shell hero-content">
-    <div class="hero-copy">
-      <p class="eyebrow">A+ TECHUCATION ORIGINAL</p>
-      <h1>ABC's of<br><span>Technology</span></h1>
-      <p class="tagline">A brighter tomorrow starts with A–Z.</p>
-      <div class="hero-actions">
-        <a class="btn orange" href="#world">Start the A–Z Adventure →</a>
-        <a class="btn glass" href="#shop">Get the Book</a>
-      </div>
-    </div>
+<section id="home" class="hero-template" aria-label="ABC's of Technology interactive homepage">
+  <img class="hero-template-image" src="/assets/hero/abc-home-hero.webp" alt="ABC's of Technology futuristic A-Z learning world with the ABC Tech Bus, Mr. A Plus, April, a young learner and robot mascot">
+  <div class="hero-hotspots" aria-label="Interactive hero navigation">
+    <a class="hot hot-home" href="#home"><span>Home</span></a>
+    <a class="hot hot-book" href="#book"><span>Book</span></a>
+    <a class="hot hot-play" href="#play"><span>Play</span></a>
+    <a class="hot hot-color" href="#color"><span>Color</span></a>
+    <a class="hot hot-watch" href="#watch"><span>Watch</span></a>
+    <a class="hot hot-stem" href="#stem"><span>STEM</span></a>
+    <a class="hot hot-spell" href="#spelling"><span>Spelling Bee</span></a>
+    <a class="hot hot-about" href="#about"><span>About</span></a>
+    <a class="hot hot-buy" href="#shop"><span>Get the Book</span></a>
+    <a class="hot hot-start" href="#world"><span>Start the A-Z Adventure</span></a>
+    <button class="hot hot-explore world-jump" data-world-jump="explore" type="button"><span>Explore</span></button>
+    <button class="hot hot-learn world-jump" data-world-jump="learn" type="button"><span>Learn</span></button>
+    <button class="hot hot-create world-jump" data-world-jump="create" type="button"><span>Create</span></button>
+    <button class="hot hot-imagine world-jump" data-world-jump="imagine" type="button"><span>Imagine</span></button>
+    <button class="hot hot-belong world-jump" data-world-jump="belong" type="button"><span>Belong</span></button>
   </div>
 </section>
 
-<section class="quick-strip">
+<section class="live-tool-dock" aria-label="ABC learning tools">
   <div class="shell quick-grid">
     <a href="#book"><span>📖</span><b>Book</b><small>Preview</small></a>
     <a href="#play"><span>🎮</span><b>Play</b><small>Games</small></a>
@@ -65,6 +47,9 @@
     <a href="#world"><span>🌐</span><b>Explore</b><small>World</small></a>
   </div>
 </section>
+
+
+  
 
 <section id="world" class="world section">
   <div class="shell">
