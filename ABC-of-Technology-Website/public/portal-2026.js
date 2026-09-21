@@ -59,7 +59,7 @@ function updateSoundUI(){
 }
 function toggleSound(){
   soundEnabled=!soundEnabled;
-  if(!soundEnabled){stopTheme();speechSynthesis?.cancel?.();}
+  if(!soundEnabled){stopTheme();window.speechSynthesis?.cancel?.();}
   else startTheme();
   updateSoundUI();
 }
