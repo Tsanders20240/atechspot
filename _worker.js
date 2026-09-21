@@ -7,16 +7,6 @@ const escapeHtml=value=>String(value).replaceAll("&","&amp;").replaceAll("<","&l
 const PUBLIC_INBOXES={jason:"jason@atechspot.com",hello:"hello@atechspot.com",sales:"sales@atechspot.com",support:"support@atechspot.com",billing:"billing@atechspot.com",legal:"legal@atechspot.com"};
 const PRODUCTION_SENDER="ATechSpot Website <forms@atechspot.com>";
 const PRODUCTION_RECIPIENT="aplustechucation@gmail.com";
-const UI_HARDENING_STYLE=`<style id="atechspot-ui-hardening">
-[hidden]{display:none!important}
-html body .site-header{height:78px!important;min-height:78px!important}
-html body .site-header .brand{width:220px!important;height:54px!important;flex:0 0 220px!important;display:block!important;overflow:hidden!important;background-image:url('/assets/atechspot-logo.png')!important;background-repeat:no-repeat!important;background-position:left center!important;background-size:contain!important;filter:brightness(1.32) saturate(1.08) drop-shadow(0 0 14px rgba(76,179,255,.18))!important}
-html body .site-header .brand-logo-clean{display:none!important}
-html body .footer-brand{width:220px!important;height:58px!important;flex:0 0 220px!important;display:block!important;overflow:hidden!important;background-image:url('/assets/atechspot-logo.png')!important;background-repeat:no-repeat!important;background-position:left center!important;background-size:contain!important;filter:brightness(0) invert(1) drop-shadow(0 0 12px rgba(76,179,255,.16))!important}
-html body .footer-brand .brand-logo-clean{display:none!important}
-@media(max-width:650px){html body .site-header .brand{width:176px!important;height:48px!important;flex-basis:176px!important}html body .footer-brand{width:190px!important;height:52px!important;flex-basis:190px!important}}
-</style>`;
-
 const CANONICAL_REDIRECTS=new Map([
   ["/services","/services/"],["/services.html","/services/"],["/solutions","/services/"],["/solutions/","/services/"],["/solutions.html","/services/"],
   ["/app","/app/"],["/app.html","/app/"],["/apps","/app/"],["/apps/","/app/"],["/apps.html","/app/"],
@@ -76,21 +66,19 @@ async function deliverLead(request,env,leadType,requiredFields,{confirmation=tru
 }
 
 function transformHtml(response,url){
-  const type=response.headers.get("content-type")||"";if(!type.includes("text/html"))return response;
+  const type=response.headers.get("content-type")||"";
+  if(!type.includes("text/html"))return response;
   let rewriter=new HTMLRewriter()
-    .on('head',{element(element){element.append(UI_HARDENING_STYLE,{html:true})}})
-    .on('a[href]',{element(element){const href=element.getAttribute('href');if(LINK_REWRITES.has(href))element.setAttribute('href',LINK_REWRITES.get(href))}})
-    .on('.site-header .desktop-cta',{element(element){element.setAttribute('href','/intake/');element.setInnerContent('Start My Project')}})
-    .on('footer .footer-grid p',{element(element){element.setInnerContent('AI, automation, websites, ecommerce, apps and software built around real business needs. ATechSpot is operated by A+ Techucation LLC.')}});
+    .on('a[href]',{element(element){
+      const href=element.getAttribute('href');
+      if(LINK_REWRITES.has(href))element.setAttribute('href',LINK_REWRITES.get(href));
+    }});
   if(url.pathname.startsWith('/intake')){
-    rewriter=rewriter.on('.site-header nav a[href="/app/"]',{element(element){element.setAttribute('href','/assessment/');element.setInnerContent('Assessment')}})
+    rewriter=rewriter
+      .on('.site-header nav a[href="/app/"]',{element(element){element.setAttribute('href','/assessment/');element.setInnerContent('Assessment')}})
       .on('footer a[href="/app/"]',{element(element){element.setAttribute('href','/assessment/');element.setInnerContent('Assessment')}});
   }
-  if(url.pathname==='/'){
-    rewriter=rewriter.on('.hero-actions .btn-primary',{element(element){element.setAttribute('href','/intake/');element.setInnerContent('Start My Project →')}})
-      .on('.growth-copy .btn-primary',{element(element){element.setAttribute('href','/assessment/');element.setInnerContent('Start With My Business Assessment')}});
-  }
-  return rewriter.transform(response)
+  return rewriter.transform(response);
 }
 
 export default{async fetch(request,env){
