@@ -352,7 +352,8 @@ jobs:
                 portal_code=$(curl -sS -o /tmp/prod-portal.json -w '%{http_code}' -X POST "https://www.atechspot.com/api/client-access" -H "Content-Type: application/json" --data "{\"Email\":\"portal-qa-not-authorized@atechspot.invalid\",\"form_started_at\":\"$portal_started\"}" || true)
                 echo "Production portal configuration -> $portal_code"
                 if [ "$portal_code" = "200" ] && [ "$(jq -r '.configured' /tmp/prod-portal.json)" = "true" ]; then
-                  dash_code=$(curl -sS -o /dev/null -w '%{http_code}' -L --max-redirs 0 "https://www.atechspot.com/clients/dashboard/" || true)
+                  dash_code=$(curl -sS -o /dev/null -w '%{http_code}' "https://www.atechspot.com/clients/dashboard/" || true)
+                  echo "Unauthenticated client dashboard -> $dash_code"
                   if [ "$dash_code" = "302" ]; then
                     echo 'Production ATechSpot + DriveSavers + Client Portal verification passed.'
                     exit 0
