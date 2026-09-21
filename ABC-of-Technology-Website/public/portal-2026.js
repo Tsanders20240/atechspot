@@ -156,12 +156,21 @@ function renderQuiz(){
 
 const colorGrid=document.getElementById('colorGrid');
 function renderColor(){
- if(!colorGrid)return;colorGrid.innerHTML='';
- WORDS.forEach((w,i)=>{const a=document.createElement('a');a.className='color-card'+(i<6?' featured-color':'');a.dataset.letter=w[0];a.href='/downloads/coloring-pages/'+w[6];a.target='_blank';a.rel='noopener';a.innerHTML='<div class="color-preview"><span class="color-letter">'+w[0]+w[0].toLowerCase()+'</span><span class="color-icon">'+w[5]+'</span></div><b>'+w[0]+' — '+wordName(w)+'</b><small>'+(lang==='es'?'Abrir PDF ↗':'Open PDF ↗')+'</small>';colorGrid.appendChild(a)});
+ const colorGrid=document.getElementById('colorGrid');if(!colorGrid)return;colorGrid.innerHTML='';
+ WORDS.forEach(w=>{
+   const slug=w[6].replace('.pdf','.webp');
+   const a=document.createElement('a');
+   a.className='color-card color-card-large';
+   a.dataset.letter=w[0];
+   a.href='/downloads/coloring-pages/'+w[6];
+   a.target='_blank';a.rel='noopener';
+   a.innerHTML='<div class="color-page-thumb"><img loading="lazy" src="/assets/coloring-pages/'+slug+'" alt="'+w[0]+' '+wordName(w)+' coloring page"></div><b>'+w[0]+' — '+wordName(w)+'</b><small>'+(lang==='es'?'Abrir PDF ↗':'Open PDF ↗')+'</small>';
+   colorGrid.appendChild(a);
+ });
 }
 
 const pages=[...document.querySelectorAll('#bookFrame img')];let page=0;
-function showPage(){pages.forEach((p,i)=>p.classList.toggle('active',i===page));const pc=document.getElementById('pageCount');if(pc)pc.textContent=(page+1)+' / '+pages.length}
+function showPage(){pages.forEach((p,i)=>p.classList.toggle('active',i===page));const pc=document.getElementById('pageCount');if(pc)pc.textContent=(page+6)+' / 26}
 document.getElementById('prevPage')?.addEventListener('click',()=>{page=(page-1+pages.length)%pages.length;showPage()});
 document.getElementById('nextPage')?.addEventListener('click',()=>{page=(page+1)%pages.length;showPage()});
 
