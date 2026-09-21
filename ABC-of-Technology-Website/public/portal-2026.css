@@ -201,3 +201,6 @@ nav{display:none;position:absolute;left:16px;right:16px;top:78px;flex-direction:
   .hero-hotspots{display:none}
   .live-tool-dock{position:relative}
 }
+
+.hot-en{left:66.8%;top:1.6%;width:5.0%;height:6.3%}
+.hot-es{left:71.8%;top:1.6%;width:5.0%;height:6.3%}
