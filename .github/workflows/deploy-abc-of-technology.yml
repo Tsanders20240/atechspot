@@ -99,9 +99,13 @@ jobs:
           grep -q 'ABC Tech Products' "$HTML"
 
           # Core learning experiences remain intact.
-          grep -q 'preview-f-floppy-flash.svg' "$HTML"
-          grep -q 'preview-f-flash-facts.svg' "$HTML"
-          grep -q 'preview-gh-game-headphones.svg' "$HTML"
+          grep -q 'book-page-title.svg' "$HTML"
+          grep -q 'book-page-best-you.svg' "$HTML"
+          grep -q 'book-page-a.svg' "$HTML"
+          grep -q 'ACTUAL SUPPLIED BOOK PAGES' "$HTML"
+          if grep -q 'preview-f-floppy-flash.svg\|preview-f-flash-facts.svg\|preview-gh-game-headphones.svg' "$HTML"; then
+            echo 'Recreated fake book pages are still referenced' && exit 1
+          fi
           grep -q 'f-floppy-flash-drive-activity.pdf' "$HTML"
           grep -q 'g-game-controller-activity.pdf' "$HTML"
           grep -q 'h-headphones-activity.pdf' "$HTML"
@@ -218,13 +222,17 @@ jobs:
           grep -q 'id="siteControlBar"' /tmp/abc-live.html
           grep -q 'COLORING WORLD' /tmp/abc-live.html
           grep -q 'View All 26 Coloring Pages' /tmp/abc-live.html
-          grep -q 'preview-f-floppy-flash.svg' /tmp/abc-live.html
-          grep -q 'preview-f-flash-facts.svg' /tmp/abc-live.html
-          grep -q 'preview-gh-game-headphones.svg' /tmp/abc-live.html
+          grep -q 'book-page-title.svg' /tmp/abc-live.html
+          grep -q 'book-page-best-you.svg' /tmp/abc-live.html
+          grep -q 'book-page-a.svg' /tmp/abc-live.html
+          grep -q 'ACTUAL SUPPLIED BOOK PAGES' /tmp/abc-live.html
+          if grep -q 'preview-f-floppy-flash.svg\|preview-f-flash-facts.svg\|preview-gh-game-headphones.svg' /tmp/abc-live.html; then
+            echo 'Recreated fake book pages are live' && exit 1
+          fi
           grep -q 'f-floppy-flash-drive-activity.pdf' /tmp/abc-live.html
           grep -q 'g-game-controller-activity.pdf' /tmp/abc-live.html
           grep -q 'h-headphones-activity.pdf' /tmp/abc-live.html
           if grep -q 'live-tool-dock' /tmp/abc-live.html; then echo 'Duplicate bottom menu is live' && exit 1; fi
           grep -q '/assets/coloring-pages/a-analog-phone.webp' /tmp/abc-live.html
           grep -q '/assets/coloring-pages/i-internet.webp' /tmp/abc-live.html
-          echo 'Live ABC portal verified with single top navigation, F/G/H book preview, matching activity PDFs, lyric video and 26-page coloring gallery.'
+          echo 'Live ABC portal verified with single top navigation, actual supplied book pages, separate F/G/H activity PDFs, lyric video and 26-page coloring gallery.'
