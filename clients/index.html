@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ATechSpot Client Portal</title>
+<meta name="description" content="Secure client access for active ATechSpot customers.">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<link rel="canonical" href="https://www.atechspot.com/clients/">
+<meta name="theme-color" content="#050a12">
+<link rel="stylesheet" href="/command-a.css">
+<link rel="stylesheet" href="/command-b.css">
+<link rel="stylesheet" href="/system-pages.css">
+<style>
+.portal-shell{min-height:100vh;background:radial-gradient(circle at 80% 12%,rgba(101,223,240,.12),transparent 32%),linear-gradient(180deg,#07121e,#050a12)}
+.portal-login{display:grid;place-items:center;min-height:calc(100vh - 90px);padding:54px 0}
+.portal-card{width:min(680px,calc(100% - 32px));padding:clamp(26px,5vw,44px);border:1px solid #1a405d;border-radius:24px;background:linear-gradient(145deg,#0a1a2a,#07131f);box-shadow:0 30px 90px rgba(0,0,0,.32)}
+.portal-card h1{margin:12px 0 16px;font:800 clamp(2.7rem,6vw,5rem)/.96 "Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;letter-spacing:-.05em}
+.portal-card p{color:#91a7ba;line-height:1.75}
+.portal-form{display:grid;gap:14px;margin-top:26px}
+.portal-form label{color:#dcebf7;font-weight:800}
+.portal-form input{width:100%;margin-top:7px;padding:14px 15px;border:1px solid #23445f;border-radius:11px;background:#06111d;color:#fff;font:inherit}
+.portal-note{margin-top:20px;padding:16px;border-left:2px solid #65dff0;border-radius:8px;background:#081827;color:#8fa5b7;font-size:.88rem;line-height:1.65}
+.portal-status{min-height:24px;color:#65dff0;font-weight:750}
+</style>
+</head>
+<body>
+<div class="portal-shell">
+<header class="site-header"><a class="brand" href="/"><span class="brand-mark">A+</span><span class="brand-name">ATECH<span>SPOT</span><small>Technology Within Us.</small></span></a><nav><a href="/">Home</a><a href="/services/">Services</a><a href="/contact/">Contact</a></nav></header>
+<main class="portal-login">
+<section class="portal-card">
+<span class="sys-kicker">SECURE CLIENT ACCESS</span>
+<h1>Open your ATechSpot client portal.</h1>
+<p>Enter the email address authorized for your active client account. If access is available, ATechSpot will send a short-lived secure sign-in link. No password is stored in your browser.</p>
+<form id="clientAccess" class="portal-form">
+<label>Authorized Client Email<input name="Email" type="email" autocomplete="email" required maxlength="254"></label>
+<input type="hidden" name="form_started_at">
+<button class="btn btn-primary" type="submit">Send Secure Sign-In Link →</button>
+<p class="portal-status" data-status aria-live="polite"></p>
+</form>
+<div class="portal-note"><strong>Security:</strong> ATechSpot does not reveal whether an email address is registered. Never forward a portal sign-in link. If you need client access provisioned, contact <a href="/contact/?department=support#contact-form">Support</a>.</div>
+</section>
+</main>
+</div>
+<script>
+(()=>{
+ const f=document.getElementById('clientAccess'),s=f.querySelector('[data-status]'),started=f.elements.namedItem('form_started_at');
+ started.value=String(Date.now());
+ const params=new URLSearchParams(location.search);
+ if(params.get('error'))s.textContent='That secure link is invalid, expired, or no longer authorized. Request a new link.';
+ f.addEventListener('submit',async e=>{
+   e.preventDefault(); if(!f.reportValidity())return;
+   const b=f.querySelector('button'); const old=b.textContent; b.disabled=true;b.textContent='Sending…';s.textContent='Checking secure access…';
+   try{
+     const r=await fetch('/api/client-access',{method:'POST',headers:{'content-type':'application/json','accept':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(f).entries())),credentials:'same-origin'});
+     const j=await r.json().catch(()=>({}));
+     if(!r.ok)throw new Error(j.message||'Unable to process the request.');
+     s.textContent=j.message||'If this email is authorized, a secure link will be sent.';
+     f.reset();started.value=String(Date.now());
+   }catch(err){s.textContent=err.message||'Unable to process the request right now.'}
+   finally{b.disabled=false;b.textContent=old}
+ });
+})();
+</script>
+</body>
+</html>
