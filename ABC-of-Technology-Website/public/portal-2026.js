@@ -82,6 +82,13 @@ function renderWorld(k){
  panel.innerHTML='<div><p class="eyebrow">ABC ADVENTURE WORLD</p><h3>'+p.title+'</h3><p>'+p.text+'</p></div><div class="world-links">'+p.links.map(([t,h])=>'<a class="btn '+(h.startsWith('http')?'green':'cyan')+'" href="'+h+'" '+(h.startsWith('http')?'target="_blank" rel="noopener"':'')+'>'+t+' →</a>').join('')+'</div>';
 }
 document.querySelectorAll('.world-tab').forEach(b=>b.addEventListener('click',()=>renderWorld(b.dataset.world)));
+document.querySelectorAll('.world-jump').forEach(b=>b.addEventListener('click',()=>{
+  const key=b.dataset.worldJump;
+  if(key && worlds[key]){
+    renderWorld(key);
+    document.getElementById('world')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}));
 
 document.getElementById('enBtn')?.addEventListener('click',()=>{lang='en';document.documentElement.lang='en';document.getElementById('enBtn').classList.add('active');document.getElementById('esBtn').classList.remove('active');renderWord();renderColor();renderSpell()});
 document.getElementById('esBtn')?.addEventListener('click',()=>{lang='es';document.documentElement.lang='es';document.getElementById('esBtn').classList.add('active');document.getElementById('enBtn').classList.remove('active');renderWord();renderColor();renderSpell()});
