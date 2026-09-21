@@ -99,7 +99,7 @@ export default{async fetch(request,env){
   if(url.hostname==='atechspot.com'&&!url.pathname.startsWith('/.well-known/')){url.hostname='www.atechspot.com';return Response.redirect(url.toString(),request.method==='GET'||request.method==='HEAD'?301:308)}
   if(url.hostname==='account.atechspot.com'){
     if(url.pathname==='/'||url.pathname===''){url.pathname='/clients/';return Response.redirect(url.toString(),302)}
-    if(url.pathname==='/dashboard'||url.pathname==='/dashboard/'){url.pathname='/portal/dashboard/';return Response.redirect(url.toString(),302)}
+    if(url.pathname==='/dashboard'||url.pathname==='/dashboard/'){url.pathname='/clients/dashboard/';return Response.redirect(url.toString(),302)}
   }
   if(LEGACY_PREFIXES.some(prefix=>url.pathname.startsWith(prefix)))return redirectResponse(request,'/',301);
 
@@ -126,12 +126,12 @@ export default{async fetch(request,env){
     if(!payload)return redirectResponse(request,"/clients/?error=expired",302);
     if(!clientAllowlist(env).has(String(payload.email).toLowerCase()))return redirectResponse(request,"/clients/?error=access",302);
     const session=await signPortalToken(env,{email:payload.email,purpose:"session",exp:Date.now()+8*60*60*1000});
-    return new Response(null,{status:302,headers:{location:"/portal/dashboard/","set-cookie":`atechspot_client=${session}; Path=/; Max-Age=28800; HttpOnly; Secure; SameSite=Lax`,"cache-control":"no-store","x-robots-tag":"noindex,nofollow"}});
+    return new Response(null,{status:302,headers:{location:"/clients/dashboard/","set-cookie":`atechspot_client=${session}; Path=/; Max-Age=28800; HttpOnly; Secure; SameSite=Lax`,"cache-control":"no-store","x-robots-tag":"noindex,nofollow"}});
   }
   if(url.pathname==="/api/client-logout"){
     return new Response(null,{status:302,headers:{location:"/clients/","set-cookie":"atechspot_client=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax","cache-control":"no-store","x-robots-tag":"noindex,nofollow"}});
   }
-  if(url.pathname==="/portal/dashboard/"||url.pathname==="/portal/dashboard"||url.pathname==="/clients/dashboard/"||url.pathname==="/clients/dashboard"){
+  if(url.pathname==="/clients/dashboard/"||url.pathname==="/clients/dashboard"){
     if(request.method!=="GET"&&request.method!=="HEAD")return new Response("Method not allowed",{status:405});
     const payload=await verifyPortalToken(env,cookieValue(request,"atechspot_client"),"session");
     if(!payload||!clientAllowlist(env).has(String(payload.email).toLowerCase()))return redirectResponse(request,"/clients/",302);
