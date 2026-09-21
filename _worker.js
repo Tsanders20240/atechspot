@@ -97,6 +97,7 @@ export default{async fetch(request,env){
   const url=new URL(request.url);
   if(request.method==="OPTIONS"&&url.pathname.startsWith("/api/"))return new Response(null,{status:204,headers:JSON_HEADERS});
   if(url.hostname==='atechspot.com'&&!url.pathname.startsWith('/.well-known/')){url.hostname='www.atechspot.com';return Response.redirect(url.toString(),request.method==='GET'||request.method==='HEAD'?301:308)}
+  if(url.hostname==='www.atechspot.com'&&url.pathname.startsWith('/clients')){url.hostname='account.atechspot.com';return Response.redirect(url.toString(),request.method==='GET'||request.method==='HEAD'?301:308)}
   if(url.hostname==='account.atechspot.com'){
     if(url.pathname==='/'||url.pathname===''){url.pathname='/clients/';return Response.redirect(url.toString(),302)}
     if(url.pathname==='/dashboard'||url.pathname==='/dashboard/'){url.pathname='/clients/dashboard/';return Response.redirect(url.toString(),302)}
@@ -114,7 +115,7 @@ export default{async fetch(request,env){
     if(allowed){
       try{
         const token=await signPortalToken(env,{email,purpose:"magic",exp:Date.now()+20*60*1000});
-        const link=new URL("/api/client-login",url.origin);link.searchParams.set("token",token);
+        const link=new URL("/api/client-login","https://account.atechspot.com");link.searchParams.set("token",token);
         await resend(env,{from:PRODUCTION_SENDER,to:[email],reply_to:PUBLIC_INBOXES.support,subject:"Your secure ATechSpot Client Portal link",html:`<p>Your secure ATechSpot Client Portal sign-in link is ready.</p><p><a href="${escapeHtml(link.toString())}">Open Client Portal</a></p><p>This link expires in 20 minutes. If you did not request it, you can ignore this email.</p><p>For your security, do not forward this link.</p>`});
       }catch(error){console.error("Client portal magic-link delivery failed",{status:error?.status,providerCode:error?.providerCode})}
     }
