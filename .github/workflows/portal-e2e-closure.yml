@@ -113,6 +113,12 @@ jobs:
 
           dashboard_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/dashboard-headers.txt             -o /tmp/dashboard.html             -w '%{http_code}'             "https://www.atechspot.com/clients/dashboard/" || true)
           echo "Authenticated dashboard -> $dashboard_code"
+          if [ "$dashboard_code" != "200" ]; then
+            echo "--- dashboard response headers ---"
+            cat /tmp/dashboard-headers.txt | grep -Eiv "^(set-cookie:|cookie:)" || true
+            echo "--- dashboard response body ---"
+            head -n 120 /tmp/dashboard.html || true
+          fi
           test "$dashboard_code" = "200"
           grep -q 'AUTHENTICATED CLIENT DASHBOARD' /tmp/dashboard.html
           grep -q 'aplustechucation@gmail.com' /tmp/dashboard.html
