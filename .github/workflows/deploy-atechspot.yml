@@ -161,6 +161,8 @@ jobs:
           grep -q 'clients/dashboard/' _worker.js
           grep -q 'PORTAL_SIGNING_SECRET' _worker.js
           grep -q 'CLIENT_PORTAL_USERS' _worker.js
+          grep -q 'https://account.atechspot.com' _worker.js
+          grep -q 'https://account.atechspot.com/clients/' clients/index.html
           grep -q 'ATechSpot Booking' booking/index.html
           grep -q 'https://scheduler.zoom.us/a-plus-techucation/30-mins-with-a-plus' booking/index.html
           grep -q 'https://scheduler.zoom.us' _headers
@@ -356,8 +358,12 @@ jobs:
                   echo "Unauthenticated client dashboard -> $dash_code"
                   if [ "$dash_code" = "302" ] || [ "$dash_code" = "403" ]; then
                     echo "Protected client dashboard denied unauthenticated access with HTTP $dash_code."
-                    echo 'Production ATechSpot + DriveSavers + Client Portal verification passed.'
-                    exit 0
+                    account_code=$(curl -sS -L -H 'Cache-Control: no-cache' -o /tmp/prod-account.html -w '%{http_code}' "https://account.atechspot.com/?deploy=$GITHUB_SHA&attempt=$attempt" || true)
+                    echo "Production account portal -> $account_code"
+                    if [ "$account_code" = "200" ] && grep -q 'SECURE CLIENT ACCESS' /tmp/prod-account.html; then
+                      echo 'Production ATechSpot + DriveSavers + Client Portal verification passed.'
+                      exit 0
+                    fi
                   fi
                 fi
               fi
