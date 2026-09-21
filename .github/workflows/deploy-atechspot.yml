@@ -37,7 +37,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          grep -q '22-PROPERTY ECOSYSTEM' ecosystem/index.html
+          grep -q '22 PUBLIC PROPERTIES' ecosystem/index.html
           grep -q 'ATechSpot RemoteCare' ecosystem/index.html
           grep -q 'ATechSpot Tech Guru' ecosystem/index.html
           grep -q 'WEDDING &amp; FAMILY LEGACY' ecosystem/index.html
