@@ -130,12 +130,12 @@ export default{async fetch(request,env){
   if(url.pathname==="/api/client-logout"){
     return new Response(null,{status:302,headers:{location:"/clients/","set-cookie":"atechspot_client=; Path=/; Max-Age=0; HttpOnly; Secure; SameSite=Lax","cache-control":"no-store","x-robots-tag":"noindex,nofollow"}});
   }
-  if(url.pathname.startsWith("/_portal/"))return new Response("Not found",{status:404,headers:{"cache-control":"no-store","x-robots-tag":"noindex,nofollow,noarchive"}});
+  if(url.pathname.startsWith("/portal-assets/"))return new Response("Not found",{status:404,headers:{"cache-control":"no-store","x-robots-tag":"noindex,nofollow,noarchive"}});
   if(url.pathname==="/portal/dashboard/"||url.pathname==="/portal/dashboard"||url.pathname==="/clients/dashboard/"||url.pathname==="/clients/dashboard"){
     if(request.method!=="GET"&&request.method!=="HEAD")return new Response("Method not allowed",{status:405});
     const payload=await verifyPortalToken(env,cookieValue(request,"atechspot_client"),"session");
     if(!payload||!clientAllowlist(env).has(String(payload.email).toLowerCase()))return redirectResponse(request,"/clients/",302);
-    const assetUrl=new URL("/_portal/dashboard.html",request.url);
+    const assetUrl=new URL("/portal-assets/dashboard.html",request.url);
     const asset=await env.ASSETS.fetch(new Request(assetUrl.toString(),request));
     const headers=new Headers(asset.headers);headers.set("cache-control","no-store");headers.set("x-robots-tag","noindex,nofollow,noarchive");headers.set("referrer-policy","no-referrer");
     let response=new Response(asset.body,{status:asset.status,statusText:asset.statusText,headers});
