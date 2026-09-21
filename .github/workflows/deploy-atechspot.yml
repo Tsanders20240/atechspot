@@ -284,6 +284,25 @@ jobs:
           node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('/tmp/form-health.json','utf8')); const code=process.argv[1]; const inboxes=Array.isArray(j.publicInboxes)&&j.publicInboxes.length===6; const healthy=code==='200'&&j.ok===true&&j.resendConfigured===true; const previewExpected=code==='503'&&j.ok===false&&j.resendConfigured===false; if(!inboxes||(!healthy&&!previewExpected)) process.exit(1);" "$form_health_code"
           echo 'Deployment preview QA passed.'
 
+      - name: Purge Cloudflare edge cache after production deploy
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          zone_json=$(curl -fsS "https://api.cloudflare.com/client/v4/zones?name=atechspot.com&account.id=$CLOUDFLARE_ACCOUNT_ID" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json")
+          zone_id=$(echo "$zone_json" | jq -r '.result[0].id // empty')
+          test -n "$zone_id"
+          purge_json=$(curl -sS --fail-with-body -X POST "https://api.cloudflare.com/client/v4/zones/$zone_id/purge_cache" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}')
+          echo "$purge_json" | jq '{success,errors,messages}'
+          test "$(echo "$purge_json" | jq -r '.success')" = "true"
+
       - name: Verify production custom domain serves B2B flagship
         shell: bash
         run: |
