@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1244 1262" role="img" aria-labelledby="t d">
+<title id="t">ABC's of Technology title and copyright page</title>
+<desc id="d">Clean vector preview of the supplied title and copyright page.</desc>
+<defs><radialGradient id="bg" cx="50%" cy="44%" r="70%"><stop offset="0" stop-color="#eaf2ff"/><stop offset="1" stop-color="#95b2e5"/></radialGradient></defs>
+<rect width="1244" height="1262" fill="url(#bg)"/>
+<g font-family="Arial, Helvetica, sans-serif" fill="#252126" text-anchor="middle">
+<text x="622" y="145" font-size="42">Jason L. Hughes &amp; April M. Sanders</text>
+<text x="622" y="250" font-size="74" font-weight="900">A+ TECHUCATION'S</text>
+<g font-size="86" font-weight="900">
+<text x="440" y="380" fill="#ef008d">A</text><text x="525" y="380" fill="#78d334">B</text><text x="610" y="380" fill="#00a9df">C</text><text x="684" y="380" fill="#ff5a1d">'S</text>
+<text x="792" y="380" fill="#252126">OF</text>
+</g>
+<text x="622" y="490" font-size="84" font-weight="900">TECHNOLOGY</text>
+<text x="622" y="585" font-size="40" font-weight="700">Written By</text>
+<text x="622" y="640" font-size="39" font-weight="700">Jason L Hughes</text>
+<text x="622" y="690" font-size="37" font-weight="700">“Mr. A+”</text>
+<text x="622" y="740" font-size="37" font-weight="700">and April M Sanders</text>
+<text x="622" y="855" font-size="31" font-weight="700">www.abcoftechnology.com</text>
+</g>
+<g font-family="Arial, Helvetica, sans-serif" fill="#20252d" font-size="23">
+<text x="106" y="962">Copyright © 2020 by A+ TECHUCATION LLC,</text>
+<text x="106" y="995">No part of this publication may be reproduced in whole, or in part,</text>
+<text x="106" y="1028">or stored in a retrieval system, or transmitted in any form, or by any</text>
+<text x="106" y="1061">means, electronic, mechanical, photocopying, recording, or</text>
+<text x="106" y="1094">otherwise, without written permission of the author.</text>
+<text x="106" y="1127">Artwork by Toby Mikle of MyBookIllustrator.com</text>
+</g>
+</svg>
