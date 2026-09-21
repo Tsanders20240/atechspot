@@ -13,12 +13,12 @@ W,H=letter
 BOLD='/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'
 REG='/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
 
-def make_pdf(filename,letter,title,subtitle,steps,challenge,prompts,accent):
+def make_pdf(filename,letter_code,title,subtitle,steps,challenge,prompts,accent):
     p=PDF/filename
     c=canvas.Canvas(str(p),pagesize=letter)
     c.setFillColor(HexColor(accent)); c.roundRect(24,H-150,W-48,118,20,fill=1,stroke=0)
     c.setFillColor(white); c.setFont('Helvetica-Bold',13); c.drawString(45,H-65,"ABC's of Technology • A+ Techucation")
-    c.setFont('Helvetica-Bold',31); c.drawString(45,H-105,f'{letter} — {title}')
+    c.setFont('Helvetica-Bold',31); c.drawString(45,H-105,f'{letter_code} — {title}')
     c.setFont('Helvetica',11); c.drawString(45,H-130,subtitle)
     c.setFillColor(black); c.setFont('Helvetica-Bold',18); c.drawString(45,H-195,'LEARN & DO')
     y=H-235
@@ -39,14 +39,14 @@ def make_pdf(filename,letter,title,subtitle,steps,challenge,prompts,accent):
     c.save()
     return p
 
-def make_preview(filename,letter,title,steps,accent):
+def make_preview(filename,letter_code,title,steps,accent):
     w,h=1200,1550
     im=Image.new('RGB',(w,h),'white'); d=ImageDraw.Draw(im)
     def F(size,b=False):
         return ImageFont.truetype(BOLD if b else REG,size)
     d.rounded_rectangle((28,28,w-28,245),36,fill=accent)
     d.text((58,54),"ABC's OF TECHNOLOGY",font=F(44,True),fill='white')
-    d.text((58,118),f'{letter} — {title}',font=F(62,True),fill='white')
+    d.text((58,118),f'{letter_code} — {title}',font=F(62,True),fill='white')
     d.rounded_rectangle((45,285,w-45,1495),42,fill='#fbfdff',outline=accent,width=5)
     d.text((80,330),'LEARN & DO',font=F(42,True),fill='#102a56')
     y=430
