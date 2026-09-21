@@ -51,6 +51,8 @@ jobs:
           ! grep -q '/assets/atechspot-logo.png' index.html
           grep -q '/remote-support/' index.html
           grep -q '/assessment/' index.html
+          grep -q 'Data Recovery / DriveSavers' index.html
+          grep -q 'href="/data-recovery/"' index.html
           grep -q '/creator/' index.html
           grep -q 'https://atechucation.atechspot.com/' index.html
           grep -q 'https://abctechproducts.atechspot.com/' index.html
@@ -69,6 +71,15 @@ jobs:
           grep -q 'stopImmediatePropagation' intake/intake.js
           grep -q '20260912-secure' intake/index.html
           grep -q 'normalizedEndpoint' assets/site.js
+
+          # DriveSavers data recovery protections.
+          test -f data-recovery/index.html
+          grep -q 'ATECH<span>SPOT</span>' data-recovery/index.html
+          grep -q 'Technology Within Us.' data-recovery/index.html
+          grep -q 'DS25379' data-recovery/index.html
+          grep -q 'https://quote.drivesavers.com/' data-recovery/index.html
+          grep -q 'Get DriveSavers Quote' data-recovery/index.html
+          ! grep -q 'DS # ATECHSPOT.COM' data-recovery/index.html
 
           test -f dji/index.html
           grep -q 'Clear DJI picks for' dji/index.html
@@ -200,13 +211,21 @@ jobs:
             return 1
           }
           echo "Testing $DEPLOY_URL"
-          for path in / /ecosystem/ /dji/ /dji/real-estate/ /dji/roofing-inspections/ /dji/mini-5-pro-vs-mavic-4-pro/ /dji/construction/ /dji/buying-guide/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /payments/ /commerce-terms/ /payment-success/; do
+          for path in / /ecosystem/ /dji/ /dji/real-estate/ /dji/roofing-inspections/ /dji/mini-5-pro-vs-mavic-4-pro/ /dji/construction/ /dji/buying-guide/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /data-recovery/ /payments/ /commerce-terms/ /payment-success/; do
             check_path "$path"
           done
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/" -o /tmp/home.html
           grep -q 'Turn business problems into' /tmp/home.html
           grep -q 'journey-grid' /tmp/home.html
+          grep -q 'Data Recovery / DriveSavers' /tmp/home.html
+          grep -q 'href="/data-recovery/"' /tmp/home.html
+
+          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/data-recovery/" -o /tmp/data-recovery.html
+          grep -q 'ATECH<span>SPOT</span>' /tmp/data-recovery.html
+          grep -q 'DS25379' /tmp/data-recovery.html
+          grep -q 'https://quote.drivesavers.com/' /tmp/data-recovery.html
+          grep -q 'Get DriveSavers Quote' /tmp/data-recovery.html
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/intake/" -o /tmp/intake.html
           grep -q 'data-endpoint="/api/intake"' /tmp/intake.html
@@ -293,9 +312,13 @@ jobs:
             url="https://www.atechspot.com/?deploy=$GITHUB_SHA&attempt=$attempt"
             code=$(curl -sS -L -H 'Cache-Control: no-cache' -o /tmp/prod-home.html -w '%{http_code}' "$url" || true)
             echo "Production homepage -> $code (attempt $attempt/10)"
-            if [ "$code" = "200" ]               && grep -q 'Turn business problems into' /tmp/prod-home.html               && grep -q 'THE FLAGSHIP OF A 22-PROPERTY DIGITAL ECOSYSTEM' /tmp/prod-home.html               && grep -q 'Request B2B Consultation' /tmp/prod-home.html; then
-              echo 'Production B2B flagship verification passed.'
-              exit 0
+            if [ "$code" = "200" ]               && grep -q 'Turn business problems into' /tmp/prod-home.html               && grep -q 'THE FLAGSHIP OF A 22-PROPERTY DIGITAL ECOSYSTEM' /tmp/prod-home.html               && grep -q 'Request B2B Consultation' /tmp/prod-home.html               && grep -q 'Data Recovery / DriveSavers' /tmp/prod-home.html               && grep -q 'href="/data-recovery/"' /tmp/prod-home.html; then
+              dr_code=$(curl -sS -L -H 'Cache-Control: no-cache' -o /tmp/prod-data-recovery.html -w '%{http_code}' "https://www.atechspot.com/data-recovery/?deploy=$GITHUB_SHA&attempt=$attempt" || true)
+              echo "Production data recovery -> $dr_code (attempt $attempt/10)"
+              if [ "$dr_code" = "200" ]                 && grep -q 'ATECH<span>SPOT</span>' /tmp/prod-data-recovery.html                 && grep -q 'DS25379' /tmp/prod-data-recovery.html                 && grep -q 'https://quote.drivesavers.com/' /tmp/prod-data-recovery.html                 && grep -q 'Get DriveSavers Quote' /tmp/prod-data-recovery.html; then
+                echo 'Production ATechSpot + DriveSavers verification passed.'
+                exit 0
+              fi
             fi
             sleep 6
           done
