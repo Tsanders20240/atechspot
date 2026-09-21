@@ -105,7 +105,12 @@ jobs:
           grep -q 'A+ TECHUCATION PRESENTS' "$HTML"
           grep -q 'id="soundDock"' "$HTML"
           grep -q 'id="lyricStage"' "$HTML"
-          grep -q 'id="playLyric"' "$HTML"
+          grep -q 'id="lyricVideo"' "$HTML"
+          grep -q 'ognkzi0FCmU' "$HTML"
+          grep -q 'id="introVideo"' "$HTML"
+          grep -q 'VqeOgsVCKpc' "$HTML"
+          grep -q 'id="siteLangEn"' "$HTML"
+          grep -q 'id="siteLangEs"' "$HTML"
           grep -q 'id="introLights"' "$HTML"
           grep -q 'ABC Tech Theme' "$HTML"
           grep -q 'id="siteControlBar"' "$HTML"
@@ -188,7 +193,12 @@ jobs:
           grep -q 'A+ TECHUCATION PRESENTS' /tmp/abc-live.html
           grep -q 'id="soundDock"' /tmp/abc-live.html
           grep -q 'id="lyricStage"' /tmp/abc-live.html
-          grep -q 'id="playLyric"' /tmp/abc-live.html
+          grep -q 'id="lyricVideo"' /tmp/abc-live.html
+          grep -q 'ognkzi0FCmU' /tmp/abc-live.html
+          grep -q 'id="introVideo"' /tmp/abc-live.html
+          grep -q 'VqeOgsVCKpc' /tmp/abc-live.html
+          grep -q 'id="siteLangEn"' /tmp/abc-live.html
+          grep -q 'id="siteLangEs"' /tmp/abc-live.html
           grep -q 'id="introLights"' /tmp/abc-live.html
           grep -q 'id="siteControlBar"' /tmp/abc-live.html
           grep -q 'COLORING WORLD' /tmp/abc-live.html
