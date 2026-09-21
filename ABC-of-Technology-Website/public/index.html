@@ -8,7 +8,7 @@
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
 <link rel="canonical" href="https://abcoftech.atechspot.com/">
 <meta name="theme-color" content="#0b5dff">
-<link rel="stylesheet" href="/portal-2026.css?v=20260921-bookfix12">
+<link rel="stylesheet" href="/portal-2026.css?v=20260921-fullfix13">
 </head>
 <body>
 <div id="siteIntro" class="site-intro" role="dialog" aria-modal="true" aria-labelledby="introTitle">
@@ -80,22 +80,6 @@
   </div>
 </section>
 
-<section class="live-tool-dock" aria-label="ABC learning tools">
-  <div class="shell quick-grid">
-    <a href="#book"><span>📖</span><b>Book</b><small>Preview</small></a>
-    <a href="#play"><span>🎮</span><b>Play</b><small>Games</small></a>
-    <a href="#color"><span>🎨</span><b>Color</b><small>26 Pages</small></a>
-    <a href="#watch"><span>▶️</span><b>Watch</b><small>Listen</small></a>
-    <a href="#stem"><span>⚛️</span><b>STEM</b><small>Create</small></a>
-    <a href="#spelling"><span>🐝</span><b>Spell</b><small>A–Z</small></a>
-    <a href="#learn"><span>💡</span><b>Learn</b><small>Words</small></a>
-    <a href="#world"><span>🌐</span><b>Explore</b><small>World</small></a>
-  </div>
-</section>
-
-
-  
-
 <section id="world" class="world section">
   <div class="shell">
     <div class="section-head">
@@ -135,23 +119,47 @@
 </section>
 
 <section id="book" class="section feature-section book-section">
-  <div class="shell feature-grid">
-    <div class="book-copy">
-      <p class="eyebrow" data-i18n="book.eyebrow">THE BOOK</p>
-      <h2 data-i18n="book.title">Look inside the real book.</h2>
-      <p class="short" data-i18n="book.body">Three actual supplied pages, shown from the original source artwork for sharper reading.</p>
-      <div class="book-product-mockup" aria-label="ABC's of Technology book cover">
-        <img src="/assets/book/book-cover.svg" alt="ABC's of Technology book cover">
+  <div class="shell">
+    <div class="book-layout">
+      <div class="book-copy">
+        <p class="eyebrow" data-i18n="book.eyebrow">THE BOOK</p>
+        <h2 data-i18n="book.title">Look inside the real book.</h2>
+        <p class="short">Start with F, G and H: Floppy Disk / Flash Drive, Game Controller and Headphones.</p>
+        <div class="book-product-mockup" aria-label="ABC's of Technology book cover">
+          <img src="/assets/book/book-cover.svg" alt="ABC's of Technology book cover">
+        </div>
+        <div class="stack-actions"><a class="btn green" href="#shop" data-i18n="nav.getBook">Get the Book →</a></div>
       </div>
-      <div class="stack-actions"><a class="btn green" href="#shop">Get the Book →</a></div>
+      <div class="book-viewer book-viewer-fgh">
+        <div class="book-frame" id="bookFrame">
+          <img class="active" src="/assets/book/preview-f-floppy-flash.svg" alt="F — Floppy Disk and Flash Drive book preview">
+          <img src="/assets/book/preview-f-flash-facts.svg" alt="F — Flash Drive facts book preview">
+          <img src="/assets/book/preview-gh-game-headphones.svg" alt="G Game Controller and H Headphones book preview">
+        </div>
+        <div class="viewer-controls"><button id="prevPage" type="button" aria-label="Previous book page">←</button><span id="pageCount">6 / 26</span><button id="nextPage" type="button" aria-label="Next book page">→</button></div>
+      </div>
     </div>
-    <div class="book-viewer">
-      <div class="book-frame" id="bookFrame">
-        <img class="active" src="/assets/book/preview-page-1.svg" alt="ABC's of Technology title and copyright page">
-        <img src="/assets/book/preview-page-2.svg" alt="ABC's of Technology dedication and Best You page">
-        <img src="/assets/book/preview-page-3.svg" alt="Best You page from ABC's of Technology">
+
+    <div class="fgh-activity-section">
+      <div class="activity-intro">
+        <p class="eyebrow">ACTIVITY SHEETS</p>
+        <h3>Print, learn and create.</h3>
+        <p>Three matching printable activities for the F, G and H book pages.</p>
       </div>
-      <div class="viewer-controls"><button id="prevPage" type="button">←</button><span id="pageCount">1 / 3</span><button id="nextPage" type="button">→</button></div>
+      <div class="fgh-activity-grid">
+        <a class="fgh-activity-card green-card" href="/downloads/activities/f-floppy-flash-drive-activity.pdf" target="_blank" rel="noopener">
+          <img src="/assets/activities/f-floppy-flash-drive-activity.webp" alt="Floppy Disk and Flash Drive activity sheet">
+          <strong>F — Floppy Disk & Flash Drive</strong><span>Open Activity Sheet →</span>
+        </a>
+        <a class="fgh-activity-card blue-card" href="/downloads/activities/g-game-controller-activity.pdf" target="_blank" rel="noopener">
+          <img src="/assets/activities/g-game-controller-activity.webp" alt="Game Controller activity sheet">
+          <strong>G — Game Controller</strong><span>Open Activity Sheet →</span>
+        </a>
+        <a class="fgh-activity-card purple-card" href="/downloads/activities/h-headphones-activity.pdf" target="_blank" rel="noopener">
+          <img src="/assets/activities/h-headphones-activity.webp" alt="Headphones activity sheet">
+          <strong>H — Headphones</strong><span>Open Activity Sheet →</span>
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -169,7 +177,7 @@
 
 <section id="stem" class="section stem-section">
   <div class="shell">
-    <div class="section-head"><p class="eyebrow" data-i18n="stem.eyebrow">STEM ACTIVITY LAB</p><h2 data-i18n="stem.title">Build. Experiment. Create.</h2><p class="short" data-i18n="stem.body">Start with two full printable activities, then explore four quick challenges.</p></div>
+    <div class="section-head"><p class="eyebrow" data-i18n="stem.eyebrow">STEM ACTIVITY LAB</p><h2 data-i18n="stem.title">Build. Experiment. Create.</h2><p class="short">Hands-on challenges plus the matching F, G and H printable activity sheets above.</p></div>
     <div class="featured-activities">
       <a class="activity-poster battery-poster" href="/downloads/activities/battery-hunt.pdf" target="_blank" rel="noopener">
         <img src="/assets/activities/battery-hunt.webp" alt="Battery Hunt printable STEM activity preview">
@@ -207,23 +215,27 @@
 
 <section id="color" class="section color-section">
   <div class="shell">
-    <div class="section-head"><p class="eyebrow" data-i18n="color.eyebrow">COLORING WORLD</p><h2 data-i18n="color.title">Color your way through A–Z technology.</h2><p class="short" data-i18n="color.body">Choose a page, print it, color it and learn the technology word with a grown-up.</p></div>
-    <div class="color-world">
-      <div class="color-world-copy">
+    <div class="section-head"><p class="eyebrow" data-i18n="color.eyebrow">COLORING WORLD</p><h2>26 big A–Z technology coloring pages.</h2><p class="short">Large black-and-white characters, simple outlines, and one technology word per page—made to actually color.</p></div>
+    <div class="coloring-hero-card">
+      <div>
         <span class="color-spark">🎨</span>
-        <h3 data-i18n="color.adventures">26 printable adventures</h3>
-        <p data-i18n="color.description">Big A–Z letters, kid-friendly technology drawings and conversation prompts.</p>
-        <a class="btn orange" href="/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf" target="_blank" rel="noopener" data-i18n="color.openBook">Open the Full Coloring Book →</a>
+        <h3>26 printable coloring adventures</h3>
+        <p>Big letters. Big characters. Clear black outlines. A–Z technology vocabulary.</p>
+        <a class="btn orange" href="/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf" target="_blank" rel="noopener">View All 26 Coloring Pages →</a>
       </div>
-      <a class="coloring-showcase" href="/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf" target="_blank" rel="noopener">
-        <img src="/assets/coloring/coloring-preview-sheet.webp" alt="Large preview of ABC's of Technology coloring pages">
-        <span data-i18n="color.seePack">See the complete 26-page pack →</span>
-      </a>
+      <div class="coloring-feature-strip">
+        <article><img src="/assets/coloring-pages/a-analog-phone.webp" alt="A Analog Phone coloring page"><b>A</b><span>Analog Phone</span></article>
+        <article><img src="/assets/coloring-pages/b-battery.webp" alt="B Battery coloring page"><b>B</b><span>Battery</span></article>
+        <article><img src="/assets/coloring-pages/c-computer.webp" alt="C Computer coloring page"><b>C</b><span>Computer</span></article>
+        <article><img src="/assets/coloring-pages/d-drone.webp" alt="D Drone coloring page"><b>D</b><span>Drone</span></article>
+        <article><img src="/assets/coloring-pages/e-email.webp" alt="E Email coloring page"><b>E</b><span>Email</span></article>
+        <article><img src="/assets/coloring-pages/f-flash-drive.webp" alt="F Flash Drive coloring page"><b>F</b><span>Flash Drive</span></article>
+        <article><img src="/assets/coloring-pages/g-game-controller.webp" alt="G Game Controller coloring page"><b>G</b><span>Game Controller</span></article>
+        <article><img src="/assets/coloring-pages/h-headphones.webp" alt="H Headphones coloring page"><b>H</b><span>Headphones</span></article>
+        <article><img src="/assets/coloring-pages/i-internet.webp" alt="I Internet coloring page"><b>I</b><span>Internet</span></article>
+      </div>
     </div>
-    <div class="color-letter-strip" aria-label="A through Z coloring pages">
-      <a href="#colorGrid" data-color-letter="A">A</a><a href="#colorGrid" data-color-letter="B">B</a><a href="#colorGrid" data-color-letter="C">C</a><a href="#colorGrid" data-color-letter="D">D</a><a href="#colorGrid" data-color-letter="E">E</a><a href="#colorGrid" data-color-letter="F">F</a><a href="#colorGrid" data-color-letter="G">G</a><a href="#colorGrid" data-color-letter="H">H</a><a href="#colorGrid" data-color-letter="I">I</a><a href="#colorGrid" data-color-letter="J">J</a><a href="#colorGrid" data-color-letter="K">K</a><a href="#colorGrid" data-color-letter="L">L</a><a href="#colorGrid" data-color-letter="M">M</a><a href="#colorGrid" data-color-letter="N">N</a><a href="#colorGrid" data-color-letter="O">O</a><a href="#colorGrid" data-color-letter="P">P</a><a href="#colorGrid" data-color-letter="Q">Q</a><a href="#colorGrid" data-color-letter="R">R</a><a href="#colorGrid" data-color-letter="S">S</a><a href="#colorGrid" data-color-letter="T">T</a><a href="#colorGrid" data-color-letter="U">U</a><a href="#colorGrid" data-color-letter="V">V</a><a href="#colorGrid" data-color-letter="W">W</a><a href="#colorGrid" data-color-letter="X">X</a><a href="#colorGrid" data-color-letter="Y">Y</a><a href="#colorGrid" data-color-letter="Z">Z</a>
-    </div>
-    <div id="colorGrid" class="color-grid"></div>
+    <div id="colorGrid" class="color-grid color-grid-large"></div>
     <div class="center"><a class="btn orange" href="/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf" target="_blank" rel="noopener">Download All 26 →</a></div>
   </div>
 </section>
@@ -296,6 +308,6 @@
   <div class="shell footer-row"><div><strong>ABC's of Technology</strong><small>Learn · Play · Explore · Discover</small></div><div><a href="https://www.atechspot.com/privacy/">Privacy</a><a href="https://www.atechspot.com/terms/">Terms</a><a href="https://www.atechspot.com/accessibility/">Accessibility</a></div></div>
 </footer>
 
-<script src="/portal-2026.js?v=20260921-video11" defer></script>
+<script src="/portal-2026.js?v=20260921-fullfix13" defer></script>
 </body>
 </html>
