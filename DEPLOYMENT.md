@@ -4,9 +4,12 @@
 
 ATechSpot deploys from the `main` branch to Cloudflare Pages through the production GitHub Actions workflow.
 
-Primary production domain:
+Cloudflare Pages project configuration is the source of truth for runtime environment variables. Do not add a Pages `wrangler.jsonc` unless its configuration is deliberately kept in sync with the dashboard, because Pages deployments can otherwise replace dashboard-managed runtime settings.
 
-- https://www.atechspot.com
+Primary production domains:
+
+- https://www.atechspot.com — public flagship
+- https://account.atechspot.com — secure client-portal entry point
 
 ## Required Cloudflare secrets and variables
 
@@ -105,3 +108,10 @@ After configuring `PORTAL_SIGNING_SECRET` and `CLIENT_PORTAL_USERS`:
 ## Operating rule
 
 Do not call the client portal complete merely because the login shell works. A fully mature client portal should eventually add authenticated project data, milestones, files, approvals, invoices and messaging behind server-side access controls.
+
+## Account subdomain routing
+
+- `https://account.atechspot.com/` routes to `/clients/`.
+- `https://account.atechspot.com/dashboard/` routes to `/clients/dashboard/`.
+- Authentication still occurs through the same signed-session security model.
+- The public flagship at `www.atechspot.com` remains the canonical marketing site.
