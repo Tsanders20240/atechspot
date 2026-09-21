@@ -28,6 +28,58 @@ const WORDS=[
 ['Z','Zoom','A video communication app for online meetings.','Zoom','Una aplicación de videocomunicación.','🎥','z-zoom.pdf']
 ];
 let lang='en',current=0,spellIndex=0,score=0;
+let soundEnabled=true,themePlaying=false,audioCtx=null,themeTimer=null,themeStep=0,lyricTimer=null,lyricIndex=0;
+const THEME_NOTES=[261.63,329.63,392.00,523.25,392.00,329.63,293.66,349.23,440.00,523.25,440.00,349.23];
+const LYRIC_LINES=[
+  ['A brighter tomorrow starts with A–Z.','Come ride the ABC Tech Bus and explore.'],
+  ['Learn it, play it, build it, create it.','Technology can open a brand-new door.'],
+  ['From analog phones to robots and Wi-Fi,','Every letter helps us learn a little more.'],
+  ['Explore. Learn. Create. Imagine. Belong.','A+ Techucation — brighter futures start here.']
+];
+function ensureAudio(){
+  if(!audioCtx){const AC=window.AudioContext||window.webkitAudioContext;if(AC)audioCtx=new AC();}
+  if(audioCtx?.state==='suspended')audioCtx.resume();
+}
+function playTone(freq,dur=.22,vol=.035){
+  if(!soundEnabled)return;ensureAudio();if(!audioCtx)return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.type='triangle';o.frequency.value=freq;g.gain.setValueAtTime(0,audioCtx.currentTime);
+  g.gain.linearRampToValueAtTime(vol,audioCtx.currentTime+.02);
+  g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+dur);
+  o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur+.03);
+}
+function themeTick(){if(!themePlaying)return;playTone(THEME_NOTES[themeStep%THEME_NOTES.length]);themeStep++;themeTimer=setTimeout(themeTick,310);}
+function startTheme(){if(themePlaying)return;themePlaying=true;themeStep=0;themeTick();updateSoundUI();}
+function stopTheme(){themePlaying=false;clearTimeout(themeTimer);themeTimer=null;updateSoundUI();}
+function toggleTheme(){themePlaying?stopTheme():startTheme();}
+function updateSoundUI(){
+  const label=soundEnabled?'🔊 Sound On':'🔇 Sound Off';
+  ['soundDock','introSound','lyricSound'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=label;el.setAttribute('aria-pressed',String(soundEnabled));}});
+  const dock=document.getElementById('soundDock');if(dock)dock.setAttribute('aria-label',soundEnabled?'Turn ABC Tech background sound off':'Turn ABC Tech background sound on');
+}
+function toggleSound(){
+  soundEnabled=!soundEnabled;
+  if(!soundEnabled){stopTheme();speechSynthesis?.cancel?.();}
+  else startTheme();
+  updateSoundUI();
+}
+function closeIntro(withSound=true){
+  const intro=document.getElementById('siteIntro');if(!intro)return;
+  intro.classList.add('leaving');document.body.classList.remove('intro-open');
+  if(withSound&&soundEnabled)startTheme();
+  setTimeout(()=>{intro.hidden=true;intro.classList.remove('leaving')},650);
+}
+function playLyricVideo(){
+  const btn=document.getElementById('playLyric');
+  if(btn?.dataset.playing==='1'){
+    btn.dataset.playing='0';btn.textContent='▶ Play Lyric Video';clearInterval(lyricTimer);lyricTimer=null;return;
+  }
+  if(soundEnabled)startTheme();
+  lyricIndex=0;if(btn){btn.dataset.playing='1';btn.textContent='⏸ Pause Lyric Video';}
+  const paint=()=>{const [a,b]=LYRIC_LINES[lyricIndex%LYRIC_LINES.length];const l=document.getElementById('lyricLine'),s=document.getElementById('lyricSub');if(l)l.textContent=a;if(s)s.textContent=b;lyricIndex++;};
+  paint();clearInterval(lyricTimer);lyricTimer=setInterval(paint,3400);
+}
+
 
 const menuBtn=document.getElementById('menuBtn'),mainNav=document.getElementById('mainNav');
 if(menuBtn&&mainNav){menuBtn.addEventListener('click',()=>{const o=mainNav.classList.toggle('open');menuBtn.setAttribute('aria-expanded',String(o))});mainNav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{mainNav.classList.remove('open');menuBtn.setAttribute('aria-expanded','false')}));}
@@ -93,5 +145,18 @@ document.querySelectorAll('.world-jump').forEach(b=>b.addEventListener('click',(
 document.getElementById('enBtn')?.addEventListener('click',()=>{lang='en';document.documentElement.lang='en';document.getElementById('enBtn').classList.add('active');document.getElementById('esBtn').classList.remove('active');renderWord();renderColor();renderSpell()});
 document.getElementById('esBtn')?.addEventListener('click',()=>{lang='es';document.documentElement.lang='es';document.getElementById('esBtn').classList.add('active');document.getElementById('enBtn').classList.remove('active');renderWord();renderColor();renderSpell()});
 
+
+document.body.classList.add('intro-open');
+document.getElementById('enterSite')?.addEventListener('click',()=>closeIntro(true));
+document.getElementById('skipIntro')?.addEventListener('click',()=>closeIntro(false));
+document.getElementById('introSound')?.addEventListener('click',toggleSound);
+document.getElementById('soundDock')?.addEventListener('click',toggleSound);
+document.getElementById('lyricSound')?.addEventListener('click',toggleSound);
+document.getElementById('playTheme')?.addEventListener('click',toggleTheme);
+document.getElementById('playLyric')?.addEventListener('click',playLyricVideo);
+document.getElementById('jumpLyric')?.addEventListener('click',()=>document.getElementById('lyricStage')?.scrollIntoView({behavior:'smooth',block:'center'}));
+document.getElementById('introLights')?.addEventListener('click',e=>{const intro=document.getElementById('siteIntro');const off=intro?.classList.toggle('lights-off');e.currentTarget.setAttribute('aria-pressed',String(!off));e.currentTarget.textContent=off?'💡 Bus Lights Off':'💡 Bus Lights On';});
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',()=>{const id=a.getAttribute('href').slice(1);if(id)requestAnimationFrame(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'start'}));}));
+updateSoundUI();
 renderWord();renderColor();renderSpell();showPage();renderWorld('explore');
 })();
