@@ -523,3 +523,50 @@ body.intro-open{overflow:hidden}
   .intro-video-shell{width:94vw;border-radius:16px}
   .control-language{margin-left:0}
 }
+
+
+/* === CRISP BOOK VIEWER REPLACEMENT === */
+.book-viewer{
+  background:linear-gradient(145deg,#2f7cff 0%,#7955ee 58%,#eb42a8 100%);
+  border-radius:28px;
+  padding:18px 18px 12px;
+  box-shadow:0 26px 60px rgba(42,70,160,.20);
+}
+.book-frame{
+  min-height:620px;
+  padding:18px;
+  display:grid;
+  place-items:center;
+  border-radius:22px;
+  background:#fff;
+  overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(19,44,91,.08);
+}
+.book-frame img{
+  display:none;
+  width:auto;
+  max-width:100%;
+  height:auto;
+  max-height:580px;
+  object-fit:contain;
+  border-radius:12px;
+  background:#fff;
+  filter:none;
+  image-rendering:auto;
+  box-shadow:0 14px 32px rgba(16,44,91,.10);
+}
+.book-frame img.active{display:block}
+.viewer-controls{
+  color:#fff;
+  padding:12px 2px 2px;
+}
+.viewer-controls button{
+  width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.6);
+  background:#07326f;color:#fff;font-weight:1000;cursor:pointer;
+}
+.viewer-controls span{font-weight:1000}
+@media(max-width:760px){
+  .book-frame{min-height:460px;padding:12px}
+  .book-frame img{max-height:430px}
+}
