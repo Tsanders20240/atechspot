@@ -31,6 +31,21 @@ jobs:
         run: |
           test -n "$CLOUDFLARE_API_TOKEN" || (echo "Missing CLOUDFLARE_API_TOKEN" && exit 1)
           test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "Missing CLOUDFLARE_ACCOUNT_ID" && exit 1)
+      - name: Ensure A Clean Sweep DNS record
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          zone_json=$(curl -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" "https://api.cloudflare.com/client/v4/zones?name=atechspot.com")
+          zone_id=$(echo "$zone_json" | jq -r '.result[0].id // empty')
+          test -n "$zone_id" || (echo "Could not resolve Cloudflare zone ID for atechspot.com" && echo "$zone_json" && exit 1)
+          record_json=$(curl -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records?type=CNAME&name=acleansweep.atechspot.com")
+          record_id=$(echo "$record_json" | jq -r '.result[0].id // empty')
+          if [ -z "$record_id" ]; then
+            curl -sS --fail-with-body -X POST "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records"               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"               -H "Content-Type: application/json"               --data '{"type":"CNAME","name":"acleansweep","content":"atechspot.com","ttl":1,"proxied":true}'
+          else
+            curl -sS --fail-with-body -X PATCH "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records/$record_id"               -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"               -H "Content-Type: application/json"               --data '{"content":"atechspot.com","ttl":1,"proxied":true}'
+          fi
       - name: Validate A Clean Sweep production source
         run: |
           set -euo pipefail
