@@ -1,5 +1,5 @@
 name: ATechSpot Client Portal E2E Closure
-# retest after non-reserved portal asset path
+# retest worker-rendered dashboard
 
 on:
   push:
