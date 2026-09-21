@@ -43,6 +43,7 @@ jobs:
           python ABC-of-Technology-Website/scripts/decode_book_svg.py
           python ABC-of-Technology-Website/scripts/build_coloring.py
           python ABC-of-Technology-Website/scripts/build_coloring_preview.py
+          python ABC-of-Technology-Website/scripts/build_stem_activities.py
           python ABC-of-Technology-Website/scripts/build_portal_hero.py
 
       - name: Validate standalone ABC portal 10/10 source
@@ -59,6 +60,10 @@ jobs:
           test -f "$ROOT/public/portal-2026.css"
           test -f "$ROOT/public/portal-2026.js"
           test -f "$ROOT/public/assets/hero/abc-home-hero.webp"
+          test -f "$ROOT/public/assets/activities/battery-hunt.webp"
+          test -f "$ROOT/public/assets/activities/phone-stand.webp"
+          test -f "$ROOT/public/downloads/activities/battery-hunt.pdf"
+          test -f "$ROOT/public/downloads/activities/phone-stand.pdf"
           node --check "$ROOT/worker.js"
           node --check "$ROOT/public/portal-2026.js"
 
@@ -84,9 +89,12 @@ jobs:
           grep -q 'ABC Tech Products' "$HTML"
 
           # Core learning experiences remain intact.
-          grep -q 'book-page-title.webp' "$HTML"
-          grep -q 'book-page-best-you.webp' "$HTML"
-          grep -q 'book-page-a.webp' "$HTML"
+          grep -q 'book-page-title.svg' "$HTML"
+          grep -q 'book-page-best-you.svg' "$HTML"
+          grep -q 'book-page-a.svg' "$HTML"
+          grep -q 'battery-hunt.pdf' "$HTML"
+          grep -q 'phone-stand.pdf' "$HTML"
+          grep -q 'coloring-preview-sheet.webp' "$HTML"
           grep -q 'A–Z Quiz' "$HTML"
           grep -q 'SPELLING BEE' "$HTML"
           grep -q '26 printable pages' "$HTML"
@@ -142,7 +150,7 @@ jobs:
         run: |
           set -euo pipefail
           sleep 7
-          for path in / /robots.txt /sitemap.xml /api/health /portal-2026.css /portal-2026.js /assets/hero/abc-home-hero.webp /downloads/coloring-pages/a-analog-phone.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp /assets/book/book-page-a.webp /assets/authors/april-sanders-original-crop.webp; do
+          for path in / /robots.txt /sitemap.xml /api/health /portal-2026.css /portal-2026.js /assets/hero/abc-home-hero.webp /assets/activities/battery-hunt.webp /assets/activities/phone-stand.webp /downloads/activities/battery-hunt.pdf /downloads/activities/phone-stand.pdf /downloads/coloring-pages/a-analog-phone.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp /assets/book/book-page-a.webp /assets/authors/april-sanders-original-crop.webp; do
             code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://abcoftech.atechspot.com${path}")
             echo "$path -> $code"
             test "$code" = "200"
