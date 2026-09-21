@@ -48,7 +48,7 @@ jobs:
           set -euo pipefail
           cat > /tmp/atechspot-email-proxy.js <<'EOF'
           const BACKEND='https://atechspot.pages.dev';
-          const ALLOWED_ORIGINS=new Set(['https://www.atechspot.com','https://atechspot.com']);
+          const ALLOWED_ORIGINS=new Set(['https://www.atechspot.com','https://atechspot.com','https://atechucation.atechspot.com']);
           export default {
             async fetch(request) {
               const incoming=new URL(request.url);
@@ -117,3 +117,23 @@ jobs:
           cat /tmp/qa-result.json
           test "$submit_code" = "200"
           node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/qa-result.json','utf8'));if(j.ok!==true)process.exit(1)"
+
+          cat > /tmp/qa-atechucation.json <<EOF
+          {
+            "Full Name":"A+ Techucation Production QA",
+            "Email":"aplustechucation@gmail.com",
+            "Topic":"A+ Techucation — Learning Support",
+            "Preferred Timeframe":"As soon as practical",
+            "Budget Range":"Education / Membership Inquiry",
+            "Message":"Automated QA test for direct A+ Techucation ecosystem email delivery.",
+            "Desired Outcome":"Verify A+ Techucation can send through the shared ATechSpot production mail backend.",
+            "Ecosystem Path":"A+ Techucation — Property 2 of 22",
+            "form_started_at":"$started",
+            "website":""
+          }
+          EOF
+          edu_submit_code=$(curl -sS -o /tmp/qa-atechucation-result.json -w '%{http_code}' -X POST -H 'content-type: application/json' -H 'Origin: https://atechucation.atechspot.com' --data-binary @/tmp/qa-atechucation.json https://www.atechspot.com/api/intake)
+          echo "A+ Techucation QA intake -> $edu_submit_code"
+          cat /tmp/qa-atechucation-result.json
+          test "$edu_submit_code" = "200"
+          node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/qa-atechucation-result.json','utf8'));if(j.ok!==true)process.exit(1)"
