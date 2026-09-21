@@ -101,7 +101,7 @@ jobs:
             login_code=$(curl -sS             -A "$UA"             -D /tmp/login-headers.txt             -c /tmp/portal-cookies.txt             -o /tmp/login-body.txt             -w '%{http_code}'             "https://www.atechspot.com/api/client-login?token=$PORTAL_MAGIC_TOKEN" || true)
             location=$(grep -i '^location:' /tmp/login-headers.txt | tr -d '\r' | head -n1 || true)
             echo "Valid magic login -> $login_code $location (attempt $attempt/12)"
-            if [ "$login_code" = "302" ] && echo "$location" | grep -q '/portal/dashboard/'; then
+            if [ "$login_code" = "302" ] && echo "$location" | grep -q '/clients/dashboard/'; then
               login_ready="true"
               break
             fi
@@ -111,7 +111,7 @@ jobs:
           test "$login_ready" = "true"
           grep -Eiq '^set-cookie: atechspot_client=' /tmp/login-headers.txt
 
-          dashboard_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/dashboard-headers.txt             -o /tmp/dashboard.html             -w '%{http_code}'             "https://www.atechspot.com/portal/dashboard/" || true)
+          dashboard_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/dashboard-headers.txt             -o /tmp/dashboard.html             -w '%{http_code}'             "https://www.atechspot.com/clients/dashboard/" || true)
           echo "Authenticated dashboard -> $dashboard_code"
           test "$dashboard_code" = "200"
           grep -q 'AUTHENTICATED CLIENT DASHBOARD' /tmp/dashboard.html
@@ -124,7 +124,7 @@ jobs:
           test "$logout_code" = "302"
           grep -Eiq '^location: /clients/' /tmp/logout-headers.txt
 
-          after_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/after-headers.txt             -o /tmp/after-body.txt             -w '%{http_code}'             "https://www.atechspot.com/portal/dashboard/" || true)
+          after_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/after-headers.txt             -o /tmp/after-body.txt             -w '%{http_code}'             "https://www.atechspot.com/clients/dashboard/" || true)
           echo "Dashboard after logout -> $after_code"
           cat /tmp/after-headers.txt | grep -Ei '^(HTTP/|location:)' || true
           test "$after_code" = "302"
