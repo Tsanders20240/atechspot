@@ -1,0 +1,133 @@
+name: ATechSpot Client Portal E2E Closure
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/portal-e2e-closure.yml"
+  workflow_dispatch:
+
+jobs:
+  portal-e2e:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout production source
+        uses: actions/checkout@v4
+
+      - name: Generate masked portal signing secret
+        shell: bash
+        run: |
+          set -euo pipefail
+          secret="$(openssl rand -hex 32)"
+          test "${#secret}" -eq 64
+          echo "::add-mask::$secret"
+          echo "PORTAL_SIGNING_SECRET=$secret" >> "$GITHUB_ENV"
+
+      - name: Configure Cloudflare Pages portal variables
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          cat > /tmp/portal-env.json <<JSON
+          {
+            "deployment_configs": {
+              "production": {
+                "env_vars": {
+                  "PORTAL_SIGNING_SECRET": {"type":"secret_text","value":"$PORTAL_SIGNING_SECRET"},
+                  "CLIENT_PORTAL_USERS": {"type":"plain_text","value":"aplustechucation@gmail.com"}
+                }
+              },
+              "preview": {
+                "env_vars": {
+                  "PORTAL_SIGNING_SECRET": {"type":"secret_text","value":"$PORTAL_SIGNING_SECRET"},
+                  "CLIENT_PORTAL_USERS": {"type":"plain_text","value":"aplustechucation@gmail.com"}
+                }
+              }
+            }
+          }
+          JSON
+          project_url="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/atechspot"
+          curl -sS --fail-with-body -X PATCH "$project_url"             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"             -H "Content-Type: application/json"             --data @/tmp/portal-env.json > /tmp/project-update.json
+          test "$(jq -r '.success' /tmp/project-update.json)" = "true"
+          echo "Cloudflare portal variables configured."
+
+      - name: Redeploy production with test signing secret
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@latest pages deploy . --project-name atechspot --branch main
+
+      - name: Generate valid magic token
+        shell: bash
+        run: |
+          set -euo pipefail
+          token="$(node <<'NODE'
+          const crypto=require('crypto');
+          const payload={
+            email:'aplustechucation@gmail.com',
+            purpose:'magic',
+            exp:Date.now()+20*60*1000
+          };
+          const data=Buffer.from(JSON.stringify(payload)).toString('base64url');
+          const sig=crypto.createHmac('sha256',process.env.PORTAL_SIGNING_SECRET).update(data).digest('base64url');
+          process.stdout.write(data+'.'+sig);
+          NODE
+          )"
+          echo "::add-mask::$token"
+          echo "PORTAL_MAGIC_TOKEN=$token" >> "$GITHUB_ENV"
+
+      - name: Verify login session dashboard logout lifecycle
+        shell: bash
+        run: |
+          set -euo pipefail
+          UA='Mozilla/5.0 (ATechSpot Portal QA) AppleWebKit/537.36 Chrome/142 Safari/537.36'
+          rm -f /tmp/portal-cookies.txt
+
+          login_code=$(curl -sS             -A "$UA"             -D /tmp/login-headers.txt             -c /tmp/portal-cookies.txt             -o /tmp/login-body.txt             -w '%{http_code}'             "https://www.atechspot.com/api/client-login?token=$PORTAL_MAGIC_TOKEN" || true)
+          echo "Valid magic login -> $login_code"
+          cat /tmp/login-headers.txt | grep -Ei '^(HTTP/|location:|set-cookie:)' | sed -E 's/(atechspot_client=)[^;]+/\1[REDACTED]/g'
+          test "$login_code" = "302"
+          grep -Eiq '^location: /clients/dashboard/' /tmp/login-headers.txt
+          grep -Eiq '^set-cookie: atechspot_client=' /tmp/login-headers.txt
+
+          dashboard_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/dashboard-headers.txt             -o /tmp/dashboard.html             -w '%{http_code}'             "https://www.atechspot.com/clients/dashboard/" || true)
+          echo "Authenticated dashboard -> $dashboard_code"
+          test "$dashboard_code" = "200"
+          grep -q 'AUTHENTICATED CLIENT DASHBOARD' /tmp/dashboard.html
+          grep -q 'aplustechucation@gmail.com' /tmp/dashboard.html
+          grep -Eiq '^cache-control:.*no-store' /tmp/dashboard-headers.txt
+          grep -Eiq '^x-robots-tag:.*noindex' /tmp/dashboard-headers.txt
+
+          logout_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -c /tmp/portal-cookies.txt             -D /tmp/logout-headers.txt             -o /dev/null             -w '%{http_code}'             "https://www.atechspot.com/api/client-logout" || true)
+          echo "Logout -> $logout_code"
+          test "$logout_code" = "302"
+          grep -Eiq '^location: /clients/' /tmp/logout-headers.txt
+
+          after_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/after-headers.txt             -o /tmp/after-body.txt             -w '%{http_code}'             "https://www.atechspot.com/clients/dashboard/" || true)
+          echo "Dashboard after logout -> $after_code"
+          cat /tmp/after-headers.txt | grep -Ei '^(HTTP/|location:)' || true
+          test "$after_code" = "302"
+          grep -Eiq '^location: .*/clients/' /tmp/after-headers.txt
+
+          echo "Client portal authenticated lifecycle passed end-to-end."
+
+      - name: Verify public magic-link delivery endpoint stays configured
+        shell: bash
+        run: |
+          set -euo pipefail
+          started="$(node -e 'console.log(Date.now()-2500)')"
+          code=$(curl -sS             -A 'Mozilla/5.0 ATechSpot-QA'             -o /tmp/access-response.json             -w '%{http_code}'             -X POST 'https://www.atechspot.com/api/client-access'             -H 'Content-Type: application/json'             --data "{\"Email\":\"aplustechucation@gmail.com\",\"form_started_at\":\"$started\"}" || true)
+          echo "Magic-link request endpoint -> $code"
+          test "$code" = "200"
+          test "$(jq -r '.configured' /tmp/access-response.json)" = "true"
+          echo "Magic-link delivery request accepted."
