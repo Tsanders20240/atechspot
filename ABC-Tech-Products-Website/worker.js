@@ -1,12 +1,12 @@
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (url.hostname === 'abctechproducts.atechspot.com') {
-      url.hostname = 'www.abctechproducts.atechspot.com';
+    if (url.hostname === 'www.abctechproducts.atechspot.com') {
+      url.hostname = 'abctechproducts.atechspot.com';
       return Response.redirect(url.toString(), 301);
     }
     if (url.pathname === '/api/health') {
-      return new Response(JSON.stringify({ok:true,property:'ABC Tech Products',canonical:'www.abctechproducts.atechspot.com',ga4:'G-P5FFL89J6T'}), {
+      return new Response(JSON.stringify({ok:true,property:'ABC Tech Products',canonical:'abctechproducts.atechspot.com',ga4:'G-P5FFL89J6T'}), {
         headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store'}
       });
     }
@@ -21,8 +21,8 @@ export default {
     if ((response.headers.get('content-type')||'').includes('text/html') && request.method === 'GET') {
       return new HTMLRewriter()
         .on('head',{element(el){el.append('<script src="/analytics.js" defer></script>',{html:true});}})
-        .on('link[rel="canonical"]',{element(el){const href=el.getAttribute('href');if(href)el.setAttribute('href',href.replace('https://abctechproducts.atechspot.com','https://www.abctechproducts.atechspot.com'));}})
-        .on('meta[property="og:url"]',{element(el){const value=el.getAttribute('content');if(value)el.setAttribute('content',value.replace('https://abctechproducts.atechspot.com','https://www.abctechproducts.atechspot.com'));}})
+        .on('link[rel="canonical"]',{element(el){const href=el.getAttribute('href');if(href)el.setAttribute('href',href.replace('https://www.abctechproducts.atechspot.com','https://abctechproducts.atechspot.com'));}})
+        .on('meta[property="og:url"]',{element(el){const value=el.getAttribute('content');if(value)el.setAttribute('content',value.replace('https://www.abctechproducts.atechspot.com','https://abctechproducts.atechspot.com'));}})
         .transform(response);
     }
     return response;
