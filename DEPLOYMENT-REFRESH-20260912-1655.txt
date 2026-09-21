@@ -1,1 +1,4 @@
-ATechSpot production redeploy refresh after updating RESEND_API_KEY in Cloudflare Pages. This commit intentionally forces a fresh production deployment so the current environment secrets are applied.
+ATechSpot production redeploy refresh.
+
+2026-09-12: Refresh after updating RESEND_API_KEY in Cloudflare Pages.
+2026-09-20: Re-trigger current main production deployment so www.atechspot.com serves the current B2B flagship source, including the 22-property ecosystem positioning, current ATechSpot branding, and canonical ABC Tech Products routing.
