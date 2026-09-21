@@ -1,5 +1,4 @@
 name: ATechSpot Client Portal E2E Closure
-# final 10/10 worker-rendered portal closure
 
 on:
   push:
@@ -18,16 +17,16 @@ jobs:
       - name: Checkout production source
         uses: actions/checkout@v4
 
-      - name: Generate masked portal signing secret
+      - name: Generate masked preview signing secret
         shell: bash
         run: |
           set -euo pipefail
           secret="$(openssl rand -hex 32)"
           test "${#secret}" -eq 64
           echo "::add-mask::$secret"
-          echo "PORTAL_SIGNING_SECRET=$secret" >> "$GITHUB_ENV"
+          echo "PORTAL_E2E_SIGNING_SECRET=$secret" >> "$GITHUB_ENV"
 
-      - name: Configure Cloudflare Pages portal variables
+      - name: Configure preview-only portal variables
         shell: bash
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -36,18 +35,12 @@ jobs:
           set -euo pipefail
           test -n "$CLOUDFLARE_API_TOKEN"
           test -n "$CLOUDFLARE_ACCOUNT_ID"
-          cat > /tmp/portal-env.json <<JSON
+          cat > /tmp/portal-preview-env.json <<JSON
           {
             "deployment_configs": {
-              "production": {
-                "env_vars": {
-                  "PORTAL_SIGNING_SECRET": {"type":"secret_text","value":"$PORTAL_SIGNING_SECRET"},
-                  "CLIENT_PORTAL_USERS": {"type":"plain_text","value":"aplustechucation@gmail.com"}
-                }
-              },
               "preview": {
                 "env_vars": {
-                  "PORTAL_SIGNING_SECRET": {"type":"secret_text","value":"$PORTAL_SIGNING_SECRET"},
+                  "PORTAL_SIGNING_SECRET": {"type":"secret_text","value":"$PORTAL_E2E_SIGNING_SECRET"},
                   "CLIENT_PORTAL_USERS": {"type":"plain_text","value":"aplustechucation@gmail.com"}
                 }
               }
@@ -55,20 +48,24 @@ jobs:
           }
           JSON
           project_url="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/atechspot"
-          curl -sS --fail-with-body -X PATCH "$project_url"             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"             -H "Content-Type: application/json"             --data @/tmp/portal-env.json > /tmp/project-update.json
+          curl -sS --fail-with-body -X PATCH "$project_url"             -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN"             -H "Content-Type: application/json"             --data @/tmp/portal-preview-env.json > /tmp/project-update.json
           test "$(jq -r '.success' /tmp/project-update.json)" = "true"
-          echo "Cloudflare portal variables configured."
+          echo "Preview-only portal variables configured. Production variables were not changed."
 
-      - name: Redeploy production with test signing secret
+      - name: Deploy isolated portal E2E preview
         shell: bash
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
-          npx --yes wrangler@latest pages deploy . --project-name atechspot --branch main
+          npx --yes wrangler@latest pages deploy . --project-name atechspot --branch portal-e2e 2>&1 | tee /tmp/deploy.log
+          deploy_url="$(grep -oE 'https://[a-f0-9]+\.atechspot\.pages\.dev' /tmp/deploy.log | tail -n1)"
+          test -n "$deploy_url"
+          echo "PORTAL_E2E_URL=$deploy_url" >> "$GITHUB_ENV"
+          echo "Portal E2E preview: $deploy_url"
 
-      - name: Generate valid magic token
+      - name: Generate valid preview magic token
         shell: bash
         run: |
           set -euo pipefail
@@ -80,71 +77,55 @@ jobs:
             exp:Date.now()+20*60*1000
           };
           const data=Buffer.from(JSON.stringify(payload)).toString('base64url');
-          const sig=crypto.createHmac('sha256',process.env.PORTAL_SIGNING_SECRET).update(data).digest('base64url');
+          const sig=crypto.createHmac('sha256',process.env.PORTAL_E2E_SIGNING_SECRET).update(data).digest('base64url');
           process.stdout.write(data+'.'+sig);
           NODE
           )"
           echo "::add-mask::$token"
-          echo "PORTAL_MAGIC_TOKEN=$token" >> "$GITHUB_ENV"
+          echo "PORTAL_E2E_TOKEN=$token" >> "$GITHUB_ENV"
 
-      - name: Verify login session dashboard logout lifecycle
+      - name: Verify preview login dashboard logout lifecycle
         shell: bash
         run: |
           set -euo pipefail
-          UA='Mozilla/5.0 (ATechSpot Portal QA) AppleWebKit/537.36 Chrome/142 Safari/537.36'
+          UA='Mozilla/5.0 (ATechSpot Portal E2E) AppleWebKit/537.36 Chrome/142 Safari/537.36'
           rm -f /tmp/portal-cookies.txt
 
-          login_code="000"
-          login_ready="false"
-          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
-            rm -f /tmp/login-headers.txt /tmp/login-body.txt /tmp/portal-cookies.txt
-            login_code=$(curl -sS             -A "$UA"             -D /tmp/login-headers.txt             -c /tmp/portal-cookies.txt             -o /tmp/login-body.txt             -w '%{http_code}'             "https://www.atechspot.com/api/client-login?token=$PORTAL_MAGIC_TOKEN" || true)
-            location=$(grep -i '^location:' /tmp/login-headers.txt | tr -d '\r' | head -n1 || true)
-            echo "Valid magic login -> $login_code $location (attempt $attempt/12)"
-            if [ "$login_code" = "302" ] && echo "$location" | grep -q '/clients/dashboard/'; then
-              login_ready="true"
-              break
-            fi
-            sleep 5
-          done
-          cat /tmp/login-headers.txt | grep -Ei '^(HTTP/|location:|set-cookie:)' | sed -E 's/(atechspot_client=)[^;]+/\1[REDACTED]/g'
-          test "$login_ready" = "true"
+          login_code="$(curl -sS -A "$UA" -D /tmp/login-headers.txt -c /tmp/portal-cookies.txt -o /tmp/login-body.txt -w '%{http_code}' "$PORTAL_E2E_URL/api/client-login?token=$PORTAL_E2E_TOKEN" || true)"
+          location="$(grep -i '^location:' /tmp/login-headers.txt | tr -d '\r' | head -n1 || true)"
+          echo "Preview valid magic login -> $login_code $location"
+          test "$login_code" = "302"
+          echo "$location" | grep -q '/clients/dashboard/'
           grep -Eiq '^set-cookie: atechspot_client=' /tmp/login-headers.txt
 
-          dashboard_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/dashboard-headers.txt             -o /tmp/dashboard.html             -w '%{http_code}'             "https://www.atechspot.com/clients/dashboard/" || true)
-          echo "Authenticated dashboard -> $dashboard_code"
-          if [ "$dashboard_code" != "200" ]; then
-            echo "--- dashboard response headers ---"
-            cat /tmp/dashboard-headers.txt | grep -Eiv "^(set-cookie:|cookie:)" || true
-            echo "--- dashboard response body ---"
-            head -n 120 /tmp/dashboard.html || true
-          fi
+          dashboard_code="$(curl -sS -A "$UA" -b /tmp/portal-cookies.txt -D /tmp/dashboard-headers.txt -o /tmp/dashboard.html -w '%{http_code}' "$PORTAL_E2E_URL/clients/dashboard/" || true)"
+          echo "Preview authenticated dashboard -> $dashboard_code"
           test "$dashboard_code" = "200"
           grep -q 'AUTHENTICATED CLIENT DASHBOARD' /tmp/dashboard.html
           grep -q 'aplustechucation@gmail.com' /tmp/dashboard.html
           grep -Eiq '^cache-control:.*no-store' /tmp/dashboard-headers.txt
           grep -Eiq '^x-robots-tag:.*noindex' /tmp/dashboard-headers.txt
 
-          logout_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -c /tmp/portal-cookies.txt             -D /tmp/logout-headers.txt             -o /dev/null             -w '%{http_code}'             "https://www.atechspot.com/api/client-logout" || true)
-          echo "Logout -> $logout_code"
+          logout_code="$(curl -sS -A "$UA" -b /tmp/portal-cookies.txt -c /tmp/portal-cookies.txt -D /tmp/logout-headers.txt -o /dev/null -w '%{http_code}' "$PORTAL_E2E_URL/api/client-logout" || true)"
+          echo "Preview logout -> $logout_code"
           test "$logout_code" = "302"
           grep -Eiq '^location: /clients/' /tmp/logout-headers.txt
 
-          after_code=$(curl -sS             -A "$UA"             -b /tmp/portal-cookies.txt             -D /tmp/after-headers.txt             -o /tmp/after-body.txt             -w '%{http_code}'             "https://www.atechspot.com/clients/dashboard/" || true)
-          echo "Dashboard after logout -> $after_code"
-          cat /tmp/after-headers.txt | grep -Ei '^(HTTP/|location:)' || true
+          after_code="$(curl -sS -A "$UA" -b /tmp/portal-cookies.txt -D /tmp/after-headers.txt -o /dev/null -w '%{http_code}' "$PORTAL_E2E_URL/clients/dashboard/" || true)"
+          echo "Preview dashboard after logout -> $after_code"
           test "$after_code" = "302"
           grep -Eiq '^location: .*/clients/' /tmp/after-headers.txt
 
-          echo "Client portal authenticated lifecycle passed end-to-end."
+          echo "Authenticated client portal lifecycle passed end-to-end on isolated preview."
 
-      - name: Verify public magic-link delivery endpoint stays configured
+      - name: Verify production portal remains configured
         shell: bash
         run: |
           set -euo pipefail
           started="$(node -e 'console.log(Date.now()-2500)')"
-          code=$(curl -sS             -A 'Mozilla/5.0 ATechSpot-QA'             -o /tmp/access-response.json             -w '%{http_code}'             -X POST 'https://www.atechspot.com/api/client-access'             -H 'Content-Type: application/json'             --data "{\"Email\":\"aplustechucation@gmail.com\",\"form_started_at\":\"$started\"}" || true)
-          echo "Magic-link request endpoint -> $code"
+          code="$(curl -sS -o /tmp/access-response.json -w '%{http_code}'             -X POST 'https://www.atechspot.com/api/client-access'             -H 'Content-Type: application/json'             --data "{\"Email\":\"portal-qa-not-authorized@atechspot.invalid\",\"form_started_at\":\"$started\"}" || true)"
+          echo "Production portal configuration -> $code"
+          cat /tmp/access-response.json
           test "$code" = "200"
           test "$(jq -r '.configured' /tmp/access-response.json)" = "true"
-          echo "Magic-link delivery request accepted."
+          echo "Production portal remains configured without rotating its signing secret."
