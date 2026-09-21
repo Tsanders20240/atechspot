@@ -43,6 +43,13 @@ jobs:
           test -f ATechSpot-Creator-Website/worker.js
           grep -q 'Turn what you create into' ATechSpot-Creator-Website/public/index.html
           grep -q 'Creator websites' ATechSpot-Creator-Website/public/index.html
+          grep -q 'Business Template Vault' ATechSpot-Creator-Website/public/index.html
+          grep -q 'AI Visual Prompt Library' ATechSpot-Creator-Website/public/index.html
+          grep -q 'Social Content Reel Library' ATechSpot-Creator-Website/public/index.html
+          grep -q 'CUSTOM B2B DIGITAL PRODUCT STUDIO' ATechSpot-Creator-Website/public/index.html
+          grep -q 'Website 3 of the 22-property ATechSpot ecosystem' ATechSpot-Creator-Website/public/index.html
+          grep -q 'Create One for My Company' ATechSpot-Creator-Website/public/index.html
+          test -f ATechSpot-Creator-Website/public/creator-2026.css
           grep -q 'Monetization systems' ATechSpot-Creator-Website/public/index.html
           grep -q 'Product launches' ATechSpot-Creator-Website/public/index.html
           grep -q 'BEFORE → AFTER' ATechSpot-Creator-Website/public/index.html
@@ -73,7 +80,7 @@ jobs:
         continue-on-error: true
         run: |
           sleep 6
-          for path in / /assessment/ /robots.txt /sitemap.xml /api/health; do
+          for path in / /assessment/ /robots.txt /sitemap.xml /api/health /creator-2026.css /app.js; do
             code=$(curl -sS -o /dev/null -w '%{http_code}' "https://creator.atechspot.com${path}" || true)
             echo "$path -> $code"
           done
