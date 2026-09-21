@@ -156,9 +156,9 @@ jobs:
           test -f payments/index.html
           test -f booking/index.html
           test -f clients/index.html
-          test -f portal-assets/dashboard.html
           grep -q 'SECURE CLIENT ACCESS' clients/index.html
-          grep -q 'AUTHENTICATED CLIENT DASHBOARD' portal-assets/dashboard.html
+          grep -q 'AUTHENTICATED CLIENT DASHBOARD' _worker.js
+          grep -q 'clients/dashboard/' _worker.js
           grep -q 'PORTAL_SIGNING_SECRET' _worker.js
           grep -q 'CLIENT_PORTAL_USERS' _worker.js
           grep -q 'ATechSpot Booking' booking/index.html
