@@ -41,7 +41,7 @@ jobs:
           test -f ATechSpot-Creator-Website/public/index.html
           test -f ATechSpot-Creator-Website/public/assessment/index.html
           test -f ATechSpot-Creator-Website/worker.js
-          grep -q 'Turn what you create into' ATechSpot-Creator-Website/public/index.html
+          grep -q 'Build digital products people can' ATechSpot-Creator-Website/public/index.html
           grep -q 'Creator websites' ATechSpot-Creator-Website/public/index.html
           grep -q 'Business Template Vault' ATechSpot-Creator-Website/public/index.html
           grep -q 'AI Visual Prompt Library' ATechSpot-Creator-Website/public/index.html
@@ -49,12 +49,13 @@ jobs:
           grep -q 'CUSTOM B2B DIGITAL PRODUCT STUDIO' ATechSpot-Creator-Website/public/index.html
           grep -q 'Website 3 of the 22-property ATechSpot ecosystem' ATechSpot-Creator-Website/public/index.html
           grep -q 'Create One for My Company' ATechSpot-Creator-Website/public/index.html
+          grep -q 'Digital-product systems' ATechSpot-Creator-Website/public/index.html
+          grep -q 'Business automation' ATechSpot-Creator-Website/public/index.html
+          grep -q 'Launch infrastructure' ATechSpot-Creator-Website/public/index.html
+          grep -q 'Create the product, brand system' ATechSpot-Creator-Website/public/index.html
+          grep -q 'https://atechucation.atechspot.com/' ATechSpot-Creator-Website/public/index.html
+          grep -q 'https://abcoftech.atechspot.com/' ATechSpot-Creator-Website/public/index.html
           test -f ATechSpot-Creator-Website/public/creator-2026.css
-          grep -q 'Monetization systems' ATechSpot-Creator-Website/public/index.html
-          grep -q 'Product launches' ATechSpot-Creator-Website/public/index.html
-          grep -q 'BEFORE → AFTER' ATechSpot-Creator-Website/public/index.html
-          grep -q 'PORTFOLIO PROOF' ATechSpot-Creator-Website/public/index.html
-          grep -q 'CREATOR PACKAGES' ATechSpot-Creator-Website/public/index.html
           grep -q 'CREATOR BUSINESS ASSESSMENT' ATechSpot-Creator-Website/public/assessment/index.html
           grep -q 'creator.atechspot.com' ATechSpot-Creator-Website/wrangler.jsonc
           grep -q '/api/creator-assessment' ATechSpot-Creator-Website/worker.js
