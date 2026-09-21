@@ -1,0 +1,22 @@
+name: Portal E2E Request
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/portal-e2e-request.yml"
+
+jobs:
+  request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request fresh authorized magic link
+        shell: bash
+        run: |
+          set -euo pipefail
+          started="$(node -e 'console.log(Date.now()-2500)')"
+          code="$(curl -sS -o /tmp/portal.json -w '%{http_code}'             -X POST 'https://www.atechspot.com/api/client-access'             -H 'Content-Type: application/json'             --data "{\"Email\":\"aplustechucation@gmail.com\",\"form_started_at\":\"$started\"}")"
+          cat /tmp/portal.json
+          test "$code" = "200"
+          test "$(jq -r '.configured' /tmp/portal.json)" = "true"
