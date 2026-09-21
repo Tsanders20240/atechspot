@@ -1,4 +1,5 @@
 name: Configure ATechSpot Client Portal Environment
+# portal activation retry after keep_vars
 
 on:
   push:
