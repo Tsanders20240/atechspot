@@ -44,7 +44,7 @@ jobs:
           grep -q 'INDEPENDENT APPAREL BRAND' ecosystem/index.html
 
           # Flagship routing and visual-system protections.
-          grep -q 'One place to' index.html
+          grep -q 'Turn business problems into' index.html
           grep -q 'journey-grid' index.html
           grep -q '/remote-support/' index.html
           grep -q '/assessment/' index.html
@@ -184,7 +184,7 @@ jobs:
           done
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/" -o /tmp/home.html
-          grep -q 'One place to' /tmp/home.html
+          grep -q 'Turn business problems into' /tmp/home.html
           grep -q 'journey-grid' /tmp/home.html
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/intake/" -o /tmp/intake.html
