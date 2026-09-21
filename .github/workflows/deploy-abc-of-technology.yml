@@ -39,11 +39,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m pip install --disable-pip-version-check --quiet reportlab pillow
+          python -m pip install --disable-pip-version-check --quiet reportlab pillow pymupdf
           python ABC-of-Technology-Website/scripts/decode_book_svg.py
           python ABC-of-Technology-Website/scripts/build_coloring.py
           python ABC-of-Technology-Website/scripts/build_coloring_preview.py
+          python ABC-of-Technology-Website/scripts/build_coloring_thumbnails.py
           python ABC-of-Technology-Website/scripts/build_stem_activities.py
+          python ABC-of-Technology-Website/scripts/build_fgh_activities.py
           python ABC-of-Technology-Website/scripts/build_portal_hero.py
 
       - name: Validate standalone ABC portal 10/10 source
@@ -61,6 +63,14 @@ jobs:
           test -f "$ROOT/public/portal-2026.js"
           test -f "$ROOT/public/assets/hero/abc-home-hero.webp"
           test -f "$ROOT/public/assets/activities/battery-hunt.webp"
+          test -f "$ROOT/public/assets/activities/f-floppy-flash-drive-activity.webp"
+          test -f "$ROOT/public/assets/activities/g-game-controller-activity.webp"
+          test -f "$ROOT/public/assets/activities/h-headphones-activity.webp"
+          test -f "$ROOT/public/downloads/activities/f-floppy-flash-drive-activity.pdf"
+          test -f "$ROOT/public/downloads/activities/g-game-controller-activity.pdf"
+          test -f "$ROOT/public/downloads/activities/h-headphones-activity.pdf"
+          test -f "$ROOT/public/assets/coloring-pages/a-analog-phone.webp"
+          test -f "$ROOT/public/assets/coloring-pages/z-zoom.webp"
           test -f "$ROOT/public/assets/activities/phone-stand.webp"
           test -f "$ROOT/public/downloads/activities/battery-hunt.pdf"
           test -f "$ROOT/public/downloads/activities/phone-stand.pdf"
@@ -89,9 +99,12 @@ jobs:
           grep -q 'ABC Tech Products' "$HTML"
 
           # Core learning experiences remain intact.
-          grep -q 'preview-page-1.svg' "$HTML"
-          grep -q 'preview-page-2.svg' "$HTML"
-          grep -q 'preview-page-3.svg' "$HTML"
+          grep -q 'preview-f-floppy-flash.svg' "$HTML"
+          grep -q 'preview-f-flash-facts.svg' "$HTML"
+          grep -q 'preview-gh-game-headphones.svg' "$HTML"
+          grep -q 'f-floppy-flash-drive-activity.pdf' "$HTML"
+          grep -q 'g-game-controller-activity.pdf' "$HTML"
+          grep -q 'h-headphones-activity.pdf' "$HTML"
           grep -q 'battery-hunt.pdf' "$HTML"
           grep -q 'phone-stand.pdf' "$HTML"
           grep -q 'coloring-preview-sheet.webp' "$HTML"
@@ -115,7 +128,9 @@ jobs:
           grep -q 'ABC Tech Theme' "$HTML"
           grep -q 'id="siteControlBar"' "$HTML"
           grep -q 'COLORING WORLD' "$HTML"
-          grep -q 'Open the Full Coloring Book' "$HTML"
+          grep -q 'View All 26 Coloring Pages' "$HTML"
+          grep -q '/assets/coloring-pages/a-analog-phone.webp' "$HTML"
+          if grep -q 'live-tool-dock' "$HTML"; then echo 'Duplicate bottom menu remains in HTML' && exit 1; fi
 
           test -f "$ROOT/public/assets/book/book-cover.webp"
           test -f "$ROOT/public/assets/book/preview-page-1.svg"
@@ -168,7 +183,7 @@ jobs:
         run: |
           set -euo pipefail
           sleep 7
-          for path in / /robots.txt /sitemap.xml /api/health /portal-2026.css /portal-2026.js /assets/hero/abc-home-hero.webp /assets/activities/battery-hunt.webp /assets/activities/phone-stand.webp /downloads/activities/battery-hunt.pdf /downloads/activities/phone-stand.pdf /downloads/coloring-pages/a-analog-phone.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp /assets/book/book-page-a.webp /assets/authors/april-sanders-original-crop.webp; do
+          for path in / /robots.txt /sitemap.xml /api/health /portal-2026.css /portal-2026.js /assets/hero/abc-home-hero.webp /assets/activities/battery-hunt.webp /assets/activities/f-floppy-flash-drive-activity.webp /assets/activities/g-game-controller-activity.webp /assets/activities/h-headphones-activity.webp /assets/coloring-pages/a-analog-phone.webp /assets/coloring-pages/z-zoom.webp /assets/activities/phone-stand.webp /downloads/activities/battery-hunt.pdf /downloads/activities/phone-stand.pdf /downloads/activities/f-floppy-flash-drive-activity.pdf /downloads/activities/g-game-controller-activity.pdf /downloads/activities/h-headphones-activity.pdf /downloads/coloring-pages/a-analog-phone.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp /assets/book/book-page-a.webp /assets/authors/april-sanders-original-crop.webp; do
             code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://abcoftech.atechspot.com${path}")
             echo "$path -> $code"
             test "$code" = "200"
@@ -205,5 +220,12 @@ jobs:
           grep -q 'id="introLights"' /tmp/abc-live.html
           grep -q 'id="siteControlBar"' /tmp/abc-live.html
           grep -q 'COLORING WORLD' /tmp/abc-live.html
-          grep -q 'Open the Full Coloring Book' /tmp/abc-live.html
+          grep -q 'View All 26 Coloring Pages' /tmp/abc-live.html
+          grep -q 'preview-f-floppy-flash.svg' /tmp/abc-live.html
+          grep -q 'preview-f-flash-facts.svg' /tmp/abc-live.html
+          grep -q 'preview-gh-game-headphones.svg' /tmp/abc-live.html
+          grep -q 'f-floppy-flash-drive-activity.pdf' /tmp/abc-live.html
+          grep -q 'g-game-controller-activity.pdf' /tmp/abc-live.html
+          grep -q 'h-headphones-activity.pdf' /tmp/abc-live.html
+          if grep -q 'live-tool-dock' /tmp/abc-live.html; then echo 'Duplicate bottom menu is live' && exit 1; fi
           echo 'Live ABC portal verified with persistent navigation, intro, sound, lyric video, activities, book and Coloring World.'
