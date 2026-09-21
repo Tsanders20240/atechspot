@@ -170,7 +170,7 @@ function renderColor(){
 }
 
 const pages=[...document.querySelectorAll('#bookFrame img')];let page=0;
-function showPage(){pages.forEach((p,i)=>p.classList.toggle('active',i===page));const pc=document.getElementById('pageCount');if(pc)pc.textContent=(page+6)+' / 26'}
+function showPage(){pages.forEach((p,i)=>p.classList.toggle('active',i===page));const pc=document.getElementById('pageCount');if(pc)pc.textContent=(page+1)+' / '+pages.length}
 document.getElementById('prevPage')?.addEventListener('click',()=>{page=(page-1+pages.length)%pages.length;showPage()});
 document.getElementById('nextPage')?.addEventListener('click',()=>{page=(page+1)%pages.length;showPage()});
 
