@@ -37,6 +37,14 @@ jobs:
           zone_id=$(echo "$zone_json" | jq -r '.result[0].id // empty')
 
           if [ -n "$zone_id" ]; then
+            echo '=== DNS records for apex and www ==='
+            curl -fsS "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records?per_page=500" "${auth[@]}" \
+              | jq '{success,errors,result:[.result[]? | select(.name=="atechspot.com" or .name=="www.atechspot.com") | {id,type,name,content,proxied,ttl,comment}]}'
+
+            echo '=== Pages custom domains ==='
+            curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/atechspot/domains" "${auth[@]}" \
+              | jq '{success,errors,result:[.result[]? | {id,name,status,verification_data,validation_data}]}'
+
             echo '=== Worker routes ==='
             curl -fsS "https://api.cloudflare.com/client/v4/zones/$zone_id/workers/routes" "${auth[@]}" \
               | jq '{success, errors, result: [.result[]? | select(.pattern|contains("atechspot.com")) | {id,pattern,script}]}'
