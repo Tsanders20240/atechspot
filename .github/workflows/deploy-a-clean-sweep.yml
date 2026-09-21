@@ -1,0 +1,62 @@
+name: Deploy A Clean Sweep
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'A-Clean-Sweep-Website/**'
+      - '.github/workflows/deploy-a-clean-sweep.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: a-clean-sweep-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify Cloudflare credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" || (echo "Missing CLOUDFLARE_API_TOKEN" && exit 1)
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "Missing CLOUDFLARE_ACCOUNT_ID" && exit 1)
+      - name: Validate A Clean Sweep production source
+        run: |
+          set -euo pipefail
+          test -f A-Clean-Sweep-Website/public/index.html
+          test -f A-Clean-Sweep-Website/public/about/index.html
+          test -f A-Clean-Sweep-Website/public/privacy/index.html
+          test -f A-Clean-Sweep-Website/public/terms/index.html
+          test -f A-Clean-Sweep-Website/public/robots.txt
+          test -f A-Clean-Sweep-Website/public/sitemap.xml
+          test -f A-Clean-Sweep-Website/worker.js
+          grep -q 'Residential Cleaning' A-Clean-Sweep-Website/public/index.html
+          grep -q 'Commercial Cleaning' A-Clean-Sweep-Website/public/index.html
+          grep -q 'Recurring Service' A-Clean-Sweep-Website/public/index.html
+          grep -q 'acleansweep.atechspot.com' A-Clean-Sweep-Website/wrangler.jsonc
+          grep -q '/api/health' A-Clean-Sweep-Website/worker.js
+      - name: Deploy A Clean Sweep Worker
+        working-directory: A-Clean-Sweep-Website
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@latest deploy
+      - name: Verify production routes
+        run: |
+          sleep 6
+          for p in / /about/ /privacy/ /terms/ /robots.txt /sitemap.xml /api/health; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' "https://acleansweep.atechspot.com${p}" || true)
+            echo "${p} -> ${code}"
+            test "${code}" = "200"
+          done
