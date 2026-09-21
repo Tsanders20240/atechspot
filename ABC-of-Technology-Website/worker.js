@@ -62,7 +62,7 @@ const BUS_ONLY_SVG=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 76
 
 function redirect(request,target,status=301){return Response.redirect(new URL(target,request.url).toString(),status)}
 function svgResponse(svg){return new Response(svg,{status:200,headers:SVG_HEADERS})}
-function secureHeaders(headers){const h=new Headers(headers);for(const [k,v] of Object.entries(HTML_HEADERS)) if(!h.has(k)) h.set(k,v);if(!h.has('cache-control')) h.set('cache-control','public, max-age=120');return h}
+function secureHeaders(headers){const h=new Headers(headers);for(const [k,v] of Object.entries(HTML_HEADERS)) if(!h.has(k)) h.set(k,v);h.set('cache-control','no-store, no-cache, must-revalidate');h.set('pragma','no-cache');h.set('expires','0');return h}
 
 async function enhanceHtml(response){
   let html=await response.text();
@@ -99,7 +99,13 @@ export default{
     }
     if(path.startsWith('/authors/')) return redirect(request,'/#about',301);
     if(SECTION_REDIRECTS.has(path)) return redirect(request,SECTION_REDIRECTS.get(path),301);
-    const response=await env.ASSETS.fetch(request);
+    let assetRequest=request;
+    if(path==='/' || path==='/index.html'){
+      const assetUrl=new URL('/index.html',request.url);
+      assetUrl.search='';
+      assetRequest=new Request(assetUrl.toString(),request);
+    }
+    const response=await env.ASSETS.fetch(assetRequest);
     const type=response.headers.get('content-type')||'';
     if(type.includes('text/html')&&request.method==='GET') return enhanceHtml(response);
     if(type.includes('text/html')) return new Response(response.body,{status:response.status,statusText:response.statusText,headers:secureHeaders(response.headers)});
