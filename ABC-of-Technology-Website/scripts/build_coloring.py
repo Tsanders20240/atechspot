@@ -108,7 +108,7 @@ def draw_page(c,letter_,word,prompt,page_num=None):
     if line: lines.append(line)
     y=133
     for ln in lines[:2]: c.drawString(52,y,ln); y-=18
-    c.setFont('DejaVuBold',11); c.drawString(52,62,'PRINT • COLOR • LEARN • EXPLORE'); c.setFont('DejaVu',9); c.drawRightString(W-52,62,'Free family activity • abcoftech.atechspot.com')
+    c.setFont('DejaVuBold',11); c.drawString(52,62,'BIG LINES • BIG CHARACTER • EASY TO COLOR'); c.setFont('DejaVu',9); c.drawRightString(W-52,62,'ABC of Technology • abcoftech.atechspot.com')
     if page_num: c.drawCentredString(W/2,40,str(page_num))
     c.showPage()
 
