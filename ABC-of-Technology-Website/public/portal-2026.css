@@ -705,3 +705,43 @@ body.intro-open{overflow:hidden}
   .coloring-feature-strip{grid-template-columns:repeat(2,1fr)}
   .color-grid-large{grid-template-columns:1fr}
 }
+
+
+/* === ACTUAL BOOK PAGES 14 === */
+.actual-book-viewer{
+  position:relative;
+  background:linear-gradient(145deg,#247dff 0%,#7358ef 54%,#e644b3 100%);
+  border-radius:28px;
+  padding:18px;
+  box-shadow:0 24px 58px rgba(36,74,160,.18);
+}
+.actual-book-label{
+  display:inline-flex;
+  margin:0 0 10px;
+  padding:7px 12px;
+  border-radius:999px;
+  background:#061f52;
+  color:#fff;
+  font-size:.76rem;
+  font-weight:1000;
+  letter-spacing:.09em;
+}
+.actual-book-viewer .book-frame{
+  min-height:620px;
+  background:#fff;
+  border-radius:22px;
+  padding:16px;
+}
+.actual-book-viewer .book-frame img{
+  max-height:590px;
+  width:auto;
+  max-width:100%;
+  object-fit:contain;
+  background:#fff;
+  box-shadow:none;
+  border-radius:0;
+}
+@media(max-width:760px){
+  .actual-book-viewer .book-frame{min-height:460px}
+  .actual-book-viewer .book-frame img{max-height:430px}
+}
