@@ -161,10 +161,10 @@
   }
 
   function enforcePrimaryCtas(){
-    document.querySelectorAll('.site-header .desktop-cta').forEach(a=>{a.href='/intake/?client=b2b#project-intake';a.textContent='Request B2B Consultation'});
+    document.querySelectorAll('.site-header .desktop-cta').forEach(a=>{a.href='/intake/?client=b2b#project-intake';a.textContent='Start My Project'});
     if(normalizedPath(location.pathname)!=='/')return;
     const heroPrimary=document.querySelector('.hero-actions .btn-primary');
-    if(heroPrimary){heroPrimary.href='/intake/?client=b2b#project-intake';heroPrimary.textContent='Request a B2B Consultation →'}
+    if(heroPrimary){heroPrimary.href='/intake/?client=b2b#project-intake';heroPrimary.textContent='Start My Project →'}
     const growthPrimary=document.querySelector('.growth-copy .btn-primary');
     if(growthPrimary){growthPrimary.href='/assessment/';growthPrimary.textContent='Start With My Business Assessment'}
   }
