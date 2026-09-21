@@ -8,9 +8,32 @@
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
 <link rel="canonical" href="https://abcoftech.atechspot.com/">
 <meta name="theme-color" content="#0b5dff">
-<link rel="stylesheet" href="/portal-2026.css?v=20260921-complete4">
+<link rel="stylesheet" href="/portal-2026.css?v=20260921-intro5">
 </head>
 <body>
+<div id="siteIntro" class="site-intro" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+  <div class="intro-sky"></div>
+  <div class="intro-card">
+    <p class="intro-presented">A+ TECHUCATION PRESENTS</p>
+    <h1 id="introTitle">ABC'S OF TECHNOLOGY</h1>
+    <p class="intro-tagline">A brighter tomorrow starts with A–Z.</p>
+    <div class="intro-bus" aria-hidden="true">
+      <div class="intro-light intro-light-left"></div>
+      <div class="intro-light intro-light-right"></div>
+      <div class="intro-bus-title">ABC TECH BUS</div>
+      <div class="intro-wheel intro-wheel-one"></div>
+      <div class="intro-wheel intro-wheel-two"></div>
+    </div>
+    <div class="intro-actions">
+      <button id="enterSite" class="intro-enter" type="button">Enter the Adventure →</button>
+      <button id="introSound" class="intro-secondary" type="button" aria-pressed="true">🔊 Sound On</button>
+      <button id="introLights" class="intro-secondary" type="button" aria-pressed="true">💡 Bus Lights On</button>
+    </div>
+    <button id="skipIntro" class="intro-skip" type="button">Skip Intro</button>
+  </div>
+</div>
+
+<button id="soundDock" class="sound-dock" type="button" aria-pressed="true" aria-label="Turn ABC Tech background sound off">🔊 Sound On</button>
 <a class="skip" href="#main">Skip to content</a>
 
 <main id="main">
@@ -176,11 +199,23 @@
 
 <section id="watch" class="section watch-section">
   <div class="shell">
-    <div class="section-head"><p class="eyebrow">WATCH & LISTEN</p><h2>Technology comes alive.</h2></div>
+    <div class="section-head"><p class="eyebrow">WATCH & LISTEN</p><h2>Technology comes alive.</h2><p class="short">Play the ABC Tech theme, follow the words on screen, or listen to A–Z vocabulary.</p></div>
+    <div class="lyric-stage" id="lyricStage">
+      <div class="lyric-art" aria-hidden="true"><span class="lyric-bus">🚌</span><span class="lyric-robot">🤖</span><span class="lyric-glow"></span></div>
+      <div class="lyric-copy">
+        <p class="eyebrow">ABC TECH LYRIC VIDEO</p>
+        <h3 id="lyricLine">A brighter tomorrow starts with A–Z.</h3>
+        <p id="lyricSub">Press play to begin the animated lyric experience.</p>
+        <div class="lyric-actions">
+          <button id="playLyric" class="btn cyan" type="button">▶ Play Lyric Video</button>
+          <button id="lyricSound" class="btn glass" type="button">🔊 Sound On</button>
+        </div>
+      </div>
+    </div>
     <div class="media-grid">
       <article><span>🔊</span><h3>Hear A–Z</h3><p>Spoken technology words.</p><a href="#learn">Start Listening →</a></article>
-      <article><span>🎵</span><h3>Songs & Rhythm</h3><p>Repetition, movement and vocabulary.</p></article>
-      <article><span>🎬</span><h3>Video Learning</h3><p>Grown-up guided video experiences.</p></article>
+      <article><span>🎵</span><h3>ABC Tech Theme</h3><p>Original browser-played learning theme with sound control.</p><button id="playTheme" class="text-button" type="button">Play Theme →</button></article>
+      <article><span>🎬</span><h3>Lyric Video</h3><p>Animated words, technology world visuals and the ABC Tech theme.</p><button id="jumpLyric" class="text-button" type="button">Watch Here →</button></article>
     </div>
   </div>
 </section>
@@ -221,6 +256,6 @@
   <div class="shell footer-row"><div><strong>ABC's of Technology</strong><small>Learn · Play · Explore · Discover</small></div><div><a href="https://www.atechspot.com/privacy/">Privacy</a><a href="https://www.atechspot.com/terms/">Terms</a><a href="https://www.atechspot.com/accessibility/">Accessibility</a></div></div>
 </footer>
 
-<script src="/portal-2026.js?v=20260921-complete4" defer></script>
+<script src="/portal-2026.js?v=20260921-intro5" defer></script>
 </body>
 </html>
