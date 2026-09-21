@@ -47,3 +47,7 @@
 
 /booking/*
   Cache-Control: no-cache, must-revalidate
+
+/clients/*
+  Cache-Control: no-store, max-age=0, must-revalidate
+  X-Robots-Tag: noindex, nofollow, noarchive
