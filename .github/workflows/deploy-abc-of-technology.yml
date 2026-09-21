@@ -74,6 +74,15 @@ jobs:
           grep -q 'april-sanders-original-crop.webp' "$HTML"
           grep -q 'No child sign-up' "$HTML"
           grep -q 'does not collect card information or process a checkout' "$HTML"
+          grep -q 'Website 4 of the 22-property ATechSpot ecosystem' "$HTML"
+          grep -q 'THE A–Z ADVENTURE WORLD' "$HTML"
+          grep -q 'COMPLETE THE LEARNING EXPERIENCE' "$HTML"
+          grep -q 'https://creator.atechspot.com/' "$HTML"
+          grep -q 'https://abctechproducts.atechspot.com/' "$HTML"
+          grep -q 'Kids explore the adventure' "$HTML"
+          test -f "$ROOT/public/abc-adventure-2026.css"
+          test -f "$ROOT/public/abc-adventure-2026.js"
+          node --check "$ROOT/public/abc-adventure-2026.js"
 
           test -f "$ROOT/public/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf"
           test "$(find "$ROOT/public/downloads/coloring-pages" -maxdepth 1 -type f -name '[a-z]-*.pdf' | wc -l)" -eq 26
@@ -84,7 +93,7 @@ jobs:
           fi
 
           grep -q 'abcoftech.atechspot.com' "$ROOT/wrangler.jsonc"
-          echo 'ABC of Technology bilingual STEM 10/10 source assertions passed.'
+          echo 'ABC of Technology animated A-Z ecosystem, bilingual learning, activities and grown-up product funnel assertions passed.'
 
       - name: Deploy dedicated custom-domain Worker
         working-directory: ABC-of-Technology-Website
@@ -98,7 +107,7 @@ jobs:
         continue-on-error: true
         run: |
           sleep 7
-          for path in / /robots.txt /sitemap.xml /api/health /downloads/coloring-pages/a-analog-phone.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp /assets/book/book-page-a.webp /assets/authors/april-sanders-original-crop.webp; do
+          for path in / /robots.txt /sitemap.xml /api/health /abc-adventure-2026.css /abc-adventure-2026.js /downloads/coloring-pages/a-analog-phone.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp /assets/book/book-page-a.webp /assets/authors/april-sanders-original-crop.webp; do
             code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://abcoftech.atechspot.com${path}" || true)
             echo "$path -> $code"
           done
