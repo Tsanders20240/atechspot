@@ -60,7 +60,10 @@ jobs:
         run: |
           set -euo pipefail
           npx --yes wrangler@latest pages deploy . --project-name atechspot --branch portal-e2e 2>&1 | tee /tmp/deploy.log
-          deploy_url="$(grep -oE 'https://[a-f0-9]+\.atechspot\.pages\.dev' /tmp/deploy.log | tail -n1)"
+          deploy_url="$(grep -oE 'https://portal-e2e\.atechspot\.pages\.dev' /tmp/deploy.log | tail -n1)"
+          if [ -z "$deploy_url" ]; then
+            deploy_url="$(grep -oE 'https://[a-f0-9]+\.atechspot\.pages\.dev' /tmp/deploy.log | tail -n1)"
+          fi
           test -n "$deploy_url"
           echo "PORTAL_E2E_URL=$deploy_url" >> "$GITHUB_ENV"
           echo "Portal E2E preview: $deploy_url"
@@ -91,11 +94,19 @@ jobs:
           UA='Mozilla/5.0 (ATechSpot Portal E2E) AppleWebKit/537.36 Chrome/142 Safari/537.36'
           rm -f /tmp/portal-cookies.txt
 
-          login_code="$(curl -sS -A "$UA" -D /tmp/login-headers.txt -c /tmp/portal-cookies.txt -o /tmp/login-body.txt -w '%{http_code}' "$PORTAL_E2E_URL/api/client-login?token=$PORTAL_E2E_TOKEN" || true)"
-          location="$(grep -i '^location:' /tmp/login-headers.txt | tr -d '\r' | head -n1 || true)"
-          echo "Preview valid magic login -> $login_code $location"
-          test "$login_code" = "302"
-          echo "$location" | grep -q '/clients/dashboard/'
+          login_ready="false"
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+            rm -f /tmp/login-headers.txt /tmp/login-body.txt /tmp/portal-cookies.txt
+            login_code="$(curl -sS -A "$UA" -D /tmp/login-headers.txt -c /tmp/portal-cookies.txt -o /tmp/login-body.txt -w '%{http_code}' "$PORTAL_E2E_URL/api/client-login?token=$PORTAL_E2E_TOKEN" || true)"
+            location="$(grep -i '^location:' /tmp/login-headers.txt | tr -d '\r' | head -n1 || true)"
+            echo "Preview valid magic login -> $login_code $location (attempt $attempt/12)"
+            if [ "$login_code" = "302" ] && echo "$location" | grep -q '/clients/dashboard/'; then
+              login_ready="true"
+              break
+            fi
+            sleep 5
+          done
+          test "$login_ready" = "true"
           grep -Eiq '^set-cookie: atechspot_client=' /tmp/login-headers.txt
 
           dashboard_code="$(curl -sS -A "$UA" -b /tmp/portal-cookies.txt -D /tmp/dashboard-headers.txt -o /tmp/dashboard.html -w '%{http_code}' "$PORTAL_E2E_URL/clients/dashboard/" || true)"
