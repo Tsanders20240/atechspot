@@ -500,3 +500,175 @@ section[style],div[style]{}
 @media(prefers-reduced-motion:reduce){
   .bus,.bus-card:after{animation:none!important}
 }
+
+
+/* === COLORFUL PREMIUM LEARNING UNIVERSE OVERRIDES === */
+.hero.adventure-hero{
+  background:
+    radial-gradient(circle at 84% 12%,rgba(33,184,243,.35),transparent 24rem),
+    radial-gradient(circle at 68% 68%,rgba(124,58,237,.18),transparent 30rem),
+    radial-gradient(circle at 18% 82%,rgba(239,63,130,.10),transparent 24rem),
+    linear-gradient(135deg,#020914 0%,#05214a 42%,#092b5c 68%,#10205a 100%)!important;
+}
+.hero.adventure-hero:after{
+  border-color:rgba(61,211,255,.28)!important;
+  box-shadow:
+    0 0 0 40px rgba(41,225,255,.05),
+    0 0 0 100px rgba(111,75,255,.035),
+    0 0 85px rgba(29,145,255,.14)!important;
+}
+.logo{
+  background:conic-gradient(#ff496b,#ff8a22,#ffd84d,#22c96b,#20c8ff,#3479ff,#8c55ff,#ff4fba,#ff496b)!important;
+}
+.cta{
+  background:linear-gradient(135deg,#20d7ff 0%,#1677ff 46%,#7c3aed 100%)!important;
+  box-shadow:0 10px 30px rgba(22,119,255,.20)!important;
+}
+.lang button.active{
+  background:linear-gradient(135deg,#1677ff,#7c3aed)!important;
+}
+
+/* Animated A-Z universe */
+.adventure-world{
+  background:
+    radial-gradient(circle at 12% 14%,rgba(33,184,243,.12),transparent 24rem),
+    radial-gradient(circle at 88% 18%,rgba(239,63,130,.09),transparent 22rem),
+    radial-gradient(circle at 70% 88%,rgba(124,58,237,.10),transparent 26rem),
+    linear-gradient(180deg,#03101e,#061a31 42%,#071225)!important;
+}
+.adventure-letter:nth-child(6n+1){border-color:#1769aa!important}
+.adventure-letter:nth-child(6n+2){border-color:#a74573!important;background:linear-gradient(180deg,#211126,#0b1321)!important}
+.adventure-letter:nth-child(6n+3){border-color:#267b56!important;background:linear-gradient(180deg,#09241f,#07151b)!important}
+.adventure-letter:nth-child(6n+4){border-color:#8a6d22!important;background:linear-gradient(180deg,#2b2209,#10151d)!important}
+.adventure-letter:nth-child(6n+5){border-color:#6447a8!important;background:linear-gradient(180deg,#17122c,#091321)!important}
+.adventure-letter:nth-child(6n+6){border-color:#17768b!important;background:linear-gradient(180deg,#092532,#07141f)!important}
+.adventure-letter:nth-child(6n+1) strong{background:linear-gradient(145deg,#29e1ff,#087eff)!important}
+.adventure-letter:nth-child(6n+2) strong{background:linear-gradient(145deg,#ff7a18,#ef3f82)!important}
+.adventure-letter:nth-child(6n+3) strong{background:linear-gradient(145deg,#16a34a,#27d98a)!important}
+.adventure-letter:nth-child(6n+4) strong{background:linear-gradient(145deg,#ffd84d,#ff8a18)!important;color:#2b2400!important}
+.adventure-letter:nth-child(6n+5) strong{background:linear-gradient(145deg,#8b5cf6,#ef3f82)!important}
+.adventure-letter:nth-child(6n+6) strong{background:linear-gradient(145deg,#21b8f3,#12b8a6)!important}
+
+/* Book = blue/purple feature zone */
+.book{
+  background:
+    radial-gradient(circle at 86% 14%,rgba(139,92,246,.23),transparent 24rem),
+    radial-gradient(circle at 10% 86%,rgba(33,184,243,.11),transparent 20rem),
+    linear-gradient(180deg,#040b19,#0a1630)!important;
+}
+.book-copy{border-color:#4f4f9e!important;background:linear-gradient(180deg,#101835,#071827)!important}
+.preview{
+  background:linear-gradient(145deg,#1677ff 0%,#6d5df7 48%,#ef3f82 100%)!important;
+}
+
+/* Play = electric blue/cyan */
+#play{
+  background:
+    radial-gradient(circle at 12% 20%,rgba(41,225,255,.14),transparent 20rem),
+    linear-gradient(180deg,#04111f,#062344)!important;
+}
+.play-bus{border-color:#1f83aa!important;background:linear-gradient(180deg,#08304a,#061827)!important}
+.game-panel{border-color:#286da0!important;background:linear-gradient(180deg,#0b2945,#071827)!important}
+.letterchip{background:linear-gradient(135deg,#29e1ff,#1677ff,#7c3aed)!important}
+
+/* STEM = green/cyan */
+.stem{
+  background:
+    radial-gradient(circle at 84% 18%,rgba(36,201,106,.16),transparent 24rem),
+    radial-gradient(circle at 15% 78%,rgba(41,225,255,.10),transparent 22rem),
+    linear-gradient(180deg,#031712,#04141c)!important;
+}
+.stem-card:nth-child(3n+1){border-color:#287d59!important;background:linear-gradient(180deg,#0c2a21,#071827)!important}
+.stem-card:nth-child(3n+2){border-color:#227386!important;background:linear-gradient(180deg,#0a2730,#071827)!important}
+.stem-card:nth-child(3n+3){border-color:#537431!important;background:linear-gradient(180deg,#1a2a12,#071827)!important}
+
+/* Spelling = gold/orange/purple */
+.spelling{
+  background:
+    radial-gradient(circle at 85% 16%,rgba(255,216,77,.18),transparent 20rem),
+    radial-gradient(circle at 18% 86%,rgba(239,63,130,.10),transparent 22rem),
+    linear-gradient(180deg,#211908,#100f19)!important;
+}
+.spell-info{border-color:#8e722e!important;background:linear-gradient(180deg,#2d250f,#171827)!important}
+.spell-game{border-color:#765aa7!important;background:linear-gradient(180deg,#211a38,#101827)!important}
+
+/* Coloring = full-spectrum creative gallery */
+.color{
+  background:
+    radial-gradient(circle at 15% 15%,rgba(239,63,130,.12),transparent 22rem),
+    radial-gradient(circle at 83% 75%,rgba(124,58,237,.12),transparent 24rem),
+    linear-gradient(180deg,#120d20,#05101e)!important;
+}
+.color-card:nth-child(5n+1){border-color:#2a79b7!important}
+.color-card:nth-child(5n+2){border-color:#9d4674!important}
+.color-card:nth-child(5n+3){border-color:#397b4e!important}
+.color-card:nth-child(5n+4){border-color:#947427!important}
+.color-card:nth-child(5n+5){border-color:#6647aa!important}
+
+/* Watch & Listen = media blue/purple */
+.watch{
+  background:
+    radial-gradient(circle at 82% 18%,rgba(41,225,255,.16),transparent 23rem),
+    linear-gradient(180deg,#04101d,#071b35)!important;
+}
+.media:nth-child(1){border-color:#2476a6!important;background:linear-gradient(180deg,#0a2941,#071827)!important}
+.media:nth-child(2){border-color:#75489f!important;background:linear-gradient(180deg,#211738,#071827)!important}
+.media:nth-child(3){border-color:#9c4f70!important;background:linear-gradient(180deg,#2a1425,#071827)!important}
+
+/* Author = premium indigo/pink */
+.about{
+  background:
+    radial-gradient(circle at 15% 18%,rgba(41,225,255,.10),transparent 24rem),
+    radial-gradient(circle at 88% 78%,rgba(239,63,130,.12),transparent 26rem),
+    linear-gradient(180deg,#04101c,#111226)!important;
+}
+.april-card{border-color:#594d8a!important;background:linear-gradient(145deg,#0a2037,#1a1530)!important}
+.quality:nth-child(1){border-color:#3c6fa4!important}
+.quality:nth-child(2){border-color:#3b7c58!important}
+.quality:nth-child(3){border-color:#934b73!important}
+
+/* Parent funnel = colorful premium package rail */
+.family-experience{
+  background:
+    radial-gradient(circle at 10% 10%,rgba(33,184,243,.12),transparent 22rem),
+    radial-gradient(circle at 90% 80%,rgba(124,58,237,.14),transparent 24rem),
+    linear-gradient(120deg,#071d34,#0c2944 52%,#1c1740)!important;
+}
+.family-card:nth-child(1){border-color:#246fa1!important;background:linear-gradient(180deg,#0c2942,#071827)!important}
+.family-card:nth-child(2){border-color:#7651a7!important;background:linear-gradient(180deg,#20183a,#071827)!important}
+.family-card:nth-child(3){border-color:#8a6f2c!important;background:linear-gradient(180deg,#2a230f,#071827)!important}
+.family-card:nth-child(4){border-color:#397c59!important;background:linear-gradient(180deg,#0c2a21,#071827)!important}
+.family-card:nth-child(1) .num{background:linear-gradient(145deg,#29e1ff,#1677ff)!important}
+.family-card:nth-child(2) .num{background:linear-gradient(145deg,#8b5cf6,#ef3f82)!important}
+.family-card:nth-child(3) .num{background:linear-gradient(145deg,#ffd84d,#ff8a18)!important;color:#291f00!important}
+.family-card:nth-child(4) .num{background:linear-gradient(145deg,#24c96a,#21b8f3)!important}
+
+/* Shop = warm gold + cool tech */
+.shop{
+  background:
+    radial-gradient(circle at 86% 18%,rgba(255,216,77,.10),transparent 24rem),
+    radial-gradient(circle at 12% 86%,rgba(33,184,243,.09),transparent 22rem),
+    linear-gradient(180deg,#06101b,#10151f)!important;
+}
+.retailer:nth-child(1){border-color:#9a6127!important}
+.retailer:nth-child(2){border-color:#4674a0!important}
+.retailer:nth-child(3){border-color:#79589b!important}
+.retailer:nth-child(4){border-color:#3e7b5d!important}
+
+/* Ecosystem = colorful but consistent */
+.ecosystem-next{
+  background:
+    linear-gradient(90deg,#020914 0%,#082045 45%,#15133a 100%)!important;
+}
+.ecosystem-next a:nth-child(1){border-color:#2f6a99!important}
+.ecosystem-next a:nth-child(2){
+  background:linear-gradient(135deg,#0b84ff,#6f55e8)!important;
+  border-color:#42c7ff!important;
+  box-shadow:0 10px 30px rgba(33,151,255,.16)!important;
+}
+.ecosystem-next a:nth-child(3){border-color:#426f53!important}
+footer{
+  background:
+    radial-gradient(circle at 12% 0%,rgba(41,225,255,.08),transparent 20rem),
+    linear-gradient(90deg,#01060d,#06162c 55%,#101134)!important;
+}
