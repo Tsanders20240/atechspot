@@ -252,7 +252,7 @@ jobs:
           ! grep -q 'atechspot.pages.dev/api/intake' /tmp/intake.html
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/ecosystem/" -o /tmp/ecosystem.html
-          grep -q '22-PROPERTY ECOSYSTEM' /tmp/ecosystem.html
+          grep -q '22 PUBLIC PROPERTIES' /tmp/ecosystem.html
           grep -q 'ATechSpot RemoteCare' /tmp/ecosystem.html
           grep -q 'ATechSpot Tech Guru' /tmp/ecosystem.html
           grep -q 'WEDDING &amp; FAMILY LEGACY' /tmp/ecosystem.html
