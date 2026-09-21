@@ -8,47 +8,50 @@
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
 <link rel="canonical" href="https://abcoftech.atechspot.com/">
 <meta name="theme-color" content="#0b5dff">
-<link rel="stylesheet" href="/portal-2026.css?v=20260921-final10">
+<link rel="stylesheet" href="/portal-2026.css?v=20260921-video11">
 </head>
 <body>
 <div id="siteIntro" class="site-intro" role="dialog" aria-modal="true" aria-labelledby="introTitle">
   <div class="intro-sky"></div>
   <div class="intro-card">
-    <p class="intro-presented">A+ TECHUCATION PRESENTS</p>
+    <p class="intro-presented" data-i18n="intro.presented">A+ TECHUCATION PRESENTS</p>
     <h1 id="introTitle">ABC'S OF TECHNOLOGY</h1>
-    <p class="intro-tagline">A brighter tomorrow starts with A–Z.</p>
-    <div class="intro-bus" aria-hidden="true">
-      <div class="intro-light intro-light-left"></div>
-      <div class="intro-light intro-light-right"></div>
-      <div class="intro-bus-route">A–Z ADVENTURE</div>
-      <div class="intro-bus-windows"><span></span><span></span><span></span><span></span></div>
-      <div class="intro-bus-title">ABC TECH BUS</div>
-      <div class="intro-bus-badge">A+</div>
-      <div class="intro-bumper"></div>
-      <div class="intro-wheel intro-wheel-one"></div>
-      <div class="intro-wheel intro-wheel-two"></div>
+    <p class="intro-tagline" data-i18n="intro.tagline">A brighter tomorrow starts with A–Z.</p>
+    <div class="intro-video-shell">
+      <iframe
+        id="introVideo"
+        src="https://www.youtube-nocookie.com/embed/VqeOgsVCKpc?rel=0&modestbranding=1&playsinline=1"
+        title="ABC's of Technology website introduction"
+        loading="eager"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allowfullscreen></iframe>
     </div>
     <div class="intro-actions">
-      <button id="enterSite" class="intro-enter" type="button">Enter the Adventure →</button>
-      <button id="introSound" class="intro-secondary" type="button" aria-pressed="true">🔊 Sound On</button>
-      <button id="introLights" class="intro-secondary" type="button" aria-pressed="true">💡 Bus Lights On</button>
+      <button id="enterSite" class="intro-enter" type="button" data-i18n="intro.enter">Enter the Adventure →</button>
+      <button id="introSound" class="intro-secondary" type="button" aria-pressed="true" data-i18n="sound.on">🔊 Sound On</button>
+      <button id="introLights" class="intro-secondary" type="button" aria-pressed="true" data-i18n="intro.lightsOn">💡 Bus Lights On</button>
     </div>
-    <button id="skipIntro" class="intro-skip" type="button">Skip Intro</button>
+    <button id="skipIntro" class="intro-skip" type="button" data-i18n="intro.skip">Skip Intro</button>
   </div>
 </div>
 
 <button id="soundDock" class="sound-dock" type="button" aria-pressed="true" aria-label="Turn ABC Tech background sound off">🔊 Sound On</button>
 
 <nav id="siteControlBar" class="site-control-bar" aria-label="ABC of Technology main controls">
-  <a href="#home">🏠 <span>Home</span></a>
-  <a href="#book">📖 <span>Book</span></a>
-  <a href="#play">🎮 <span>Play</span></a>
-  <a href="#color">🎨 <span>Color</span></a>
-  <a href="#watch">▶️ <span>Watch</span></a>
+  <a href="#home">🏠 <span data-i18n="nav.home">Home</span></a>
+  <a href="#book">📖 <span data-i18n="nav.book">Book</span></a>
+  <a href="#play">🎮 <span data-i18n="nav.play">Play</span></a>
+  <a href="#color">🎨 <span data-i18n="nav.color">Color</span></a>
+  <a href="#watch">▶️ <span data-i18n="nav.watch">Watch</span></a>
   <a href="#stem">⚛️ <span>STEM</span></a>
-  <a href="#spelling">🐝 <span>Spelling Bee</span></a>
-  <a href="#about">ℹ️ <span>About</span></a>
-  <a class="control-buy" href="#shop">Get the Book →</a>
+  <a href="#spelling">🐝 <span data-i18n="nav.spelling">Spelling Bee</span></a>
+  <a href="#about">ℹ️ <span data-i18n="nav.about">About</span></a>
+  <div class="control-language" role="group" aria-label="Language">
+    <button id="siteLangEn" type="button" class="active" data-lang="en">EN</button>
+    <button id="siteLangEs" type="button" data-lang="es">ES</button>
+  </div>
+  <a class="control-buy" href="#shop" data-i18n="nav.getBook" data-i18n="nav.getBook">Get the Book →</a>
 </nav>
 
 <a class="skip" href="#main">Skip to content</a>
@@ -96,15 +99,15 @@
 <section id="world" class="world section">
   <div class="shell">
     <div class="section-head">
-      <p class="eyebrow">INTERACTIVE WORLD</p>
-      <h2>Choose your path.</h2>
+      <p class="eyebrow" data-i18n="world.eyebrow">INTERACTIVE WORLD</p>
+      <h2 data-i18n="world.title">Choose your path.</h2>
     </div>
     <div class="world-signs" role="tablist" aria-label="ABC Adventure World">
-      <button class="world-tab active" data-world="explore">Explore</button>
-      <button class="world-tab" data-world="learn">Learn</button>
-      <button class="world-tab" data-world="create">Create</button>
-      <button class="world-tab" data-world="imagine">Imagine</button>
-      <button class="world-tab" data-world="belong">Belong</button>
+      <button class="world-tab active" data-world="explore" data-i18n="world.explore">Explore</button>
+      <button class="world-tab" data-world="learn" data-i18n="world.learn">Learn</button>
+      <button class="world-tab" data-world="create" data-i18n="world.create">Create</button>
+      <button class="world-tab" data-world="imagine" data-i18n="world.imagine">Imagine</button>
+      <button class="world-tab" data-world="belong" data-i18n="world.belong">Belong</button>
     </div>
     <div id="worldPanel" class="world-panel" aria-live="polite"></div>
   </div>
@@ -113,8 +116,8 @@
 <section id="learn" class="section az-section">
   <div class="shell">
     <div class="section-head">
-      <p class="eyebrow">A–Z ADVENTURE</p>
-      <h2>Every letter opens a technology world.</h2>
+      <p class="eyebrow" data-i18n="learn.eyebrow">A–Z ADVENTURE</p>
+      <h2 data-i18n="learn.title">Every letter opens a technology world.</h2>
     </div>
     <div id="azGrid" class="az-grid"></div>
     <div class="word-console">
@@ -124,8 +127,8 @@
         <p id="techDef">An older telephone that carries voice using analog signals.</p>
       </div>
       <div class="console-actions">
-        <button id="speakWord" class="btn cyan" type="button">🔊 Hear</button>
-        <button id="randomWord" class="btn purple" type="button">🎲 Surprise</button>
+        <button id="speakWord" class="btn cyan" type="button" data-i18n="learn.hear">🔊 Hear</button>
+        <button id="randomWord" class="btn purple" type="button" data-i18n="learn.surprise">🎲 Surprise</button>
       </div>
     </div>
   </div>
@@ -134,9 +137,9 @@
 <section id="book" class="section feature-section book-section">
   <div class="shell feature-grid">
     <div class="book-copy">
-      <p class="eyebrow">THE BOOK</p>
-      <h2>Look inside the real book.</h2>
-      <p class="short">Three actual supplied pages, shown from the original source artwork for sharper reading.</p>
+      <p class="eyebrow" data-i18n="book.eyebrow">THE BOOK</p>
+      <h2 data-i18n="book.title">Look inside the real book.</h2>
+      <p class="short" data-i18n="book.body">Three actual supplied pages, shown from the original source artwork for sharper reading.</p>
       <div class="book-product-mockup" aria-label="ABC's of Technology book cover">
         <img src="/assets/book/book-cover.svg" alt="ABC's of Technology book cover">
       </div>
@@ -155,7 +158,7 @@
 
 <section id="play" class="section play-section">
   <div class="shell">
-    <div class="section-head"><p class="eyebrow">PLAY</p><h2>Learn through games.</h2></div>
+    <div class="section-head"><p class="eyebrow" data-i18n="play.eyebrow">PLAY</p><h2 data-i18n="play.title">Learn through games.</h2></div>
     <div class="game-grid">
       <article class="game-card blue-card"><span>🎯</span><h3>A–Z Quiz</h3><p>Choose the first letter.</p><div id="quizOptions" class="quiz-options"></div><div id="quizFeedback" class="feedback"></div></article>
       <article class="game-card purple-card"><span>🎲</span><h3>Surprise Word</h3><p>Jump to a random technology word.</p><button class="btn purple" id="surpriseGame" type="button">Surprise Me</button></article>
@@ -166,7 +169,7 @@
 
 <section id="stem" class="section stem-section">
   <div class="shell">
-    <div class="section-head"><p class="eyebrow">STEM ACTIVITY LAB</p><h2>Build. Experiment. Create.</h2><p class="short">Start with two full printable activities, then explore four quick challenges.</p></div>
+    <div class="section-head"><p class="eyebrow" data-i18n="stem.eyebrow">STEM ACTIVITY LAB</p><h2 data-i18n="stem.title">Build. Experiment. Create.</h2><p class="short" data-i18n="stem.body">Start with two full printable activities, then explore four quick challenges.</p></div>
     <div class="featured-activities">
       <a class="activity-poster battery-poster" href="/downloads/activities/battery-hunt.pdf" target="_blank" rel="noopener">
         <img src="/assets/activities/battery-hunt.webp" alt="Battery Hunt printable STEM activity preview">
@@ -189,14 +192,14 @@
 <section id="spelling" class="section spelling-section">
   <div class="shell two-col">
     <div>
-      <p class="eyebrow">SPELLING BEE</p><h2>Listen. Spell. Learn.</h2>
-      <p class="short">26 technology words. No account required.</p>
+      <p class="eyebrow" data-i18n="spell.eyebrow">SPELLING BEE</p><h2 data-i18n="spell.title">Listen. Spell. Learn.</h2>
+      <p class="short" data-i18n="spell.body">26 technology words. No account required.</p>
     </div>
     <div class="spell-card">
       <div class="spell-top"><span id="spellRound">1 / 26</span><strong id="spellScore">Score: 0</strong></div>
       <button id="spellSpeak" class="btn yellow" type="button">🔊 Hear Word</button>
-      <input id="spellInput" autocomplete="off" placeholder="Type the word">
-      <div class="spell-actions"><button id="checkSpell" class="btn cyan" type="button">Check</button><button id="nextSpell" class="btn glass" type="button">Next</button></div>
+      <input id="spellInput" autocomplete="off" placeholder="Type the word" data-i18n-placeholder="spell.placeholder">
+      <div class="spell-actions"><button id="checkSpell" class="btn cyan" type="button" data-i18n="spell.check">Check</button><button id="nextSpell" class="btn glass" type="button" data-i18n="spell.next">Next</button></div>
       <p id="spellFeedback" class="feedback"></p>
     </div>
   </div>
@@ -204,17 +207,17 @@
 
 <section id="color" class="section color-section">
   <div class="shell">
-    <div class="section-head"><p class="eyebrow">COLORING WORLD</p><h2>Color your way through A–Z technology.</h2><p class="short">Choose a page, print it, color it and learn the technology word with a grown-up.</p></div>
+    <div class="section-head"><p class="eyebrow" data-i18n="color.eyebrow">COLORING WORLD</p><h2 data-i18n="color.title">Color your way through A–Z technology.</h2><p class="short" data-i18n="color.body">Choose a page, print it, color it and learn the technology word with a grown-up.</p></div>
     <div class="color-world">
       <div class="color-world-copy">
         <span class="color-spark">🎨</span>
-        <h3>26 printable adventures</h3>
-        <p>Big A–Z letters, kid-friendly technology drawings and conversation prompts.</p>
-        <a class="btn orange" href="/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf" target="_blank" rel="noopener">Open the Full Coloring Book →</a>
+        <h3 data-i18n="color.adventures">26 printable adventures</h3>
+        <p data-i18n="color.description">Big A–Z letters, kid-friendly technology drawings and conversation prompts.</p>
+        <a class="btn orange" href="/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf" target="_blank" rel="noopener" data-i18n="color.openBook">Open the Full Coloring Book →</a>
       </div>
       <a class="coloring-showcase" href="/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf" target="_blank" rel="noopener">
         <img src="/assets/coloring/coloring-preview-sheet.webp" alt="Large preview of ABC's of Technology coloring pages">
-        <span>See the complete 26-page pack →</span>
+        <span data-i18n="color.seePack">See the complete 26-page pack →</span>
       </a>
     </div>
     <div class="color-letter-strip" aria-label="A through Z coloring pages">
@@ -227,23 +230,32 @@
 
 <section id="watch" class="section watch-section">
   <div class="shell">
-    <div class="section-head"><p class="eyebrow">WATCH & LISTEN</p><h2>Technology comes alive.</h2><p class="short">Play the ABC Tech theme, follow the words on screen, or listen to A–Z vocabulary.</p></div>
+    <div class="section-head"><p class="eyebrow" data-i18n="watch.eyebrow">WATCH & LISTEN</p><h2 data-i18n="watch.title">Technology comes alive.</h2><p class="short" data-i18n="watch.body">Play the ABC Tech theme, follow the words on screen, or listen to A–Z vocabulary.</p></div>
     <div class="lyric-stage" id="lyricStage">
-      <div class="lyric-art" aria-hidden="true"><span class="lyric-bus">🚌</span><span class="lyric-robot">🤖</span><span class="lyric-glow"></span></div>
+      <div class="lyric-video-frame">
+        <iframe
+          id="lyricVideo"
+          src="https://www.youtube-nocookie.com/embed/ognkzi0FCmU?rel=0&modestbranding=1&playsinline=1"
+          title="ABC's of Technology lyric video"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen></iframe>
+      </div>
       <div class="lyric-copy">
-        <p class="eyebrow">ABC TECH LYRIC VIDEO</p>
-        <h3 id="lyricLine">A brighter tomorrow starts with A–Z.</h3>
-        <p id="lyricSub">Press play to begin the animated lyric experience.</p>
+        <p class="eyebrow" data-i18n="watch.lyricEyebrow">ABC TECH LYRIC VIDEO</p>
+        <h3 data-i18n="watch.lyricTitle">Sing, watch and learn with ABC's of Technology.</h3>
+        <p data-i18n="watch.lyricBody">Play the official lyric video, then explore the A–Z words, coloring pages and activities.</p>
         <div class="lyric-actions">
-          <button id="playLyric" class="btn cyan" type="button">▶ Play Lyric Video</button>
-          <button id="lyricSound" class="btn glass" type="button">🔊 Sound On</button>
+          <a class="btn cyan" href="https://www.youtube.com/watch?v=ognkzi0FCmU" target="_blank" rel="noopener" data-i18n="watch.youtube">Open on YouTube ↗</a>
+          <button id="lyricSound" class="btn glass" type="button" data-i18n="sound.on">🔊 Sound On</button>
         </div>
       </div>
     </div>
     <div class="media-grid">
       <article><span>🔊</span><h3>Hear A–Z</h3><p>Spoken technology words.</p><a href="#learn">Start Listening →</a></article>
       <article><span>🎵</span><h3>ABC Tech Theme</h3><p>Original browser-played learning theme with sound control.</p><button id="playTheme" class="text-button" type="button">Play Theme →</button></article>
-      <article><span>🎬</span><h3>Lyric Video</h3><p>Animated words, technology world visuals and the ABC Tech theme.</p><button id="jumpLyric" class="text-button" type="button">Watch Here →</button></article>
+      <article><span>🎬</span><h3>Lyric Video</h3><p>Animated words, technology world visuals and the ABC Tech theme.</p><button id="jumpLyric" class="text-button" type="button" data-i18n="watch.watchHere">Watch Here →</button></article>
     </div>
   </div>
 </section>
@@ -251,14 +263,14 @@
 <section id="about" class="section about-section">
   <div class="shell about-grid">
     <div class="author-photo"><img src="/assets/authors/april-sanders-original-crop.webp" alt="April M. Sanders"></div>
-    <div><p class="eyebrow">THE CREATORS</p><h2>A brighter tomorrow.</h2><p class="short">Created to make technology vocabulary fun, approachable and memorable for young learners and families.</p></div>
+    <div><p class="eyebrow" data-i18n="about.eyebrow">THE CREATORS</p><h2 data-i18n="about.title">A brighter tomorrow.</h2><p class="short" data-i18n="about.body">Created to make technology vocabulary fun, approachable and memorable for young learners and families.</p></div>
   </div>
 </section>
 
 <section id="shop" class="section shop-section">
   <div class="shell">
     <div class="shop-intro">
-      <div class="section-head"><p class="eyebrow">FOR GROWN-UPS</p><h2>Bring the adventure home.</h2><p class="short">Choose a book format or continue to ABC Tech Products. Purchases open on the seller's site.</p></div>
+      <div class="section-head"><p class="eyebrow" data-i18n="shop.eyebrow">FOR GROWN-UPS</p><h2 data-i18n="shop.title">Bring the adventure home.</h2><p class="short" data-i18n="shop.body">Choose a book format or continue to ABC Tech Products. Purchases open on the seller's site.</p></div>
       <div class="shop-book"><img src="/assets/book/book-cover.svg" alt="ABC's of Technology actual book cover"><span>ABC's of Technology</span></div>
     </div>
     <div class="purchase-grid">
@@ -284,6 +296,6 @@
   <div class="shell footer-row"><div><strong>ABC's of Technology</strong><small>Learn · Play · Explore · Discover</small></div><div><a href="https://www.atechspot.com/privacy/">Privacy</a><a href="https://www.atechspot.com/terms/">Terms</a><a href="https://www.atechspot.com/accessibility/">Accessibility</a></div></div>
 </footer>
 
-<script src="/portal-2026.js?v=20260921-final10" defer></script>
+<script src="/portal-2026.js?v=20260921-video11" defer></script>
 </body>
 </html>
