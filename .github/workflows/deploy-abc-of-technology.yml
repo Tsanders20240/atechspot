@@ -35,7 +35,7 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || (echo 'Missing CLOUDFLARE_API_TOKEN' && exit 1)
           test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo 'Missing CLOUDFLARE_ACCOUNT_ID' && exit 1)
 
-      - name: Build official book assets and 26 printable PDFs
+      - name: Build portal, book and printable assets
         shell: bash
         run: |
           set -euo pipefail
@@ -43,56 +43,72 @@ jobs:
           python ABC-of-Technology-Website/scripts/decode_book_svg.py
           python ABC-of-Technology-Website/scripts/build_coloring.py
           python ABC-of-Technology-Website/scripts/build_coloring_preview.py
+          python ABC-of-Technology-Website/scripts/build_portal_hero.py
 
-      - name: Validate bilingual 10/10 learning source
+      - name: Validate standalone ABC portal 10/10 source
         shell: bash
         run: |
           set -euo pipefail
           ROOT='ABC-of-Technology-Website'
           HTML="$ROOT/public/index.html"
+
           test -f "$HTML"
           test -f "$ROOT/worker.js"
+          test -f "$ROOT/seo-worker.js"
           test -f "$ROOT/wrangler.jsonc"
+          test -f "$ROOT/public/portal-2026.css"
+          test -f "$ROOT/public/portal-2026.js"
+          test -f "$ROOT/public/assets/hero/abc-home-hero.webp"
           node --check "$ROOT/worker.js"
+          node --check "$ROOT/public/portal-2026.js"
+
+          # Portal and ecosystem identity.
+          grep -q 'Website 4 of 22' "$HTML"
+          grep -q 'Start the A–Z Adventure' "$HTML"
+          grep -q 'Choose your path.' "$HTML"
+          grep -q 'data-world="explore"' "$HTML"
+          grep -q 'data-world="learn"' "$HTML"
+          grep -q 'data-world="create"' "$HTML"
+          grep -q 'data-world="imagine"' "$HTML"
+          grep -q 'data-world="belong"' "$HTML"
+          grep -q 'portal-2026.css' "$HTML"
+          grep -q 'portal-2026.js' "$HTML"
+          grep -q 'https://creator.atechspot.com/' "$HTML"
+          grep -q 'https://abctechproducts.atechspot.com/' "$HTML"
+
+          # Standalone external purchase portal.
+          grep -q 'This portal uses external purchase links' "$HTML"
+          grep -q 'amazon.com' "$HTML"
+          grep -q 'audible.com' "$HTML"
+          grep -q 'store.bookbaby.com' "$HTML"
+          grep -q 'ABC Tech Products' "$HTML"
+
+          # Core learning experiences remain intact.
+          grep -q 'book-page-title.webp' "$HTML"
+          grep -q 'book-page-best-you.webp' "$HTML"
+          grep -q 'book-page-a.webp' "$HTML"
+          grep -q 'A–Z Quiz' "$HTML"
+          grep -q 'SPELLING BEE' "$HTML"
+          grep -q '26 printable pages' "$HTML"
+          grep -q 'English' "$HTML"
+          grep -q 'Español' "$HTML"
+          grep -q 'april-sanders-original-crop.webp' "$HTML"
 
           test -f "$ROOT/public/assets/book/book-cover.webp"
-          test -f "$ROOT/public/assets/book/book-bus-crop.webp"
           test -f "$ROOT/public/assets/book/book-page-title.webp"
           test -f "$ROOT/public/assets/book/book-page-best-you.webp"
           test -f "$ROOT/public/assets/book/book-page-a.webp"
           test -f "$ROOT/public/assets/authors/april-sanders-original-crop.webp"
-
-          grep -q 'ACTUAL BOOK PREVIEW' "$HTML"
-          grep -q 'book-page-title.webp' "$HTML"
-          grep -q 'book-page-best-you.webp' "$HTML"
-          grep -q 'book-page-a.webp' "$HTML"
-          grep -q 'book-bus-crop.webp' "$HTML"
-          grep -q 'TECHNOLOGY SPELLING BEE' "$HTML"
-          grep -q 'STEM LEARNING' "$HTML"
-          grep -q 'Español' "$HTML"
-          grep -q "April M. Sanders" "$HTML"
-          grep -q 'april-sanders-original-crop.webp' "$HTML"
-          grep -q 'No child sign-up' "$HTML"
-          grep -q 'does not collect card information or process a checkout' "$HTML"
-          grep -q 'Website 4 of the 22-property ATechSpot ecosystem' "$HTML"
-          grep -q 'THE A–Z ADVENTURE WORLD' "$HTML"
-          grep -q 'COMPLETE THE LEARNING EXPERIENCE' "$HTML"
-          grep -q 'https://creator.atechspot.com/' "$HTML"
-          grep -q 'https://abctechproducts.atechspot.com/' "$HTML"
-          grep -q 'Kids explore the adventure' "$HTML"
-          test -f "$ROOT/public/abc-adventure-2026.css"
-          test -f "$ROOT/public/abc-adventure-2026.js"
-          node --check "$ROOT/public/abc-adventure-2026.js"
-
           test -f "$ROOT/public/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf"
           test "$(find "$ROOT/public/downloads/coloring-pages" -maxdepth 1 -type f -name '[a-z]-*.pdf' | wc -l)" -eq 26
-          test -f "$ROOT/public/assets/coloring/coloring-preview-sheet.webp"
 
-          if grep -Eqi 'stripe|paypal|card number|checkout session' "$HTML" "$ROOT/worker.js"; then
-            echo 'On-site payment code detected' && exit 1
+          # This property intentionally uses external purchase links only.
+          if grep -Eqi 'stripe|paypal|card number|checkout session' "$HTML" "$ROOT/public/portal-2026.js" "$ROOT/worker.js"; then
+            echo 'On-site payment or card collection code detected' && exit 1
           fi
 
           grep -q 'abcoftech.atechspot.com' "$ROOT/wrangler.jsonc"
+
           python - <<'PY'
           from html.parser import HTMLParser
           from pathlib import Path
@@ -112,7 +128,7 @@ jobs:
           print(f"Internal anchor validation passed: {len(p.hashrefs)} hash links, {len(p.ids)} ids.")
           PY
 
-          echo 'ABC of Technology animated A-Z ecosystem, bilingual learning, activities and grown-up product funnel assertions passed.'
+          echo 'ABC standalone A-Z ecosystem portal source assertions passed.'
 
       - name: Deploy dedicated custom-domain Worker
         working-directory: ABC-of-Technology-Website
@@ -121,26 +137,29 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx --yes wrangler@latest deploy
 
-      - name: Diagnose canonical domain and key routes
+      - name: Verify canonical production routes
         shell: bash
-        continue-on-error: true
         run: |
+          set -euo pipefail
           sleep 7
-          for path in / /robots.txt /sitemap.xml /api/health /abc-adventure-2026.css /abc-adventure-2026.js /downloads/coloring-pages/a-analog-phone.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp /assets/book/book-page-a.webp /assets/authors/april-sanders-original-crop.webp; do
-            code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://abcoftech.atechspot.com${path}" || true)
+          for path in / /robots.txt /sitemap.xml /api/health /portal-2026.css /portal-2026.js /assets/hero/abc-home-hero.webp /downloads/coloring-pages/a-analog-phone.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp /assets/book/book-page-a.webp /assets/authors/april-sanders-original-crop.webp; do
+            code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://abcoftech.atechspot.com${path}")
             echo "$path -> $code"
+            test "$code" = "200"
           done
 
-      - name: Verify live ABC adventure experience
+      - name: Verify live standalone ABC portal
         shell: bash
         run: |
           set -euo pipefail
           curl -L -sS -A 'Mozilla/5.0' https://abcoftech.atechspot.com/ -o /tmp/abc-live.html
-          grep -q 'THE A–Z ADVENTURE WORLD' /tmp/abc-live.html
-          grep -q 'COMPLETE THE LEARNING EXPERIENCE' /tmp/abc-live.html
-          grep -q 'Website 4 of the 22-property ATechSpot ecosystem' /tmp/abc-live.html
+          grep -q 'Start the A–Z Adventure' /tmp/abc-live.html
+          grep -q 'Choose your path.' /tmp/abc-live.html
+          grep -q 'Website 4 of 22' /tmp/abc-live.html
+          grep -q 'ABC Tech Products' /tmp/abc-live.html
           grep -q 'https://creator.atechspot.com/' /tmp/abc-live.html
           grep -q 'https://abctechproducts.atechspot.com/' /tmp/abc-live.html
-          grep -q 'abc-adventure-2026.css' /tmp/abc-live.html
-          grep -q 'abc-adventure-2026.js' /tmp/abc-live.html
-          echo 'Live ABC of Technology adventure experience verified.'
+          grep -q 'portal-2026.css' /tmp/abc-live.html
+          grep -q 'portal-2026.js' /tmp/abc-live.html
+          grep -q 'This portal uses external purchase links' /tmp/abc-live.html
+          echo 'Live standalone ABC of Technology portal verified.'
