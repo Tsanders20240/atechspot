@@ -1,0 +1,51 @@
+/* ABC of Technology — Animated A–Z Adventure Universe */
+:root{--adv-blue:#1677ff;--adv-cyan:#24c7f5;--adv-purple:#7c3aed;--adv-pink:#ef3f82;--adv-yellow:#ffd84d;--adv-green:#20b95d;--adv-navy:#10205a}
+.eco-top{background:#10205a;color:#dce7ff;font-size:.73rem}.eco-top .wrap{min-height:34px;display:flex;align-items:center;justify-content:space-between;gap:16px}.eco-top a{color:#fff;font-weight:1000;text-decoration:none}
+.adventure-hero{position:relative}
+.adventure-hero:before,.adventure-hero:after{content:"";position:absolute;border-radius:50%;filter:blur(1px);pointer-events:none;opacity:.5}
+.adventure-hero:before{width:240px;height:240px;background:radial-gradient(circle,#bfeaff,transparent 65%);right:7%;top:4%}
+.adventure-hero:after{width:190px;height:190px;background:radial-gradient(circle,#f8c6ff,transparent 65%);left:3%;bottom:5%}
+.bus-card{isolation:isolate}
+.bus-card:before{content:"";position:absolute;inset:0;background:
+radial-gradient(circle at 12% 18%,#fff 0 3px,transparent 4px),
+radial-gradient(circle at 76% 10%,#fff 0 4px,transparent 5px),
+radial-gradient(circle at 88% 35%,#fff 0 3px,transparent 4px);opacity:.8}
+.bus{animation:abcFloat 3.8s ease-in-out infinite;transform-origin:center}
+.bus-card:after{content:"";position:absolute;width:70%;height:22px;bottom:64px;left:15%;border-radius:50%;background:#3a678a2c;filter:blur(10px);animation:abcShadow 3.8s ease-in-out infinite;z-index:-1}
+@keyframes abcFloat{0%,100%{transform:translateY(0) rotate(-.4deg)}50%{transform:translateY(-13px) rotate(.6deg)}}
+@keyframes abcShadow{0%,100%{transform:scaleX(1);opacity:.45}50%{transform:scaleX(.86);opacity:.25}}
+.adventure-world{background:linear-gradient(180deg,#f0fbff 0,#fff7ee 45%,#f9f4ff 100%);overflow:hidden;position:relative}
+.adventure-world:before{content:"";position:absolute;inset:0;background-image:radial-gradient(#1677ff18 1px,transparent 1px);background-size:22px 22px;mask-image:linear-gradient(to bottom,#000,transparent)}
+.adventure-shell{position:relative}
+.adventure-map{position:relative;display:grid;grid-template-columns:repeat(7,1fr);gap:13px;margin-top:32px}
+.adventure-map:before{content:"";position:absolute;left:4%;right:4%;top:50%;height:7px;border-radius:99px;background:linear-gradient(90deg,#ef3340,#ff8a18,#facc15,#22c55e,#21b8f3,#2563eb,#8b5cf6,#ef3f82);opacity:.23;z-index:0}
+.adventure-letter{position:relative;z-index:1;min-height:112px;border:2px solid #e1e8f5;background:#fff;border-radius:23px;padding:13px 8px;text-align:center;cursor:pointer;box-shadow:0 10px 26px rgba(39,79,130,.08);transition:.2s;animation:letterBob 5s ease-in-out infinite}
+.adventure-letter:nth-child(3n){animation-delay:-1s}.adventure-letter:nth-child(4n){animation-delay:-2.2s}.adventure-letter:nth-child(5n){animation-delay:-3.1s}
+.adventure-letter:hover,.adventure-letter:focus-visible{transform:translateY(-6px) scale(1.03);border-color:#8dc7ff;box-shadow:0 18px 34px rgba(34,100,170,.14)}
+.adventure-letter strong{display:grid;place-items:center;margin:0 auto 8px;width:48px;height:48px;border-radius:15px;color:#fff;font-size:1.55rem;background:linear-gradient(145deg,#1677ff,#7c3aed)}
+.adventure-letter:nth-child(6n+2) strong{background:linear-gradient(145deg,#ff7b1a,#ef3f82)}
+.adventure-letter:nth-child(6n+3) strong{background:linear-gradient(145deg,#16a34a,#20c997)}
+.adventure-letter:nth-child(6n+4) strong{background:linear-gradient(145deg,#f3b700,#ff7c1d)}
+.adventure-letter:nth-child(6n+5) strong{background:linear-gradient(145deg,#ef3f82,#8b5cf6)}
+.adventure-letter small{display:block;font-size:.68rem;font-weight:900;color:#5d6781;line-height:1.2}
+@keyframes letterBob{0%,100%{translate:0 0}50%{translate:0 -3px}}
+.adventure-progress{margin:28px auto 0;max-width:780px;background:#fff;border:1px solid #dce8f7;border-radius:20px;padding:18px;display:flex;align-items:center;gap:14px;box-shadow:0 12px 30px rgba(34,76,126,.08)}
+.adventure-progress .badge{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,#ffd84d,#ff8a18);font-size:1.8rem}
+.adventure-progress p{margin:3px 0;color:#626d86;font-size:.86rem}
+.family-experience{background:#101f58;color:#fff}
+.family-experience .section-head h2{color:#fff}.family-experience .section-head p{color:#ccd8f2}.family-experience .kicker{color:#8fdcff}
+.family-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+.family-card{background:#fff;color:#17213d;border-radius:24px;padding:22px;box-shadow:0 16px 36px rgba(0,0,0,.16);display:flex;flex-direction:column;min-height:300px}
+.family-card .num{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:#edf5ff;color:#165fcb;font-weight:1000}
+.family-card h3{color:#10205a;margin:14px 0 7px}.family-card p{color:#65708a;font-size:.86rem;flex:1}.family-card .btn{align-self:flex-start}
+.family-note{margin-top:18px;text-align:center;color:#b9c8e9;font-size:.77rem}
+.ecosystem-next{background:#071436;color:#fff;padding:28px 0}.ecosystem-next .wrap{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}
+.ecosystem-next a{text-decoration:none;color:#fff;border:1px solid #ffffff22;border-radius:16px;padding:14px 16px;background:#ffffff08}
+.ecosystem-next a:nth-child(2){text-align:center;background:#1677ff;border-color:#1677ff}.ecosystem-next a:last-child{text-align:right}
+.ecosystem-next small{display:block;color:#a9bbe6;font-size:.68rem}.ecosystem-next strong{display:block;margin-top:2px}
+.grownup-ribbon{display:flex;align-items:center;justify-content:center;gap:9px;margin:20px auto 0;max-width:760px;padding:12px 16px;border-radius:999px;background:#fff;border:1px solid #dce8f6;font-size:.78rem;font-weight:900;color:#485674}
+.nav-toggle-abc{display:none;border:1px solid #cfe0f6;background:#fff;border-radius:12px;padding:10px 12px;font-weight:1000;color:#10205a}
+@media(max-width:1050px){.adventure-map{grid-template-columns:repeat(5,1fr)}.family-grid{grid-template-columns:1fr 1fr}.nav-toggle-abc{display:block}.nav{position:absolute;display:none!important;left:16px;right:16px;top:78px;background:#fff;padding:16px;border:1px solid #dce9fb;border-radius:18px;box-shadow:0 18px 45px rgba(24,65,120,.15);flex-direction:column;align-items:stretch}.nav.open{display:flex!important}}
+@media(max-width:700px){.eco-top .wrap{display:block;text-align:center;padding:7px 0}.eco-top a{display:block;margin-top:2px}.adventure-map{grid-template-columns:repeat(3,1fr)}.family-grid{grid-template-columns:1fr}.ecosystem-next .wrap{grid-template-columns:1fr}.ecosystem-next a,.ecosystem-next a:last-child{text-align:center}.adventure-progress{align-items:flex-start}.grownup-ribbon{border-radius:18px}}
+@media(max-width:440px){.adventure-map{grid-template-columns:repeat(2,1fr)}}
+@media(prefers-reduced-motion:reduce){.bus,.bus-card:after,.adventure-letter{animation:none!important}}
