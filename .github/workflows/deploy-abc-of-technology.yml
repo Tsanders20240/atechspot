@@ -108,6 +108,9 @@ jobs:
           grep -q 'id="playLyric"' "$HTML"
           grep -q 'id="introLights"' "$HTML"
           grep -q 'ABC Tech Theme' "$HTML"
+          grep -q 'id="siteControlBar"' "$HTML"
+          grep -q 'COLORING WORLD' "$HTML"
+          grep -q 'Open the Full Coloring Book' "$HTML"
 
           test -f "$ROOT/public/assets/book/book-cover.webp"
           test -f "$ROOT/public/assets/book/book-page-title.webp"
@@ -187,4 +190,7 @@ jobs:
           grep -q 'id="lyricStage"' /tmp/abc-live.html
           grep -q 'id="playLyric"' /tmp/abc-live.html
           grep -q 'id="introLights"' /tmp/abc-live.html
-          echo 'Live ABC portal verified with intro, sound, lyric video, activities, book and coloring shell.'
+          grep -q 'id="siteControlBar"' /tmp/abc-live.html
+          grep -q 'COLORING WORLD' /tmp/abc-live.html
+          grep -q 'Open the Full Coloring Book' /tmp/abc-live.html
+          echo 'Live ABC portal verified with persistent navigation, intro, sound, lyric video, activities, book and Coloring World.'
