@@ -52,6 +52,10 @@ jobs:
           grep -q '/remote-support/' index.html
           grep -q '/assessment/' index.html
           grep -q 'Data Recovery / DriveSavers' index.html
+          grep -q 'RESULTS &amp; CASE STUDIES' index.html
+          grep -q 'buyer-confidence' index.html
+          grep -q 'Not Sure? Take the Free Assessment' index.html
+          ! grep -q 'Start a Business Project' index.html
           grep -q 'href="/data-recovery/"' index.html
           grep -q '/creator/' index.html
           grep -q 'https://atechucation.atechspot.com/' index.html
@@ -79,6 +83,8 @@ jobs:
           grep -q 'DS25379' data-recovery/index.html
           grep -q 'https://quote.drivesavers.com/' data-recovery/index.html
           grep -q 'Get DriveSavers Quote' data-recovery/index.html
+          grep -q 'DriveSavers Data Recovery' services/index.html
+          grep -q 'href="/data-recovery/"' services/index.html
           ! grep -q 'DS # ATECHSPOT.COM' data-recovery/index.html
 
           test -f dji/index.html
@@ -219,7 +225,15 @@ jobs:
           grep -q 'Turn business problems into' /tmp/home.html
           grep -q 'journey-grid' /tmp/home.html
           grep -q 'Data Recovery / DriveSavers' /tmp/home.html
+          grep -q 'RESULTS &amp; CASE STUDIES' /tmp/home.html
+          grep -q 'buyer-confidence' /tmp/home.html
+          grep -q 'Not Sure? Take the Free Assessment' /tmp/home.html
+          ! grep -q 'Start a Business Project' /tmp/home.html
           grep -q 'href="/data-recovery/"' /tmp/home.html
+
+          curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/services/" -o /tmp/services.html
+          grep -q 'DriveSavers Data Recovery' /tmp/services.html
+          grep -q 'href="/data-recovery/"' /tmp/services.html
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/data-recovery/" -o /tmp/data-recovery.html
           grep -q 'ATECH<span>SPOT</span>' /tmp/data-recovery.html
