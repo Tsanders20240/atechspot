@@ -1,5 +1,5 @@
 name: ATechSpot Client Portal E2E Closure
-# retest worker-rendered dashboard
+# final 10/10 worker-rendered portal closure
 
 on:
   push:
