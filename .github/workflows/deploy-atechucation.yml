@@ -34,7 +34,7 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || (echo "Missing CLOUDFLARE_API_TOKEN repository secret" && exit 1)
           test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "Missing CLOUDFLARE_ACCOUNT_ID repository secret" && exit 1)
 
-      - name: Validate membership payment source
+      - name: Validate A+ Techucation 10/10 source
         shell: bash
         run: |
           set -euo pipefail
@@ -48,7 +48,24 @@ jobs:
           grep -q 'https://buy.stripe.com/3cIdRa1j0bTo0yL5TI6EU03' A-Techucation-Website/payments-live.js
           grep -q 'Renews monthly until canceled' A-Techucation-Website/payments-live.js
           grep -q 'Cancel future renewals' A-Techucation-Website/billing/index.html
-          echo 'A+ Techucation payment source assertions passed.'
+          grep -q 'Website 2 of the 22-property ATechSpot ecosystem' A-Techucation-Website/app.js
+          grep -q 'Grant Writing & Funding' A-Techucation-Website/app.js
+          grep -q 'Business Plan Course' A-Techucation-Website/app.js
+          grep -q 'Ecommerce Course' A-Techucation-Website/app.js
+          grep -q 'Reseller Course' A-Techucation-Website/app.js
+          test -f A-Techucation-Website/courses/grant-writing/index.html
+          test -f A-Techucation-Website/courses/business-plan/index.html
+          test -f A-Techucation-Website/courses/ecommerce/index.html
+          test -f A-Techucation-Website/courses/reseller/index.html
+          grep -q 'Grant Writing & Funding Course' A-Techucation-Website/courses/grant-writing/index.html
+          grep -q 'Business Plan Course' A-Techucation-Website/courses/business-plan/index.html
+          grep -q 'Ecommerce Course' A-Techucation-Website/courses/ecommerce/index.html
+          grep -q 'Reseller Course' A-Techucation-Website/courses/reseller/index.html
+          grep -q 'https://atechucation.atechspot.com/courses/grant-writing/' A-Techucation-Website/sitemap.xml
+          grep -q 'https://atechucation.atechspot.com/courses/business-plan/' A-Techucation-Website/sitemap.xml
+          grep -q 'https://atechucation.atechspot.com/courses/ecommerce/' A-Techucation-Website/sitemap.xml
+          grep -q 'https://atechucation.atechspot.com/courses/reseller/' A-Techucation-Website/sitemap.xml
+          echo 'A+ Techucation 10/10 source assertions passed.'
 
       - name: Deploy to Cloudflare Worker
         working-directory: A-Techucation-Website
@@ -64,7 +81,7 @@ jobs:
           set -u
           sleep 5
           echo 'Cloudflare WAF may return 403 to GitHub-hosted runners even when the public site is healthy; these custom-domain requests are diagnostic only.'
-          for path in / /billing/ /terms/ /privacy/ /onboarding/; do
+          for path in / /business-funding/ /courses/grant-writing/ /courses/business-plan/ /courses/ecommerce/ /courses/reseller/ /billing/ /terms/ /privacy/ /accessibility/ /onboarding/ /robots.txt /sitemap.xml; do
             code=$(curl -sS -o /dev/null -w '%{http_code}' "https://atechucation.atechspot.com${path}" || true)
             echo "$path -> $code"
           done
