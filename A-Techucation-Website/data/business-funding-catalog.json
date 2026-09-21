@@ -47,7 +47,8 @@
       "title": "Business Planning Blueprint",
       "price_usd": 99,
       "status": "flagship",
-      "track": "business"
+      "track": "business",
+      "route": "/courses/business-plan/"
     },
     {
       "id": "CRS-NP-501C3-001",
@@ -68,8 +69,9 @@
       "id": "CRS-FUND-GRANT-WRITE-001",
       "slug": "grant-writing-with-ai",
       "title": "Grant Writing With AI",
-      "status": "planned",
-      "track": "funding"
+      "status": "flagship",
+      "track": "funding",
+      "route": "/courses/grant-writing/"
     },
     {
       "id": "CRS-FUND-CAPITAL-001",
@@ -126,6 +128,22 @@
       "title": "Scaling Your Business With AI",
       "status": "planned",
       "track": "business"
+    },
+    {
+      "id": "CRS-BUS-ECOM-001",
+      "slug": "ecommerce-business-foundations",
+      "title": "Ecommerce Business Foundations",
+      "status": "flagship",
+      "track": "business",
+      "route": "/courses/ecommerce/"
+    },
+    {
+      "id": "CRS-BUS-RESELL-001",
+      "slug": "reseller-business-blueprint",
+      "title": "Reseller Business Blueprint",
+      "status": "flagship",
+      "track": "business",
+      "route": "/courses/reseller/"
     }
   ]
 }
