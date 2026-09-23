@@ -91,8 +91,13 @@ jobs:
           ! grep -q 'DS # ATECHSPOT.COM' data-recovery/index.html
 
           test -f dji/index.html
-          grep -q 'Clear DJI picks for' dji/index.html
+          grep -q 'Pick the right DJI drone for the' dji/index.html
           grep -q '02 / FIVE CLEAR PICKS' dji/index.html
+          grep -q 'WEBSITE 6 OF 22' dji/index.html
+          grep -q '01 / DRONE MISSION FINDER' dji/index.html
+          grep -q '05 / U.S. FLIGHT READINESS' dji/index.html
+          grep -q 'Build my drone workflow' dji/index.html
+          grep -q 'UPDATED SEP 23, 2026' dji/index.html
           grep -q 'DJI Neo 2' dji/index.html
           grep -q 'DJI Flip' dji/index.html
           grep -q 'DJI Mini 5 Pro' dji/index.html
@@ -277,8 +282,13 @@ jobs:
           grep -q 'INDEPENDENT APPAREL BRAND' /tmp/ecosystem.html
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/dji/" -o /tmp/dji.html
-          grep -q 'Clear DJI picks for' /tmp/dji.html
+          grep -q 'Pick the right DJI drone for the' /tmp/dji.html
           grep -q '02 / FIVE CLEAR PICKS' /tmp/dji.html
+          grep -q 'WEBSITE 6 OF 22' /tmp/dji.html
+          grep -q '01 / DRONE MISSION FINDER' /tmp/dji.html
+          grep -q '05 / U.S. FLIGHT READINESS' /tmp/dji.html
+          grep -q 'Build my drone workflow' /tmp/dji.html
+          grep -q 'UPDATED SEP 23, 2026' /tmp/dji.html
           grep -q 'DJI Neo 2' /tmp/dji.html
           grep -q 'DJI Flip' /tmp/dji.html
           grep -q 'DJI Mini 5 Pro' /tmp/dji.html
