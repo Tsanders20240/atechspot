@@ -169,10 +169,9 @@
       "id": 21,
       "name": "ATechSpot RemoteCare",
       "url": "https://remotecare.atechspot.com/",
-      "fallback_url": "https://www.atechspot.com/remote-support/",
       "scope": "public",
-      "role": "Paid remote technical support",
-      "stage": "domain-pending"
+      "role": "Paid remote technology support",
+      "stage": "deployment-fix"
     },
     {
       "id": 22,

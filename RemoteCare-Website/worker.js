@@ -1,0 +1,5 @@
+const SECURITY={"x-content-type-options":"nosniff","x-frame-options":"DENY","referrer-policy":"strict-origin-when-cross-origin","permissions-policy":"camera=(), microphone=(), geolocation=(), payment=(), usb=()","strict-transport-security":"max-age=31536000"};
+function secured(response){const h=new Headers(response.headers);for(const[k,v]of Object.entries(SECURITY))h.set(k,v);return new Response(response.body,{status:response.status,statusText:response.statusText,headers:h})}
+export default{async fetch(request,env){const url=new URL(request.url);
+if(url.pathname==="/api/contact"){if(request.method!=="POST")return new Response(JSON.stringify({ok:false,message:"Method not allowed."}),{status:405,headers:{"content-type":"application/json",...SECURITY}});const upstream=new Request("https://www.atechspot.com/api/contact",{method:"POST",headers:{"content-type":request.headers.get("content-type")||"application/json","user-agent":request.headers.get("user-agent")||"ATechSpot RemoteCare"},body:request.body});const r=await fetch(upstream);return secured(r)}
+const response=await env.ASSETS.fetch(request);return secured(response)}};
