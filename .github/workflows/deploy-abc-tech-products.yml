@@ -16,7 +16,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,19 +34,12 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || (echo "Missing CLOUDFLARE_API_TOKEN" && exit 1)
           test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "Missing CLOUDFLARE_ACCOUNT_ID" && exit 1)
 
-      - name: Store approved campaign mockup asset
+      - name: Verify approved campaign mockup asset
         shell: bash
         run: |
           set -euo pipefail
           python -m pip install --disable-pip-version-check --quiet pillow
           python ABC-Tech-Products-Website/scripts/fetch_campaign_asset.py
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ABC-Tech-Products-Website/public/assets/campaign/a-plus-tech-generation-campaign.webp
-          if ! git diff --cached --quiet; then
-            git commit -m "Store approved ABC Tech Products campaign mockup [skip ci]"
-            git push origin HEAD:main || echo "Campaign asset commit could not be pushed; continuing current deployment."
-          fi
 
       - name: Validate ABC Tech Products next-gen source
         shell: bash
