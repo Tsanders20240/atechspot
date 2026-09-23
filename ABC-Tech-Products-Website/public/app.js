@@ -1,1 +1,32 @@
-(()=>{const menu=document.getElementById('menu');const nav=document.getElementById('nav');menu?.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));});nav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');menu?.setAttribute('aria-expanded','false');}));const profiles={Laptop:{focus:'Prioritize memory, processor fit, battery life, display quality and the ports your workflow needs.',skip:'Do not pay for gaming graphics or ultra-high refresh rates unless your work or games will use them.'},Phone:{focus:'Prioritize battery, camera behavior, storage, software support and ecosystem compatibility.',skip:'Do not chase maximum megapixels or benchmark scores if your daily use is messaging, photos and apps.'},'Smart Home':{focus:'Prioritize platform compatibility, privacy controls, local reliability and simple household use.',skip:'Avoid mixing too many ecosystems unless you know how they will connect.'},'Creator Gear':{focus:'Prioritize the weakest point in your production chain: capture, audio, lighting, editing or storage.',skip:'Do not upgrade every piece at once when one bottleneck is limiting quality.'},Gaming:{focus:'Prioritize the games you play, target resolution, frame rate and the display you already own.',skip:'Do not buy performance your monitor or favorite games cannot show.'},Accessories:{focus:'Prioritize compatibility, power requirements, connector standards, ergonomics and warranty.',skip:'Avoid paying extra for branding when the standard, fit and reliability are equivalent.'}};document.getElementById('finderForm')?.addEventListener('submit',e=>{e.preventDefault();const category=document.getElementById('category').value;const priority=document.getElementById('priority').value;const budget=document.getElementById('budget').value;const result=document.getElementById('finderResult');if(!category||!priority||!budget||!result)return;const p=profiles[category];result.innerHTML=`<strong>Your ${category} buying profile</strong><p><b>Lead priority:</b> ${priority}. <b>Budget approach:</b> ${budget}.</p><p>${p.focus}</p><p><b>What to skip:</b> ${p.skip}</p><a href="#compare">Use the 4-check comparison →</a>`;result.classList.add('show');result.scrollIntoView({behavior:'smooth',block:'nearest'});});document.getElementById('copyRule')?.addEventListener('click',async e=>{const text='If two products solve your problem equally well, buy the simpler one.';try{await navigator.clipboard.writeText(text);e.currentTarget.textContent='Copied ✓';setTimeout(()=>e.currentTarget.textContent='Copy shopping rule',1800);}catch{e.currentTarget.textContent='Select and copy the rule above';}});})();
+(()=>{'use strict';
+const menu=document.getElementById('menu'),nav=document.getElementById('nav');
+menu?.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));});
+nav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.classList.remove('open');menu?.setAttribute('aria-expanded','false');}));
+
+const profiles={
+  Kids:{
+    collection:'ABC Tech Kids',
+    copy:'Start with bright, playful learning designs connected to robots, STEM, the technology alphabet and the ABC of Technology world.'
+  },
+  Teens:{
+    collection:'Future Mode',
+    copy:'Start with the Gen Z teen streetwear lane: gaming, AI, coding, creator culture and bold digital-identity graphics.'
+  },
+  Adults:{
+    collection:'A+ Tech Core',
+    copy:'Start with cleaner A+ Techucation lifestyle pieces for creators, entrepreneurs, educators and everyday technology culture.'
+  }
+};
+document.getElementById('finderForm')?.addEventListener('submit',e=>{
+  e.preventDefault();
+  const audience=document.getElementById('audience')?.value;
+  const style=document.getElementById('style')?.value;
+  const interest=document.getElementById('interest')?.value;
+  const result=document.getElementById('finderResult');
+  if(!audience||!style||!interest||!result)return;
+  const p=profiles[audience];
+  result.innerHTML=`<strong>${p.collection}</strong><p><b>Your style:</b> ${style}. <b>Your tech world:</b> ${interest}.</p><p>${p.copy}</p><a href="#drops">Explore the collection architecture →</a>`;
+  result.classList.add('show');
+  result.scrollIntoView({behavior:'smooth',block:'nearest'});
+});
+})();
