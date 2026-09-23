@@ -15,6 +15,8 @@
 
   const query=new URLSearchParams(location.search);
   const selectedTopic=query.get('topic');
+  const supportPath=form.querySelector('input[name="Ecosystem Path"][value="Technical Support and Troubleshooting"]');
+  if(selectedTopic==='Remote Technical Support'&&supportPath)supportPath.checked=true;
   if(selectedTopic){
     const goal=form.querySelector('select[name="Topic"]');
     const option=[...goal.options].find(item=>item.value.toLowerCase()===selectedTopic.toLowerCase());
@@ -36,6 +38,14 @@
     if(heroKicker)heroKicker.textContent='ATechSpot Qualified B2B Intake';
     if(heroTitle)heroTitle.innerHTML='Tell us the business goal. <em>We’ll evaluate the fit.</em>';
     if(heroCopy)heroCopy.textContent='Designed for established businesses and funded projects considering a $997 strategy review, $2,500+ implementation or ongoing GrowthCare engagement.';
+  }else if(query.get('client')==='b2c'){
+    const segment=document.createElement('input');
+    segment.type='hidden';
+    segment.name='Lead Segment';
+    segment.value='Individual or New Founder';
+    form.appendChild(segment);
+    const heroCopy=document.querySelector('.intake-hero p');
+    if(heroCopy)heroCopy.textContent='Tell us about your tech issue or new business idea. We will review it and recommend a practical next step before any paid work begins.';
   }
 
   // Always use the production same-origin API. Never hand the lead off to a mail client.
@@ -61,6 +71,7 @@
 
   function recommendation(){
     const goal=value('Topic'),budget=value('Budget Range');
+    if(goal==='Remote Technical Support'||value('Ecosystem Path')==='Technical Support and Troubleshooting')return['Technical Support Review','We’ll review the issue, confirm whether remote help is appropriate and explain the scope and fee before work begins.'];
     if(budget.includes('low-cost')||goal.includes('Learn AI'))return['AI Readiness & Learning Plan','A guided skills assessment will identify the right coaching, class or self-paced learning path.'];
     if(goal.includes('Executive')||budget.includes('$5,000')||budget.includes('$15,000'))return['Executive Growth Review','A deeper strategy review will prioritize the revenue, technology and operating systems to address first.'];
     if(/Website|App|Automation|Software|Launch/.test(goal))return['Project Discovery Assessment','We’ll clarify requirements, recommend a build path and prepare the right scope before development begins.'];
