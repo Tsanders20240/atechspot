@@ -2,11 +2,11 @@
   "$schema": "../node_modules/wrangler/config-schema.json",
   "name": "abc-of-technology",
   "main": "seo-worker.js",
-  "compatibility_date": "2026-09-11",
+  "compatibility_date": "2026-09-22",
   "routes": [
     {
-      "pattern": "abcoftech.atechspot.com/*",
-      "zone_name": "atechspot.com"
+      "pattern": "abcoftech.atechspot.com",
+      "custom_domain": true
     }
   ],
   "assets": {
