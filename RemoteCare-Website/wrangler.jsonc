@@ -1,0 +1,17 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "atechspot-remotecare",
+  "compatibility_date": "2026-09-22",
+  "main": "worker.js",
+  "routes": [
+    {
+      "pattern": "remotecare.atechspot.com",
+      "custom_domain": true
+    }
+  ],
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page"
+  }
+}
