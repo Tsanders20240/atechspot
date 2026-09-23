@@ -1,0 +1,92 @@
+/* A+ Techucation Academy — premium visual system 2026 */
+:root{
+  --academy-ink:#06111f;
+  --academy-navy:#071b33;
+  --academy-navy-2:#0b2b4d;
+  --academy-blue:#1688f4;
+  --academy-cyan:#66e5ef;
+  --academy-red:#ff3d4f;
+  --academy-gold:#f5c76b;
+  --academy-surface:#f7fafc;
+  --academy-line:#d9e6ef;
+  --academy-text:#12263b;
+  --academy-muted:#63778a;
+  --academy-radius:24px;
+}
+body{background:linear-gradient(180deg,#fbfdff 0,#f4f8fb 100%);color:var(--academy-text)}
+.topbar{background:#020913;border-bottom:1px solid rgba(102,229,239,.16)}
+.topbar .wrap{min-height:38px}
+.topbar span{letter-spacing:.04em}
+.site-header{background:rgba(5,18,33,.94);border-bottom:1px solid rgba(102,229,239,.16);box-shadow:0 10px 34px rgba(0,0,0,.16)}
+.navin{min-height:84px}
+.brand{position:relative;padding-right:98px}
+.brand:after{content:"ACADEMY";position:absolute;right:0;top:50%;transform:translateY(-50%);font-size:10px;font-weight:950;letter-spacing:.18em;color:var(--academy-cyan);border:1px solid rgba(102,229,239,.38);border-radius:999px;padding:6px 9px;background:rgba(102,229,239,.08)}
+.brand img{height:56px}
+.links{color:#d9e8f4}
+.links>a:not(.btn):hover{color:var(--academy-cyan)}
+.menuBtn{border-color:#274866;background:#0a2037;color:white}
+.btn{border-radius:999px;padding-inline:21px;letter-spacing:.01em}
+.btn.primary{background:linear-gradient(135deg,var(--academy-red),#cf1734);box-shadow:0 12px 32px rgba(255,61,79,.22)}
+.btn.blue{background:linear-gradient(135deg,#0d73d7,#1ea7ef)}
+.hero{min-height:760px;display:flex;align-items:center;padding:98px 0 88px;background:
+ radial-gradient(circle at 86% 18%,rgba(102,229,239,.20),transparent 26%),
+ radial-gradient(circle at 8% 76%,rgba(255,61,79,.16),transparent 25%),
+ linear-gradient(132deg,#020914 0,#071a32 45%,#0b3155 100%)}
+.hero-grid-pattern{opacity:.09;background-size:54px 54px}
+.heroGrid{grid-template-columns:1.08fr .92fr;gap:66px}
+.heroLogo{max-width:430px;margin-bottom:18px}
+.academyHeroBadge{display:inline-flex;align-items:center;gap:9px;margin:4px 0 18px;padding:8px 12px;border-radius:999px;background:rgba(102,229,239,.08);border:1px solid rgba(102,229,239,.28);font-size:11px;font-weight:900;letter-spacing:.14em;color:#bdf7fb;text-transform:uppercase}
+.academyHeroBadge:before{content:"A+";display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--academy-cyan),#42a6ff);color:#04111b;font-weight:950;letter-spacing:0}
+.hero h1{font-size:clamp(54px,7vw,92px);max-width:780px}
+.hero h1 span{color:var(--academy-cyan)}
+.hero .lead{font-size:19px;max-width:700px}
+.hero .trust{gap:10px;margin-top:28px}
+.hero .trust span{padding:9px 12px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.04)}
+.hero .trust span::before{display:none}
+.heroDashboard{position:relative;overflow:hidden;border-radius:28px;border:1px solid rgba(255,255,255,.88);box-shadow:0 44px 110px rgba(0,0,0,.35)}
+.heroDashboard:before{content:"ACADEMY EXPERIENCE";position:absolute;right:-42px;top:27px;transform:rotate(35deg);padding:6px 50px;background:var(--academy-red);color:#fff;font-size:9px;font-weight:950;letter-spacing:.12em}
+.academyPathRail{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:24px}
+.academyPathRail a{padding:13px 14px;border:1px solid rgba(255,255,255,.17);border-radius:15px;background:rgba(255,255,255,.05);color:#dcebf5;font-size:12px;font-weight:850}
+.academyPathRail a b{display:block;color:var(--academy-cyan);font-size:10px;letter-spacing:.12em;margin-bottom:3px}
+.proofStrip{background:#03101e;border-bottom:1px solid #173650}
+.proofGrid div{border-color:#19364d!important;background:linear-gradient(180deg,#06192a,#051421)}
+.proofGrid b{color:#fff}
+.proofGrid span{color:#9db3c4}
+section{padding:88px 0}
+.sectionHead h2{font-size:clamp(38px,4.7vw,60px)}
+.schoolGrid{gap:18px}
+.schoolCard{border-radius:24px;min-height:285px;box-shadow:0 18px 50px rgba(9,40,67,.07);transition:.22s ease}
+.schoolCard:hover{transform:translateY(-5px);box-shadow:0 26px 64px rgba(9,40,67,.12)}
+.schoolCard:before{width:5px;background:linear-gradient(var(--academy-cyan),var(--academy-blue),var(--academy-red))}
+.schoolNum{font-size:42px;color:#eef4f8}
+.softSection{background:linear-gradient(180deg,#eff7fc 0,#f8fbfd 100%)}
+.lessonSection{background:#fff}
+.darkSection{background:
+ radial-gradient(circle at 85% 15%,rgba(102,229,239,.12),transparent 26%),
+ linear-gradient(145deg,#020914,#071d36 58%,#0a2d50)}
+.assistantCard{border-radius:22px}
+.placementGrid{gap:52px}
+.placementForm,.placementResult,.memberMock,.contactShell{border-radius:26px}
+.priceCard{border-radius:24px;overflow:hidden}
+.priceCard.featured{transform:translateY(-10px);border:2px solid var(--academy-blue);box-shadow:0 30px 80px rgba(22,136,244,.18)}
+.priceCard.featured:before{content:"ACADEMY RECOMMENDED";display:block;margin:-24px -24px 20px;padding:10px 24px;background:linear-gradient(90deg,#0b69c1,#198cf2);color:#fff;font-size:10px;font-weight:950;letter-spacing:.13em}
+.helpChoice{background:linear-gradient(145deg,#04111f,#081f39);color:#fff}
+.helpCard{border-radius:22px}
+.proofSection{background:#fff}
+.contactExperience{background:linear-gradient(180deg,#eef6fb,#fff)}
+.ecosystemSection{background:linear-gradient(145deg,#04111f,#0a2b4b)}
+.footer{background:#020913}
+.academySignature{display:flex;align-items:center;gap:10px;margin-top:16px;color:#93adbf;font-size:12px}
+.academySignature b{color:var(--academy-cyan)}
+@media(max-width:1020px){
+ .site-header .brand{padding-right:0}.site-header .brand:after{display:none}
+ .hero{min-height:auto}
+ .academyPathRail{grid-template-columns:1fr}
+ .priceCard.featured{transform:none}
+}
+@media(max-width:700px){
+ .hero{padding-top:68px}.hero h1{font-size:50px}
+ .heroLogo{max-width:320px}
+ .academyHeroBadge{font-size:9px}
+ .proofGrid div{padding:20px}
+}
