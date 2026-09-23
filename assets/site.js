@@ -161,7 +161,7 @@
   }
 
   function enforcePrimaryCtas(){
-    document.querySelectorAll('.site-header .desktop-cta').forEach(a=>{a.href='/intake/?client=b2b#project-intake';a.textContent='Start My Project'});
+    document.querySelectorAll('.site-header .desktop-cta').forEach(a=>{if(a.hasAttribute('data-cta-preserve'))return;a.href='/intake/?client=b2b#project-intake';a.textContent='Start My Project'});
     if(normalizedPath(location.pathname)!=='/')return;
     const heroPrimary=document.querySelector('.hero-actions .btn-primary');
     if(heroPrimary){heroPrimary.href='/intake/?client=b2b#project-intake';heroPrimary.textContent='Start My Project →'}
