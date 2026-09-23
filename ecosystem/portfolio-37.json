@@ -58,8 +58,9 @@
       "name": "A+ Automotive Technology",
       "url": "https://auto.atechspot.com/",
       "scope": "public",
-      "role": "Automotive technology education",
-      "stage": "audit"
+      "role": "Automotive technology education covering ADAS, EV charging, diagnostics, connected-car privacy and smarter vehicle buying",
+      "stage": "verified-live",
+      "updated": "2026-09-23"
     },
     {
       "id": 8,
