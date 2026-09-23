@@ -1,0 +1,106 @@
+name: Deploy ATechSpot RemoteCare
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'RemoteCare-Website/**'
+      - '.github/workflows/deploy-remotecare.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: remotecare-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Verify Cloudflare credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+
+      - name: Validate RemoteCare 10/10 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT='RemoteCare-Website'
+          for f in index.html styles.css worker.js wrangler.jsonc _headers robots.txt sitemap.xml; do test -f "$ROOT/$f"; done
+          grep -q 'ATechSpot RemoteCare' "$ROOT/index.html"
+          grep -q 'Get technology help' "$ROOT/index.html"
+          grep -q 'Price confirmed before paid work' "$ROOT/index.html"
+          grep -q 'Consent required for remote access' "$ROOT/index.html"
+          grep -q 'Do not include:' "$ROOT/index.html"
+          grep -q 'data' "$ROOT/index.html" || true
+          grep -q '/api/contact' "$ROOT/index.html"
+          grep -q 'www.atechspot.com/api/contact' "$ROOT/worker.js"
+          grep -q '"custom_domain": true' "$ROOT/wrangler.jsonc"
+          grep -q 'remotecare.atechspot.com' "$ROOT/wrangler.jsonc"
+          grep -q 'Content-Security-Policy' "$ROOT/_headers"
+          grep -q 'X-Frame-Options: DENY' "$ROOT/_headers"
+          grep -q 'https://remotecare.atechspot.com/' "$ROOT/sitemap.xml"
+          echo 'RemoteCare 10/10 source assertions passed.'
+
+      - name: Remove stale Pages custom-domain attachment
+        shell: bash
+        continue-on-error: true
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -u
+          domain='remotecare.atechspot.com'
+          endpoint="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/atechspot/domains"
+          current=$(curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$endpoint" || true)
+          if echo "$current" | jq -e --arg domain "$domain" '.result[]? | select(.name == $domain)' >/dev/null; then
+            echo 'Removing stale RemoteCare Pages attachment before Worker Custom Domain deployment.'
+            curl -sS -X DELETE -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$endpoint/$domain" | tee /tmp/remotecare-pages-delete.json
+          else
+            echo 'No stale RemoteCare Pages attachment found.'
+          fi
+          sleep 4
+
+      - name: Deploy dedicated RemoteCare Worker
+        working-directory: RemoteCare-Website
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@latest deploy
+
+      - name: Verify RemoteCare production hostname
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
+            code=$(curl -sS -L -o /tmp/remotecare.html -w '%{http_code}' "https://remotecare.atechspot.com/?deploy=$GITHUB_SHA&attempt=$attempt" || true)
+            echo "RemoteCare homepage -> $code (attempt $attempt/12)"
+            if [ "$code" = "200" ] && grep -q 'Get technology help' /tmp/remotecare.html && grep -q 'SECURE SUPPORT REQUEST' /tmp/remotecare.html; then
+              robots=$(curl -sS -o /tmp/remotecare-robots.txt -w '%{http_code}' https://remotecare.atechspot.com/robots.txt || true)
+              sitemap=$(curl -sS -o /tmp/remotecare-sitemap.xml -w '%{http_code}' https://remotecare.atechspot.com/sitemap.xml || true)
+              css=$(curl -sS -o /dev/null -w '%{http_code}' https://remotecare.atechspot.com/styles.css || true)
+              echo "robots=$robots sitemap=$sitemap css=$css"
+              test "$robots" = "200"
+              test "$sitemap" = "200"
+              test "$css" = "200"
+              grep -q 'remotecare.atechspot.com/sitemap.xml' /tmp/remotecare-robots.txt
+              echo 'RemoteCare production hostname verified.'
+              exit 0
+            fi
+            sleep 8
+          done
+          echo 'RemoteCare hostname did not become ready.'
+          exit 1
