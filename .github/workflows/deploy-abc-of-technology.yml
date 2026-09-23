@@ -150,6 +150,26 @@ jobs:
           test -f "$ROOT/public/assets/book/book-page-a.webp"
           test -f "$ROOT/public/assets/authors/april-sanders-original-crop.webp"
           test -f "$ROOT/public/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf"
+          test -f "$ROOT/public/downloads/coloring-pages/A-J_Tech_Coloring_Pages.zip"
+          test -f "$ROOT/public/downloads/coloring-pages/K-T_Tech_Coloring_Pages.zip"
+          test -f "$ROOT/public/downloads/coloring-pages/U-Z_Tech_Coloring_Pages.zip"
+          test -f "$ROOT/public/downloads/coloring-pages/ABC_Tech_Coloring_Pages_A-Z_26_Page_Combined.zip"
+          test -f "$ROOT/public/downloads/activities/keyboard-key-hunt.pdf"
+          test -f "$ROOT/public/downloads/activities/laptop-parts-match.pdf"
+          test -f "$ROOT/public/downloads/activities/mouse-click-maze.pdf"
+          test -f "$ROOT/public/downloads/activities/wifi-signal-path.pdf"
+          test -f "$ROOT/public/assets/activities/keyboard-key-hunt.webp"
+          test -f "$ROOT/public/assets/activities/laptop-parts-match.webp"
+          test -f "$ROOT/public/assets/activities/mouse-click-maze.webp"
+          test -f "$ROOT/public/assets/activities/wifi-signal-path.webp"
+          grep -q "Android" "$ROOT/public/portal-2026.js"
+          grep -q "Bitcoin" "$ROOT/public/portal-2026.js"
+          grep -q "Cache" "$ROOT/public/portal-2026.js"
+          grep -q "XTC" "$ROOT/public/portal-2026.js"
+          grep -q "A-J_Tech_Coloring_Pages.zip" "$HTML"
+          grep -q "ABC_Tech_Coloring_Pages_A-Z_26_Page_Combined.zip" "$HTML"
+          grep -q "Jason L. Hughes" "$HTML"
+          grep -q "April M. Sanders" "$HTML"
           test "$(find "$ROOT/public/downloads/coloring-pages" -maxdepth 1 -type f -name '[a-z]-*.pdf' | wc -l)" -eq 26
 
           # This property intentionally uses external purchase links only.
@@ -290,6 +310,16 @@ jobs:
           grep -q 'id="introLights"' /tmp/abc-live.html
           grep -q 'id="siteControlBar"' /tmp/abc-live.html
           grep -q 'COLORING WORLD' /tmp/abc-live.html
+          grep -q 'A-J_Tech_Coloring_Pages.zip' /tmp/abc-live.html
+          grep -q 'K-T_Tech_Coloring_Pages.zip' /tmp/abc-live.html
+          grep -q 'U-Z_Tech_Coloring_Pages.zip' /tmp/abc-live.html
+          grep -q 'ABC_Tech_Coloring_Pages_A-Z_26_Page_Combined.zip' /tmp/abc-live.html
+          grep -q 'Keyboard Key Hunt' /tmp/abc-live.html
+          grep -q 'Laptop Parts Match' /tmp/abc-live.html
+          grep -q 'Mouse Click Maze' /tmp/abc-live.html
+          grep -q 'Wi-Fi Signal Path' /tmp/abc-live.html
+          grep -q 'Jason L. Hughes' /tmp/abc-live.html
+          grep -q 'April M. Sanders' /tmp/abc-live.html
           grep -q 'View All 26 Coloring Pages' /tmp/abc-live.html
           grep -q 'book-page-title.svg' /tmp/abc-live.html
           grep -q 'book-page-best-you.svg' /tmp/abc-live.html
