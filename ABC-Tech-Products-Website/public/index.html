@@ -19,7 +19,7 @@
 <header class="topbar">
   <a class="logo" href="/" aria-label="ABC Tech Products home"><span class="logo-mark">A+</span><strong>ABC TECH <b>PRODUCTS</b><small>WEAR · LEARN · CREATE · BELONG</small></strong></a>
   <nav id="nav" aria-label="Primary navigation">
-    <a href="#drops">Collections</a><a href="#kids">Kids</a><a href="#teens">Teens</a><a href="#adults">Adults</a><a href="#lookbook">Lookbook</a><a href="#try-on">Try It On</a><a href="#book">Book</a><a href="#ecosystem">Ecosystem</a>
+    <a href="#drops">Collections</a><a href="#kids">Kids</a><a href="#teens">Teens</a><a href="#adults">Adults</a><a href="#lookbook">Lookbook</a><a href="#book">Book</a><a href="#ecosystem">Ecosystem</a>
   </nav>
   <a class="pill desktop" href="#drops">Explore Drops →</a>
   <button id="menu" class="menu" aria-label="Open menu" aria-expanded="false">☰</button>
@@ -33,7 +33,7 @@
     <p class="eyebrow">A+ TECHUCATION × ABC TECH PRODUCTS</p>
     <h1>Wear. Create.<br>Learn. <em>Belong.</em></h1>
     <p>Original technology-inspired fashion for the generation building what comes next—kids, teens, creators, educators and adults.</p>
-    <div class="hero-actions"><a class="btn neon" href="#drops">Explore the Collection →</a><a class="btn glass" href="#try-on">Try It On</a></div>
+    <div class="hero-actions"><a class="btn neon" href="#drops">Explore the Collection →</a><a class="btn glass" href="#lookbook">View Lookbook</a></div>
     <div class="hero-chips"><span>ORIGINAL A+ DESIGNS</span><span>ABC OF TECHNOLOGY</span><span>GEN Z STREETWEAR</span><span>FAMILY / CREATOR DROPS</span></div>
   </div>
 </section>
@@ -70,7 +70,7 @@
 
 <section id="kids" class="collection-band kids-band"><div class="shell split"><div><p class="eyebrow dark">01 · ABC TECH KIDS</p><h2>Learn it.<br><em>Wear it.</em></h2><p>Robots, technology vocabulary, STEM energy and colorful messages that connect directly to the ABC of Technology learning world.</p><div class="tags"><span>ROBOTS</span><span>STEM</span><span>A–Z TECH</span><span>FAMILY FRIENDLY</span></div><a class="btn dark" href="#book">See the book connection →</a></div><div class="mini-board"><strong>SMALL LEARNERS<br>BIG FUTURES</strong><span>ABC TECH KIDS</span></div></div></section>
 
-<section id="teens" class="collection-band teens-band"><div class="shell split reverse"><div class="mini-board dark-board"><strong>CREATE<br>CODE<br>CONNECT</strong><span>FUTURE MODE</span></div><div><p class="eyebrow dark">02 · FUTURE MODE</p><h2>Built for <em>Gen Z energy.</em></h2><p>Streetwear direction influenced by gaming, AI, coding, internet culture and the confidence to build something original.</p><div class="tags"><span>STREETWEAR</span><span>AI</span><span>GAMING</span><span>CREATOR CULTURE</span></div><a class="btn dark" href="#try-on">Try the style finder →</a></div></div></section>
+<section id="teens" class="collection-band teens-band"><div class="shell split reverse"><div class="mini-board dark-board"><strong>CREATE<br>CODE<br>CONNECT</strong><span>FUTURE MODE</span></div><div><p class="eyebrow dark">02 · FUTURE MODE</p><h2>Built for <em>Gen Z energy.</em></h2><p>Streetwear direction influenced by gaming, AI, coding, internet culture and the confidence to build something original.</p><div class="tags"><span>STREETWEAR</span><span>AI</span><span>GAMING</span><span>CREATOR CULTURE</span></div><a class="btn dark" href="#lookbook">View teen lookbook →</a></div></div></section>
 
 <section id="adults" class="collection-band adults-band"><div class="shell split"><div><p class="eyebrow dark">03 · A+ TECH CORE</p><h2>Clean techwear.<br><em>Everyday confidence.</em></h2><p>More refined A+ Techucation pieces for creators, educators, entrepreneurs and adults who want the brand in a cleaner, wearable format.</p><div class="tags"><span>MINIMAL</span><span>CREATOR</span><span>EDUCATOR</span><span>EVERYDAY</span></div></div><div class="mini-board light-board"><strong>IDEAS<br>TECHNOLOGY<br>PEOPLE<br>POSSIBILITIES</strong><span>A+ TECH CORE</span></div></div></section>
 
@@ -83,57 +83,19 @@
   </div>
 </section>
 
-<section id="try-on" class="tryon section">
-  <div class="shell tryon-grid">
-    <div><p class="eyebrow">A+ FIT PREVIEW STUDIO</p><h2>Put the look<br><em>on your photo now.</em></h2><p>This version works immediately in the browser. Upload a photo, choose a collection and garment style, then drag and resize the A+ garment overlay until it sits correctly on the person. Nothing is uploaded by this page.</p><div class="tryon-steps"><span><b>1</b> Upload photo</span><span><b>2</b> Choose collection</span><span><b>3</b> Fit the garment</span><span><b>4</b> Save preview</span></div><p class="fine light-fine">For best results, use a front-facing photo that includes shoulders and upper torso. A true AI cloth-warping provider can replace this local fitting mode later when you launch commerce.</p></div>
-    <div class="tryon-card">
-      <div id="tryonPreview" class="tryon-preview tryon-stage">
-        <img id="tryonPhoto" alt="" hidden>
-        <svg id="garmentOverlay" class="garment-overlay" viewBox="0 0 420 520" role="img" aria-label="A+ Tech garment overlay" hidden>
-          <path id="garmentShape" d="M120 70 L170 35 Q210 60 250 35 L300 70 L380 125 L335 205 L300 180 L300 470 L120 470 L120 180 L85 205 L40 125 Z" fill="#0b1220" stroke="#ffffff" stroke-width="5"/>
-          <text id="garmentMain" x="210" y="220" text-anchor="middle" fill="#ffffff" font-size="42" font-weight="900">A+ TECH</text>
-          <text id="garmentSub" x="210" y="270" text-anchor="middle" fill="#46e5ff" font-size="23" font-weight="900">CREATE • CODE • CONNECT</text>
-          <circle cx="210" cy="335" r="48" fill="none" stroke="#ff4fc3" stroke-width="8"/>
-          <path d="M185 335h50M210 310v50" stroke="#f4ff3b" stroke-width="8" stroke-linecap="round"/>
-        </svg>
-        <div id="tryonEmpty" class="tryon-empty"><strong>UPLOAD A PHOTO</strong><span>Front-facing upper-body photos work best</span></div>
-      </div>
-
-      <div class="tryon-form-grid">
-        <label>Choose photo<input id="tryonUpload" type="file" accept="image/*"></label>
-        <label>Collection<select id="tryonCollection"><option>ABC Tech Kids</option><option>Future Mode</option><option>A+ Tech Core</option><option>Creator Edition</option></select></label>
-        <label>Garment<select id="tryonGarment"><option value="tee">T-Shirt</option><option value="hoodie">Hoodie</option></select></label>
-      </div>
-
-      <div class="fit-controls">
-        <label>Size <input id="tryonScale" type="range" min="28" max="90" value="46"></label>
-        <label>Left / Right <input id="tryonX" type="range" min="-35" max="35" value="0"></label>
-        <label>Up / Down <input id="tryonY" type="range" min="-35" max="45" value="4"></label>
-      </div>
-
-      <div class="tryon-actions">
-        <button id="tryonLaunch" class="btn dark" type="button">Apply A+ Look →</button>
-        <button id="tryonReset" class="btn line" type="button">Reset Fit</button>
-        <button id="tryonSave" class="btn line" type="button">Save Preview</button>
-      </div>
-      <p id="tryonStatus" class="status" role="status" aria-live="polite"></p>
-    </div>
-  </div>
-</section>
-
 <section class="customize section shell">
   <div class="section-head"><div><p class="eyebrow dark">PERSONALIZATION ROADMAP</p><h2>Your name.<br><em>Your number. Your message.</em></h2></div><p>Once commerce is live, selected products can support personalization such as names, creator handles, jersey-style numbers or approved custom text. The production workflow is prepared for launch but stays off until you authorize it.</p></div>
   <div class="custom-grid"><article><b>01</b><h3>Pick a base design</h3><p>Start with an approved A+ Tech or ABC Tech graphic.</p></article><article><b>02</b><h3>Add personal detail</h3><p>Name, creator handle, number or short approved phrase.</p></article><article><b>03</b><h3>Preview</h3><p>See the personalized layout before purchase.</p></article><article><b>04</b><h3>Produce on demand</h3><p>Activate fulfillment only when the store launches.</p></article></div>
 </section>
 
 <section id="launch" class="launch-band">
-  <div class="shell launch-grid"><div><p class="eyebrow">LAUNCH WHEN READY</p><h2>Brand first.<br><em>Commerce second.</em></h2><p>The public experience is complete in preview mode now. When you are ready to sell, connect the commerce store, publish approved products, test checkout, activate virtual try-on, then switch the site from Preview Mode to Live Store Mode.</p></div><div class="launch-checklist"><span>✓ Brand + landing experience</span><span>✓ Model campaign + product concepts</span><span>✓ Kids / teens / adults / creators</span><span>✓ Book/IP connection</span><span>✓ Style finder + photo preview</span><span>○ Commerce authorization</span><span>○ Product sync + test order</span><span>○ AI try-on provider activation</span></div></div>
+  <div class="shell launch-grid"><div><p class="eyebrow">LAUNCH WHEN READY</p><h2>Brand first.<br><em>Commerce second.</em></h2><p>The public experience is complete in preview mode now. When you are ready to sell, connect the commerce store, publish approved products, test checkout, activate virtual try-on, then switch the site from Preview Mode to Live Store Mode.</p></div><div class="launch-checklist"><span>✓ Brand + landing experience</span><span>✓ Model campaign + product concepts</span><span>✓ Kids / teens / adults / creators</span><span>✓ Book/IP connection</span><span>✓ Style finder + photo preview</span><span>○ Commerce authorization</span><span>○ Product sync + test order</span><span>↗ Virtual try-on deferred to Phase 2</span></div></div>
 </section>
 
 <section id="ecosystem" class="ecosystem section"><div class="shell"><div class="section-head"><div><p class="eyebrow dark">A+ TECHUCATION ECOSYSTEM</p><h2>More than clothes.<br><em>A connected world.</em></h2></div><p>ABC Tech Products turns the larger A+ Techucation mission into a lifestyle brand while keeping clear pathways back to learning, creator systems and technology support.</p></div><div class="eco-grid"><a href="https://www.atechspot.com/"><small>#1</small><strong>ATechSpot</strong><span>Technology hub</span></a><a href="https://atechucation.atechspot.com/"><small>#2</small><strong>A+ Techucation</strong><span>Learning & AI</span></a><a href="https://creator.atechspot.com/"><small>#3</small><strong>Creator</strong><span>Creator business systems</span></a><a href="https://www.abcoftech.atechspot.com/"><small>#4</small><strong>ABC of Technology</strong><span>Kids A–Z learning</span></a><a class="current" href="/"><small>#5</small><strong>ABC Tech Products</strong><span>Fashion & lifestyle</span></a></div></div></section>
 </main>
 
-<footer><div class="footer-grid"><div><a class="logo" href="/"><span class="logo-mark">A+</span><strong>ABC TECH <b>PRODUCTS</b></strong></a><p>Technology-inspired fashion and lifestyle products from the A+ Techucation ecosystem.</p><small>Operated by A+ Techucation L.L.C. · Website 5 of 22</small></div><div><h3>Collections</h3><a href="#kids">Kids</a><a href="#teens">Teens</a><a href="#adults">Adults</a><a href="#creators">Creators</a></div><div><h3>Experience</h3><a href="#lookbook">Lookbook</a><a href="#try-on">Try It On</a><a href="#book">Book Collection</a><a href="#launch">Launch Status</a></div><div><h3>Support</h3><a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="/affiliate-disclosure/">Affiliate Disclosure</a><a href="https://support.atechspot.com/">Customer Support</a></div></div><div class="footer-bottom"><span>© 2026 A+ Techucation L.L.C. / ABC Tech Products</span><span>Wear · Learn · Create · Belong</span></div></footer>
+<footer><div class="footer-grid"><div><a class="logo" href="/"><span class="logo-mark">A+</span><strong>ABC TECH <b>PRODUCTS</b></strong></a><p>Technology-inspired fashion and lifestyle products from the A+ Techucation ecosystem.</p><small>Operated by A+ Techucation L.L.C. · Website 5 of 22</small></div><div><h3>Collections</h3><a href="#kids">Kids</a><a href="#teens">Teens</a><a href="#adults">Adults</a><a href="#creators">Creators</a></div><div><h3>Experience</h3><a href="#lookbook">Lookbook</a><a href="#book">Book Collection</a><a href="#launch">Launch Status</a></div><div><h3>Support</h3><a href="/about/">About</a><a href="/privacy/">Privacy</a><a href="/affiliate-disclosure/">Affiliate Disclosure</a><a href="https://support.atechspot.com/">Customer Support</a></div></div><div class="footer-bottom"><span>© 2026 A+ Techucation L.L.C. / ABC Tech Products</span><span>Wear · Learn · Create · Belong</span></div></footer>
 <div id="productModal" class="modal" hidden><div class="modal-card"><button id="modalClose" class="modal-close" aria-label="Close">×</button><p class="eyebrow dark">PREVIEW DROP</p><h2 id="modalTitle">Product</h2><p>This is a brand concept preview. Exact garment, price, colors and sizes will appear only after the product is published to the live store.</p><button id="modalLaunch" class="btn dark" type="button">Launch Status →</button></div></div>
 <script src="/app.js?v=20260923-final10" defer></script>
 </body></html>
