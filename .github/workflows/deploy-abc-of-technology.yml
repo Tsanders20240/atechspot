@@ -16,7 +16,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,22 +26,12 @@ jobs:
         with:
           node-version: 24
 
-      - name: Ingest approved ABC production artwork
+      - name: Verify approved ABC production artwork
         shell: bash
         run: |
           set -euo pipefail
           python -m pip install --disable-pip-version-check --quiet pillow
           python ABC-of-Technology-Website/scripts/fetch_official_assets.py
-
-          # Persist the user-approved binary sources so later deployments do not
-          # depend on the short-lived transfer URLs used for this one-time import.
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ABC-of-Technology-Website/official-coloring-src ABC-of-Technology-Website/official-homepage-src.png
-          if ! git diff --cached --quiet; then
-            git commit -m "Store approved ABC production artwork [skip ci]"
-            git push origin HEAD:main || echo "Asset source commit could not be pushed; continuing current deployment with downloaded assets."
-          fi
 
 
       - name: Verify Cloudflare credentials
