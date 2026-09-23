@@ -216,26 +216,10 @@ jobs:
           echo "DEPLOY_URL=$deploy_url" >> "$GITHUB_ENV"
           echo "Deployment URL: $deploy_url"
 
-      - name: Connect RemoteCare subdomain to the live support flow
+      - name: RemoteCare deployment ownership
         shell: bash
-        continue-on-error: true
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          set -euo pipefail
-          domains_url="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/atechspot/domains"
-          curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$domains_url" -o /tmp/pages-domains.json
-          if jq -e '.result[] | select(.name == "remotecare.atechspot.com")' /tmp/pages-domains.json >/dev/null; then
-            echo "RemoteCare domain is already attached to ATechSpot Pages."
-          else
-            echo "Attaching RemoteCare domain to ATechSpot Pages."
-            curl -sS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" -X POST "$domains_url" --data '{"name":"remotecare.atechspot.com"}' -o /tmp/remotecare-domain.json
-            jq -r 'if .success then "RemoteCare domain attached; certificate/DNS activation may still be pending." else (.errors[]?.message // "Domain attachment failed.") end' /tmp/remotecare-domain.json
-            test "$(jq -r '.success' /tmp/remotecare-domain.json)" = "true"
-          fi
-          curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$domains_url" -o /tmp/pages-domains-after.json
-          jq -r '.result[] | select(.name == "remotecare.atechspot.com") | "RemoteCare Pages status: \(.status); validation: \(.validation_data.status // "unknown"); verification: \(.verification_data.status // "unknown")"' /tmp/pages-domains-after.json
+          echo 'RemoteCare uses its dedicated Worker deployment and custom domain.'
 
       - name: Verify deployed preview
         shell: bash
