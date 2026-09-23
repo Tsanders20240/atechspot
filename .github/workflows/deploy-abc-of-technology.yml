@@ -148,7 +148,8 @@ jobs:
           test -f "$ROOT/public/assets/book/book-page-title.webp"
           test -f "$ROOT/public/assets/book/book-page-best-you.webp"
           test -f "$ROOT/public/assets/book/book-page-a.webp"
-          test -f "$ROOT/public/assets/authors/april-sanders-original-crop.webp"
+          test -s "$ROOT/public/assets/authors/jason-hughes-abc-author.webp"
+          test -s "$ROOT/public/assets/authors/april-sanders-abc-author.webp"
           test -f "$ROOT/public/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf"
           test -f "$ROOT/public/downloads/coloring-pages/A-J_Tech_Coloring_Pages.zip"
           test -f "$ROOT/public/downloads/coloring-pages/K-T_Tech_Coloring_Pages.zip"
@@ -334,4 +335,9 @@ jobs:
           if grep -q 'live-tool-dock' /tmp/abc-live.html; then echo 'Duplicate bottom menu is live' && exit 1; fi
           grep -q '/assets/coloring-pages/a-android.webp' /tmp/abc-live.html
           grep -q '/assets/coloring-pages/i-internet.webp' /tmp/abc-live.html
+          for asset in /assets/authors/jason-hughes-abc-author.webp /assets/authors/april-sanders-abc-author.webp; do
+            code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://www.abcoftech.atechspot.com${asset}")
+            echo "${asset} -> ${code}"
+            test "${code}" = "200"
+          done
           echo 'Live ABC portal verified with single top navigation, actual supplied book pages, separate F/G/H activity PDFs, lyric video and 26-page coloring gallery.'
