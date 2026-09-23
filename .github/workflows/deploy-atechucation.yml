@@ -44,6 +44,10 @@ jobs:
           test -f A-Techucation-Website/payments-live.js
           test -f A-Techucation-Website/_headers
           grep -q 'A+ Techucation Academy' A-Techucation-Website/index.html
+          grep -q 'A+ Techucation Academy' A-Techucation-Website/courses/grant-writing/index.html
+          grep -q 'A+ Techucation Academy' A-Techucation-Website/courses/business-plan/index.html
+          grep -q 'A+ Techucation Academy' A-Techucation-Website/courses/ecommerce/index.html
+          grep -q 'A+ Techucation Academy' A-Techucation-Website/courses/reseller/index.html
           grep -q 'Technology Education for the AI Era' A-Techucation-Website/index.html
           grep -q 'AI study guides' A-Techucation-Website/index.html
           ! grep -q '24/7 AI study support' A-Techucation-Website/app.js
