@@ -745,3 +745,31 @@ body.intro-open{overflow:hidden}
   .actual-book-viewer .book-frame{min-height:460px}
   .actual-book-viewer .book-frame img{max-height:430px}
 }
+
+
+/* Sharp actual-book viewer: never upscale the supplied raster pages beyond native size. */
+.actual-book-viewer .book-frame{
+  min-height:620px;
+  padding:28px;
+  background:#fff;
+}
+.actual-book-viewer .book-frame img{
+  display:none;
+  width:auto;
+  height:auto;
+  max-width:min(100%,520px);
+  max-height:528px;
+  object-fit:contain;
+  margin:auto;
+  image-rendering:auto;
+}
+.actual-book-viewer .book-frame img.active{display:block}
+.book-product-mockup img{
+  width:auto;
+  max-width:min(100%,300px);
+  height:auto;
+}
+@media(max-width:700px){
+  .actual-book-viewer .book-frame{min-height:420px;padding:16px}
+  .actual-book-viewer .book-frame img{max-width:100%;max-height:390px}
+}
