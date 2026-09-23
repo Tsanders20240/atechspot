@@ -133,6 +133,7 @@ jobs:
           grep -q '26 printable coloring adventures' "$HTML"
           grep -q 'jason-hughes-abc-author.webp' "$HTML"
           grep -q 'april-sanders-abc-author.webp' "$HTML"
+          test "$(grep -o 'data:image/webp;base64,' "$HTML" | wc -l)" -ge 2
           grep -q 'id="siteIntro"' "$HTML"
           grep -q 'A+ TECHUCATION PRESENTS' "$HTML"
           grep -q 'id="soundDock"' "$HTML"
@@ -332,6 +333,7 @@ jobs:
           grep -q 'Wi-Fi Signal Path' /tmp/abc-live.html
           grep -q 'Jason L. Hughes' /tmp/abc-live.html
           grep -q 'April M. Sanders' /tmp/abc-live.html
+          test "$(grep -o 'data:image/webp;base64,' /tmp/abc-live.html | wc -l)" -ge 2
           grep -q 'All 26 PDF' /tmp/abc-live.html
           grep -q 'book-page-title.webp' /tmp/abc-live.html
           grep -q 'book-page-best-you.webp' /tmp/abc-live.html
