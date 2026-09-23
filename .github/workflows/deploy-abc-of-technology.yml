@@ -60,6 +60,12 @@ jobs:
           test -f "$ROOT/seo-worker.js"
           test -f "$ROOT/wrangler.jsonc"
           test -f "$ROOT/public/portal-2026.css"
+          test -f "$ROOT/public/abc-10of10-2026.css"
+          grep -q 'START YOUR ADVENTURE' "$HTML"
+          grep -q 'GROWN-UP GUIDE' "$HTML"
+          grep -q 'No child account required' "$HTML"
+          grep -q 'abc-10of10-2026.css' "$HTML"
+          grep -q 'Pick what you want to do first.' "$HTML"
           test -f "$ROOT/public/portal-2026.js"
           test -f "$ROOT/public/assets/hero/abc-home-hero.webp"
           test -f "$ROOT/public/assets/activities/battery-hunt.webp"
@@ -204,6 +210,9 @@ jobs:
           grep -q 'https://creator.atechspot.com/' /tmp/abc-live.html
           grep -q 'https://abctechproducts.atechspot.com/' /tmp/abc-live.html
           grep -q 'portal-2026.css' /tmp/abc-live.html
+          grep -q 'abc-10of10-2026.css' /tmp/abc-live.html
+          grep -q 'START YOUR ADVENTURE' /tmp/abc-live.html
+          grep -q 'GROWN-UP GUIDE' /tmp/abc-live.html
           grep -q 'portal-2026.js' /tmp/abc-live.html
           grep -q 'Purchases open on the seller' /tmp/abc-live.html
           grep -q 'battery-hunt.pdf' /tmp/abc-live.html
