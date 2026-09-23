@@ -14,6 +14,16 @@
   let sending=false;
 
   const query=new URLSearchParams(location.search);
+  const selectedTopic=query.get('topic');
+  if(selectedTopic){
+    const goal=form.querySelector('select[name="Topic"]');
+    const option=[...goal.options].find(item=>item.value.toLowerCase()===selectedTopic.toLowerCase());
+    if(option)goal.value=option.value;
+    if(option?.value.startsWith('Launch a new business')){
+      const start=form.querySelector('input[name="Ecosystem Path"][value="Business and Professional Services"]');
+      if(start)start.checked=true;
+    }
+  }
   if(query.get('client')==='b2b'){
     const segment=document.createElement('input');
     segment.type='hidden';

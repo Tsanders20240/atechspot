@@ -1,0 +1,33 @@
+/* Customer-first homepage, retaining the established A+ TechSpot brand assets. */
+.customer-hero{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.06fr) minmax(330px,.94fr);gap:clamp(28px,5vw,78px);align-items:center;padding:90px 0 86px}
+.customer-hero-copy h1{max-width:850px;font:800 clamp(3.4rem,6.2vw,6.8rem)/.98 "Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;letter-spacing:-.06em;margin:23px 0 24px}
+.customer-hero-copy h1 em{font-style:normal;color:#67d6ee}
+.customer-hero-copy .hero-lead{max-width:750px;color:#c3d2df;font-size:clamp(1.05rem,1.5vw,1.25rem);line-height:1.65}
+.customer-hero-copy .hero-actions{margin-top:29px}
+.hero-assurance{max-width:650px;margin:18px 0 0;color:#a4bed0;font-size:.92rem}
+.customer-paths{display:grid;gap:13px}
+.customer-path{display:block;padding:25px 28px;border:1px solid #285875;border-radius:22px;background:linear-gradient(120deg,#102b43,#081827 72%);box-shadow:0 20px 50px #0003;transition:transform .2s,border-color .2s}
+.customer-path:hover,.customer-path:focus-visible{transform:translateY(-3px);border-color:#6ed8f5}
+.customer-path span{font-size:.78rem;color:#71dcf1;font-weight:800;letter-spacing:.11em}
+.customer-path h2{font-size:clamp(1.45rem,2vw,1.9rem);margin:8px 0 4px}
+.customer-path p{font-size:1rem;color:#adc0d1;margin:0 0 11px;line-height:1.5}
+.customer-path b{font-size:.94rem;color:#7ae7df}
+.flagship-hero{min-height:0}
+.help-route h3,.journey-step h3{font-size:1.4rem}
+.help-route p,.journey-step p,.case-study-card dd,.price-card p,.buyer-confidence span{font-size:.95rem;line-height:1.55}
+.help-route small,.price-card small,.case-study-card small,.buyer-confidence small{font-size:.78rem}
+.help-route b,.price-card a,.case-study-card a,.router-assist span{font-size:.92rem}
+.journey-grid:before{top:42%}
+.journey-step{min-height:225px}
+.journey-step h3{margin-top:25px}
+.pricing-section,.case-study-section,.ecosystem-preview,.serious-inquiry-section{padding-block:80px}
+.pricing-section .price-card p{min-height:92px}
+.pricing-grid{grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.pricing-grid .price-card strong{font-size:clamp(1.3rem,1.8vw,1.8rem)}
+.case-study-card h3{margin:17px 0}
+.proof-note strong,.proof-note span{font-size:.92rem}
+.footer-grid a{font-size:.92rem!important}
+.footer-grid p{font-size:.94rem}
+@media(max-width:1020px){.customer-hero{grid-template-columns:1fr;padding:75px 0}.customer-paths{grid-template-columns:repeat(3,minmax(0,1fr))}.customer-path{padding:20px}.customer-path h2{font-size:1.35rem}}
+@media(max-width:720px){.customer-hero{padding:56px 0 66px}.customer-hero-copy h1{font-size:clamp(3rem,12vw,4.5rem)}.customer-paths{grid-template-columns:1fr}.customer-path h2{font-size:1.55rem}.customer-path p{font-size:1rem}.customer-hero-copy .hero-actions{flex-direction:column}.customer-hero-copy .hero-actions .btn{width:100%}}
+@media(prefers-reduced-motion:reduce){.customer-path{transition:none}}
