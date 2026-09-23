@@ -54,7 +54,7 @@ jobs:
           ! grep -q '/assets/atechspot-logo.png' index.html
           test -f assets/atechspot-logo.png
           test -f customer-path.css
-          grep -q '/remote-support/' index.html
+          grep -q 'https://remotecare.atechspot.com/' index.html
           grep -q '/assessment/' index.html
           grep -q 'EXAMPLES OF OUR WORK' index.html
           grep -q 'buyer-confidence' index.html
@@ -141,7 +141,7 @@ jobs:
           grep -q 'Best DJI Drone for Construction Progress' dji/construction/index.html
           grep -q 'DJI Mavic 4 Pro' dji/construction/index.html
           grep -q 'DJI Mini 5 Pro' dji/construction/index.html
-          grep -q 'Not survey-grade by default.' dji/construction/index.html
+          grep -q 'Not survey-grade by default' dji/construction/index.html
           grep -q 'Plan my construction workflow' dji/construction/index.html
           grep -q 'https://www.atechspot.com/dji/construction/' sitemap.xml
 
@@ -325,7 +325,7 @@ jobs:
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/dji/construction/" -o /tmp/dji-construction.html
           grep -q 'Best DJI Drone for Construction Progress' /tmp/dji-construction.html
-          grep -q 'Not survey-grade by default.' /tmp/dji-construction.html
+          grep -q 'Not survey-grade by default' /tmp/dji-construction.html
           grep -q 'Plan my construction workflow' /tmp/dji-construction.html
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/dji/buying-guide/" -o /tmp/dji-buying-guide.html
