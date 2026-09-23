@@ -320,7 +320,7 @@ jobs:
           grep -q 'Wi-Fi Signal Path' /tmp/abc-live.html
           grep -q 'Jason L. Hughes' /tmp/abc-live.html
           grep -q 'April M. Sanders' /tmp/abc-live.html
-          grep -q 'View All 26 Coloring Pages' /tmp/abc-live.html
+          grep -q 'All 26 PDF' /tmp/abc-live.html
           grep -q 'book-page-title.svg' /tmp/abc-live.html
           grep -q 'book-page-best-you.svg' /tmp/abc-live.html
           grep -q 'book-page-a.svg' /tmp/abc-live.html
@@ -332,6 +332,6 @@ jobs:
           grep -q 'g-game-controller-activity.pdf' /tmp/abc-live.html
           grep -q 'h-headphones-activity.pdf' /tmp/abc-live.html
           if grep -q 'live-tool-dock' /tmp/abc-live.html; then echo 'Duplicate bottom menu is live' && exit 1; fi
-          grep -q '/assets/coloring-pages/a-analog-phone.webp' /tmp/abc-live.html
+          grep -q '/assets/coloring-pages/a-android.webp' /tmp/abc-live.html
           grep -q '/assets/coloring-pages/i-internet.webp' /tmp/abc-live.html
           echo 'Live ABC portal verified with single top navigation, actual supplied book pages, separate F/G/H activity PDFs, lyric video and 26-page coloring gallery.'
