@@ -62,7 +62,7 @@ jobs:
           grep -q 'href="/services/"' index.html
           grep -q 'href="/ecosystem/"' index.html
           grep -q 'https://atechucation.atechspot.com/' index.html
-          grep -q 'https://abctechproducts.atechspot.com/' index.html
+          grep -q 'href="/dji/"' index.html
           grep -q 'https://atechnetwork.atechspot.com/' index.html
           test -f flagship.css
           test -f flagship-fix.css
