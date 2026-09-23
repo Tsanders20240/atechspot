@@ -49,4 +49,11 @@ jobs:
             fi
           done
 
-          echo 'DJI outbound-link safety QA passed.'
+          if grep -RIn --include='*.html' 'DJI_Flip_in_de_winkel.jpg/1600px' dji; then
+            echo 'ERROR: retired DJI Flip image URL found.'
+            exit 1
+          fi
+          grep -q 'Special:Redirect/file/DJI%20Flip%20-%202.jpg?width=1280' dji/index.html
+          grep -q 'File:DJI_Flip_-_2.jpg' dji/index.html
+
+          echo 'DJI outbound-link and image QA passed.'
