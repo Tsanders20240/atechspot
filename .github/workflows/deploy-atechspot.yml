@@ -257,7 +257,7 @@ jobs:
           grep -q 'buyer-confidence' /tmp/home.html
           grep -q 'Approve and pay' /tmp/home.html
           ! grep -q 'Start a Business Project' /tmp/home.html
-          grep -q 'href="/remote-support/"' /tmp/home.html
+          grep -q 'https://remotecare.atechspot.com/' /tmp/home.html
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/services/" -o /tmp/services.html
           grep -q 'DriveSavers Data Recovery' /tmp/services.html
