@@ -81,50 +81,40 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx --yes wrangler@latest deploy
 
-      - name: Verify Cloudflare authoritative DNS state
+      - name: Verify RemoteCare public DNS propagation
         shell: bash
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
-          zone_json=$(curl -fsS -G "https://api.cloudflare.com/client/v4/zones" \
-            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            --data-urlencode "name=atechspot.com" \
-            --data-urlencode "account.id=$CLOUDFLARE_ACCOUNT_ID")
-          zone_id=$(echo "$zone_json" | jq -r '.result[0].id // empty')
-          test -n "$zone_id"
-          echo "Cloudflare zone found for atechspot.com."
-
-          found=0
-          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
-            dns_json=$(curl -fsS -G "https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records" \
-              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-              --data-urlencode "name=remotecare.atechspot.com")
-            count=$(echo "$dns_json" | jq '.result | length')
-            echo "Authoritative DNS record count -> $count (attempt $attempt/12)"
-            if [ "$count" -gt 0 ]; then
-              echo "$dns_json" | jq -r '.result[] | "name=\(.name) type=\(.type) proxied=\(.proxied) ttl=\(.ttl) content=\(.content)"'
-              found=1
-              break
-            fi
-            sleep 8
-          done
-          test "$found" = "1"
-
-          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12; do
-            doh=$(curl -fsS -H 'accept: application/dns-json' \
+          cf_ok=0
+          google_ok=0
+          for attempt in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
+            cf=$(curl -fsS -H 'accept: application/dns-json' \
               'https://cloudflare-dns.com/dns-query?name=remotecare.atechspot.com&type=A' || true)
-            status=$(echo "$doh" | jq -r '.Status // 99' 2>/dev/null || echo 99)
-            answers=$(echo "$doh" | jq '.Answer | length' 2>/dev/null || echo 0)
-            echo "Cloudflare public DNS -> status=$status answers=$answers (attempt $attempt/12)"
-            if [ "$status" = "0" ] && [ "$answers" -gt 0 ]; then
-              echo "$doh" | jq -r '.Answer[] | "\(.name) -> \(.data) TTL=\(.TTL)"'
+            cf_status=$(echo "$cf" | jq -r '.Status // 99' 2>/dev/null || echo 99)
+            cf_answers=$(echo "$cf" | jq '.Answer | length' 2>/dev/null || echo 0)
+
+            google=$(curl -fsS \
+              'https://dns.google/resolve?name=remotecare.atechspot.com&type=A' || true)
+            google_status=$(echo "$google" | jq -r '.Status // 99' 2>/dev/null || echo 99)
+            google_answers=$(echo "$google" | jq '.Answer | length' 2>/dev/null || echo 0)
+
+            echo "Public DNS attempt $attempt/15 -> Cloudflare status=$cf_status answers=$cf_answers; Google status=$google_status answers=$google_answers"
+
+            if [ "$cf_status" = "0" ] && [ "$cf_answers" -gt 0 ]; then cf_ok=1; fi
+            if [ "$google_status" = "0" ] && [ "$google_answers" -gt 0 ]; then google_ok=1; fi
+
+            if [ "$cf_ok" = "1" ] && [ "$google_ok" = "1" ]; then
+              echo 'Cloudflare answers:'
+              echo "$cf" | jq -r '.Answer[]? | "\(.name) -> \(.data) TTL=\(.TTL)"'
+              echo 'Google answers:'
+              echo "$google" | jq -r '.Answer[]? | "\(.name) -> \(.data) TTL=\(.TTL)"'
+              echo 'RemoteCare is publicly resolvable from both Cloudflare and Google DNS.'
               exit 0
             fi
             sleep 8
           done
-          echo 'Cloudflare public recursive DNS still does not resolve RemoteCare.'
+
+          echo 'RemoteCare is not yet publicly resolvable from both independent DNS providers.'
           exit 1
 
       - name: Verify RemoteCare production hostname
