@@ -75,7 +75,7 @@ jobs:
           test -f "$ROOT/public/downloads/activities/f-floppy-flash-drive-activity.pdf"
           test -f "$ROOT/public/downloads/activities/g-game-controller-activity.pdf"
           test -f "$ROOT/public/downloads/activities/h-headphones-activity.pdf"
-          test -f "$ROOT/public/assets/coloring-pages/a-analog-phone.webp"
+          test -f "$ROOT/public/assets/coloring-pages/a-android.webp"
           test -f "$ROOT/public/assets/coloring-pages/z-zoom.webp"
           test -f "$ROOT/public/assets/activities/phone-stand.webp"
           test -f "$ROOT/public/downloads/activities/battery-hunt.pdf"
@@ -137,8 +137,8 @@ jobs:
           grep -q 'ABC Tech Theme' "$HTML"
           grep -q 'id="siteControlBar"' "$HTML"
           grep -q 'COLORING WORLD' "$HTML"
-          grep -q 'View All 26 Coloring Pages' "$HTML"
-          grep -q '/assets/coloring-pages/a-analog-phone.webp' "$HTML"
+          grep -q 'All 26 PDF' "$HTML"
+          grep -q '/assets/coloring-pages/a-android.webp' "$HTML"
           if grep -q 'live-tool-dock' "$HTML"; then echo 'Duplicate bottom menu remains in HTML' && exit 1; fi
 
           test -f "$ROOT/public/assets/book/book-cover.webp"
