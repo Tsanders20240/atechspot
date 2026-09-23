@@ -1,0 +1,58 @@
+/* ABC's of Technology — premium kids edutainment visual system */
+:root{
+  --abc-navy:#08255b;
+  --abc-blue:#1677ff;
+  --abc-cyan:#27d9ff;
+  --abc-purple:#7356ff;
+  --abc-orange:#ff9f1c;
+  --abc-yellow:#ffd84d;
+  --abc-green:#29c86f;
+  --abc-pink:#ff5aa5;
+  --abc-ink:#0d2a58;
+  --abc-soft:#f5fbff;
+  --abc-line:#d9e8f4;
+}
+body{background:#f8fcff;color:var(--abc-ink)}
+.site-control-bar{
+  position:sticky;top:0;z-index:80;
+  box-shadow:0 10px 32px rgba(4,31,74,.16);
+  background:linear-gradient(90deg,#08255b,#0d3678)!important;
+  border-bottom:2px solid rgba(39,217,255,.45)
+}
+.site-control-bar a,.site-control-bar button{font-weight:900}
+.control-buy{background:linear-gradient(135deg,#ffae24,#ff6c22)!important;box-shadow:0 8px 24px rgba(255,126,30,.28)}
+.hero-template{position:relative;overflow:hidden;border-bottom:0!important}
+.hero-template:after{content:"";position:absolute;inset:auto 0 0;height:70px;background:linear-gradient(180deg,transparent,#f7fbff);pointer-events:none}
+.adventure-launch{background:linear-gradient(180deg,#f7fbff,#eef8ff);padding:34px 0 56px}
+.launch-shell{width:min(1180px,calc(100% - 34px));margin:auto}
+.launch-intro{text-align:center;max-width:760px;margin:0 auto 26px}
+.launch-intro .eyebrow{color:#1685e6}
+.launch-intro h2{font-size:clamp(34px,5vw,58px);line-height:1;margin:8px 0 12px;color:#08255b;letter-spacing:-.04em}
+.launch-intro p{color:#55708b;font-size:16px}
+.launch-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.launch-card{position:relative;overflow:hidden;border-radius:24px;padding:24px;min-height:190px;border:1px solid #dce8f2;background:#fff;box-shadow:0 16px 45px rgba(16,66,110,.08);transition:.2s}
+.launch-card:hover{transform:translateY(-5px);box-shadow:0 24px 58px rgba(16,66,110,.14)}
+.launch-card span{font-size:34px}.launch-card small{display:block;font-weight:950;letter-spacing:.12em;margin:12px 0 5px}
+.launch-card h3{margin:0 0 8px;font-size:22px}.launch-card p{margin:0;color:#64798d;font-size:13px;line-height:1.6}
+.launch-card.play{border-top:5px solid var(--abc-blue)}.launch-card.learn{border-top:5px solid var(--abc-green)}.launch-card.create{border-top:5px solid var(--abc-purple)}.launch-card.watch{border-top:5px solid var(--abc-orange)}
+.section{padding:84px 0}
+.section-head h2{font-size:clamp(36px,5vw,58px);letter-spacing:-.04em}
+.book-layout{gap:48px!important;align-items:center}
+.book-copy{border-radius:26px!important;padding:30px!important;box-shadow:0 24px 65px rgba(25,45,100,.12)}
+.actual-book-viewer{border-radius:30px!important;box-shadow:0 30px 80px rgba(55,61,173,.18)}
+.actual-book-label{border-radius:999px!important;padding:9px 14px!important;letter-spacing:.12em}
+.book-frame{border-radius:24px!important;overflow:hidden;background:#fff!important}
+.game-card,.stem-grid article,.media-grid article,.fgh-activity-card,.activity-poster{border-radius:22px!important;box-shadow:0 18px 48px rgba(9,42,83,.08)}
+.game-card:hover,.stem-grid article:hover,.media-grid article:hover,.fgh-activity-card:hover,.activity-poster:hover{transform:translateY(-4px)}
+.grownup-section{background:linear-gradient(135deg,#071f4b,#0d3b76);color:#fff;padding:74px 0}
+.grownup-grid{width:min(1180px,calc(100% - 34px));margin:auto;display:grid;grid-template-columns:.9fr 1.1fr;gap:46px;align-items:center}
+.grownup-copy h2{font-size:clamp(34px,5vw,56px);line-height:1.02;margin:8px 0 14px}
+.grownup-copy p{color:#c8d9ea;line-height:1.75}
+.grownup-points{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grownup-points article{padding:20px;border:1px solid rgba(255,255,255,.18);border-radius:18px;background:rgba(255,255,255,.06)}
+.grownup-points b{display:block;color:#8ff2ff;margin-bottom:5px}.grownup-points span{color:#dbe8f4;font-size:13px;line-height:1.55}
+.shop-section{background:linear-gradient(180deg,#fff9ec,#fff)}
+.about-section{background:linear-gradient(180deg,#f7fbff,#eef7ff)}
+.sound-dock{box-shadow:0 12px 36px rgba(0,35,85,.24)!important}
+@media(max-width:900px){.launch-grid{grid-template-columns:1fr 1fr}.grownup-grid{grid-template-columns:1fr}.grownup-points{grid-template-columns:1fr 1fr}}
+@media(max-width:620px){.launch-grid,.grownup-points{grid-template-columns:1fr}.section{padding:62px 0}.launch-card{min-height:auto}.site-control-bar{overflow-x:auto;justify-content:flex-start!important}.site-control-bar>a,.site-control-bar>button{flex:0 0 auto}.book-layout{gap:28px!important}}
