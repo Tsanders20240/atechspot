@@ -104,5 +104,88 @@ def pdf_stand():
     c.rect(45,70,W-90,95,fill=0,stroke=1)
     c.save()
 
+
+def simple_preview(filename,title,subtitle,color,lines):
+    w,h=1200,1550
+    im=Image.new('RGB',(w,h),'#f7fbff'); d=ImageDraw.Draw(im)
+    header(d,w,title,subtitle,color)
+    d.rounded_rectangle((45,285,w-45,1485),42,fill='white',outline=color,width=5)
+    y=345
+    for i,line in enumerate(lines,1):
+        d.rounded_rectangle((80,y,1120,y+165),22,fill='#f8fbff',outline='#d4e6f5',width=3)
+        d.ellipse((105,y+42,165,y+102),fill=color)
+        d.text((125,y+54),str(i),font=F(28,True),fill='white')
+        d.text((195,y+38),line,font=F(30,True),fill='#17304f')
+        y+=205
+    d.text((85,1370),'PRINT • COMPLETE • TALK ABOUT WHAT YOU LEARNED',font=F(24,True),fill='#53657c')
+    out=PREV/filename; im.save(out,'WEBP',quality=94,method=6); return out
+
+def simple_pdf(filename,title,subtitle,color,steps):
+    p=PDF/filename; c=canvas.Canvas(str(p),pagesize=letter); W,H=letter
+    c.setFillColor(HexColor(color)); c.roundRect(24,H-160,W-48,125,20,fill=1,stroke=0)
+    c.setFillColor(white); c.setFont('Helvetica-Bold',26); c.drawString(45,H-82,f"ABC's of Technology — {title}")
+    c.setFont('Helvetica',11); c.drawString(45,H-108,subtitle)
+    c.setFillColor(black); y=H-215
+    for i,(head,body) in enumerate(steps,1):
+        c.setFont('Helvetica-Bold',16); c.drawString(50,y,f'{i}. {head}')
+        c.setFont('Helvetica',11); c.drawString(72,y-20,body)
+        y-=82
+    c.setFont('Helvetica-Bold',16); c.drawString(45,210,'Your Turn')
+    c.setFont('Helvetica',11); c.drawString(45,190,'Draw, circle, trace or write your answer in the space below.')
+    c.rect(45,65,W-90,105,fill=0,stroke=1)
+    c.save()
+
+simple_preview('keyboard-key-hunt.webp','Keyboard Key Hunt','Find the keys that help you type, play and create.','#1677ff',[
+    'Find A, M and Z on the keyboard.',
+    'Find the number keys 5 and 0.',
+    'Find Space, Enter and Backspace.',
+    'Find Shift, Ctrl and Alt.'
+])
+simple_pdf('keyboard-key-hunt.pdf','Keyboard Key Hunt','Find and circle important keyboard keys.', '#1677ff',[
+    ('Letter Keys','Find and circle A, M and Z.'),
+    ('Number Keys','Find and circle 5 and 0.'),
+    ('Typing Keys','Find Space, Enter and Backspace.'),
+    ('Special Keys','Find Shift, Ctrl and Alt.')
+])
+
+simple_preview('laptop-parts-match.webp','Laptop Parts Match','Match each laptop part to its job.','#09a86f',[
+    'Screen — shows pictures, words and video.',
+    'Keyboard — lets you type letters and numbers.',
+    'Touchpad — helps you point and click.',
+    'Webcam — lets you appear in a video call.'
+])
+simple_pdf('laptop-parts-match.pdf','Laptop Parts Match','Match each laptop part to its job.', '#09a86f',[
+    ('Screen','Draw a line to the part that shows pictures and video.'),
+    ('Keyboard','Draw a line to the part used for typing.'),
+    ('Touchpad','Draw a line to the part used for pointing and clicking.'),
+    ('Webcam','Draw a line to the small camera above the screen.')
+])
+
+simple_preview('mouse-click-maze.webp','Mouse Click Maze','Follow directions from START to FINISH.','#7a4ee7',[
+    'Move through the maze one direction at a time.',
+    'Practice left click for selecting.',
+    'Practice right click for more options.',
+    'Say the direction before you move.'
+])
+simple_pdf('mouse-click-maze.pdf','Mouse Click Maze','Practice directions and mouse-click vocabulary.', '#7a4ee7',[
+    ('Start','Place your pencil or finger at START.'),
+    ('Follow Directions','Move right, right, down, down, right, up, right, down.'),
+    ('Left Click','Say “left click” when you reach a selection circle.'),
+    ('Right Click','Say “right click” when you reach an options circle.')
+])
+
+simple_preview('wifi-signal-path.webp','Wi-Fi Signal Path','Trace the signal from router to devices.','#ff7a1a',[
+    'Start at the Wi-Fi router.',
+    'Trace a path to a laptop.',
+    'Trace a path to a tablet or phone.',
+    'Trace a path to a printer.'
+])
+simple_pdf('wifi-signal-path.pdf','Wi-Fi Signal Path','Trace how Wi-Fi connects a router to devices.', '#ff7a1a',[
+    ('Find the Router','Circle the Wi-Fi router.'),
+    ('Laptop Path','Draw a dotted line from the router to a laptop.'),
+    ('Mobile Path','Draw a dotted line from the router to a tablet or smartphone.'),
+    ('Printer Path','Draw a dotted line from the router to a printer.')
+])
+
 battery_preview(); stand_preview(); pdf_battery(); pdf_stand()
-print('Built 2 clear STEM activity previews and 2 printable PDFs.')
+print('Built 6 STEM activity previews and 6 printable PDFs.')
