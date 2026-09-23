@@ -157,7 +157,9 @@ jobs:
             echo 'On-site payment or card collection code detected' && exit 1
           fi
 
+          grep -q 'www.abcoftech.atechspot.com' "$ROOT/wrangler.jsonc"
           grep -q 'abcoftech.atechspot.com' "$ROOT/wrangler.jsonc"
+          grep -q 'https://www.abcoftech.atechspot.com/' "$HTML"
 
           python - <<'PY'
           from html.parser import HTMLParser
@@ -193,16 +195,24 @@ jobs:
           set -euo pipefail
           sleep 7
           for path in / /robots.txt /sitemap.xml /api/health /portal-2026.css /portal-2026.js /assets/hero/abc-home-hero.webp /assets/activities/battery-hunt.webp /assets/activities/f-floppy-flash-drive-activity.webp /assets/activities/g-game-controller-activity.webp /assets/activities/h-headphones-activity.webp /assets/coloring-pages/a-analog-phone.webp /assets/coloring-pages/z-zoom.webp /assets/activities/phone-stand.webp /downloads/activities/battery-hunt.pdf /downloads/activities/phone-stand.pdf /downloads/activities/f-floppy-flash-drive-activity.pdf /downloads/activities/g-game-controller-activity.pdf /downloads/activities/h-headphones-activity.pdf /downloads/coloring-pages/a-analog-phone.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp /assets/book/book-page-a.webp /assets/authors/april-sanders-original-crop.webp; do
-            code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://abcoftech.atechspot.com${path}")
+            code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://www.abcoftech.atechspot.com${path}")
             echo "$path -> $code"
             test "$code" = "200"
           done
+
+      - name: Verify non-www redirects to www canonical
+        shell: bash
+        run: |
+          set -euo pipefail
+          location=$(curl -sSI "https://abcoftech.atechspot.com/" | awk 'BEGIN{IGNORECASE=1}/^location:/{gsub("\r","");print $2;exit}')
+          echo "non-www redirect -> $location"
+          test "$location" = "https://www.abcoftech.atechspot.com/"
 
       - name: Verify live standalone ABC portal
         shell: bash
         run: |
           set -euo pipefail
-          curl -L -sS -A 'Mozilla/5.0' -H 'Cache-Control: no-cache' "https://abcoftech.atechspot.com/?qa=${GITHUB_SHA}" -o /tmp/abc-live.html
+          curl -L -sS -A 'Mozilla/5.0' -H 'Cache-Control: no-cache' "https://www.abcoftech.atechspot.com/?qa=${GITHUB_SHA}" -o /tmp/abc-live.html
           grep -q 'Start the A–Z Adventure' /tmp/abc-live.html
           grep -q 'Choose your path.' /tmp/abc-live.html
           grep -q 'Website 4 of 22' /tmp/abc-live.html
