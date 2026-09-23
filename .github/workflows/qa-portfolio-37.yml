@@ -1,0 +1,86 @@
+name: Audit 37-Site Portfolio Health
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 12 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout portfolio registry
+        uses: actions/checkout@v4
+
+      - name: Audit every registered destination
+        shell: bash
+        run: |
+          set -u
+          registry="ecosystem/portfolio-37.json"
+          test -f "$registry"
+
+          total=$(jq '.properties | length' "$registry")
+          public=$(jq '[.properties[] | select(.scope == "public")] | length' "$registry")
+          operations=$(jq '[.properties[] | select(.scope != "public")] | length' "$registry")
+
+          test "$total" -eq 37
+          test "$public" -eq 22
+          test "$operations" -eq 15
+
+          {
+            echo "# ATechSpot 37-Site Portfolio Health"
+            echo
+            echo "**Run:** $(date -u +"%Y-%m-%d %H:%M UTC")"
+            echo
+            echo "| # | Property | Scope | HTTP | Result |"
+            echo "|---:|---|---|---:|---|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          healthy=0
+          unhealthy=0
+
+          while IFS=$'\t' read -r id name scope url fallback; do
+            code=$(curl -L -sS --connect-timeout 8 --max-time 18 -o /dev/null -w '%{http_code}' "$url" || printf '000')
+            result="REVIEW"
+
+            if [ "$scope" = "operations-private" ]; then
+              case "$code" in
+                200|301|302|303|307|308|401|403) result="HEALTHY" ;;
+                *) result="REVIEW" ;;
+              esac
+            else
+              case "$code" in
+                200|201|202|204|301|302|303|307|308) result="HEALTHY" ;;
+                *) result="REVIEW" ;;
+              esac
+            fi
+
+            if [ "$result" = "HEALTHY" ]; then
+              healthy=$((healthy+1))
+            else
+              unhealthy=$((unhealthy+1))
+            fi
+
+            printf '| %s | %s | %s | %s | %s |\n' "$id" "$name" "$scope" "$code" "$result" >> "$GITHUB_STEP_SUMMARY"
+
+            if [ "$result" = "REVIEW" ] && [ -n "$fallback" ]; then
+              fallback_code=$(curl -L -sS --connect-timeout 8 --max-time 18 -o /dev/null -w '%{http_code}' "$fallback" || printf '000')
+              printf '  Fallback for %s -> %s (%s)\n' "$name" "$fallback" "$fallback_code"
+            fi
+          done < <(jq -r '.properties[] | [.id,.name,.scope,.url,(.fallback_url // "")] | @tsv' "$registry")
+
+          {
+            echo
+            echo "## Summary"
+            echo "- Registered destinations: **$total**"
+            echo "- Healthy/responding by HTTP policy: **$healthy**"
+            echo "- Require review: **$unhealthy**"
+            echo "- Stripe certification: **deferred until 37/37**"
+            echo
+            echo "> This workflow reports infrastructure reachability only. A property is not 10/10 until its content, UX, accessibility, analytics, legal, security, forms, conversion path and device testing are separately certified."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "Portfolio audit complete: $healthy healthy, $unhealthy require review."

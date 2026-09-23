@@ -1,0 +1,306 @@
+{
+  "portfolio_name": "ATechSpot 37-site operating portfolio",
+  "public_brand_count": 22,
+  "operational_site_count": 15,
+  "stripe_certification": "deferred-until-37-of-37",
+  "updated": "2026-09-22",
+  "properties": [
+    {
+      "id": 1,
+      "name": "ATechSpot",
+      "url": "https://www.atechspot.com/",
+      "scope": "public",
+      "role": "Corporate technology and revenue hub",
+      "stage": "verified-live"
+    },
+    {
+      "id": 2,
+      "name": "A+ Techucation",
+      "url": "https://atechucation.atechspot.com/",
+      "scope": "public",
+      "role": "Adult technology and AI education",
+      "stage": "audit"
+    },
+    {
+      "id": 3,
+      "name": "ATechSpot Creator",
+      "url": "https://creator.atechspot.com/",
+      "scope": "public",
+      "role": "Creator business systems",
+      "stage": "audit"
+    },
+    {
+      "id": 4,
+      "name": "ABC of Technology",
+      "url": "https://abcoftech.atechspot.com/",
+      "scope": "public",
+      "role": "Children's technology learning",
+      "stage": "hosting-blocked"
+    },
+    {
+      "id": 5,
+      "name": "ABC Tech Products",
+      "url": "https://abctechproducts.atechspot.com/",
+      "scope": "public",
+      "role": "Technology commerce and buying guides",
+      "stage": "audit"
+    },
+    {
+      "id": 6,
+      "name": "ATechSpot DJI",
+      "url": "https://www.atechspot.com/dji/",
+      "scope": "public",
+      "role": "Independent drone decision guides",
+      "stage": "verified-live"
+    },
+    {
+      "id": 7,
+      "name": "A+ Automotive Technology",
+      "url": "https://auto.atechspot.com/",
+      "scope": "public",
+      "role": "Automotive technology education",
+      "stage": "audit"
+    },
+    {
+      "id": 8,
+      "name": "A+ Credit Education",
+      "url": "https://credit.atechspot.com/",
+      "scope": "public",
+      "role": "Consumer credit education",
+      "stage": "audit"
+    },
+    {
+      "id": 9,
+      "name": "ASCR Financial",
+      "url": "https://ascrfinancial.atechspot.com/",
+      "scope": "public",
+      "role": "Financial services",
+      "stage": "audit"
+    },
+    {
+      "id": 10,
+      "name": "A Clean Sweep",
+      "url": "https://acleansweep.atechspot.com/",
+      "scope": "public",
+      "role": "Cleaning services",
+      "stage": "audit"
+    },
+    {
+      "id": 11,
+      "name": "Vision of Sanders",
+      "url": "https://visionofsanders.atechspot.com/",
+      "scope": "public",
+      "role": "Photography and visual branding",
+      "stage": "audit"
+    },
+    {
+      "id": 12,
+      "name": "A Studio MX",
+      "url": "https://astudiomx.atechspot.com/",
+      "scope": "public",
+      "role": "Recording and media production",
+      "stage": "audit"
+    },
+    {
+      "id": 13,
+      "name": "I Am Modeling",
+      "url": "https://iammodeling.atechspot.com/",
+      "scope": "public",
+      "role": "Model education and development",
+      "stage": "audit"
+    },
+    {
+      "id": 14,
+      "name": "HÄZIL",
+      "url": "https://hazil.atechspot.com/",
+      "scope": "public",
+      "role": "Recording artist",
+      "stage": "audit"
+    },
+    {
+      "id": 15,
+      "name": "HazilFlix",
+      "url": "https://hazilflix.atechspot.com/",
+      "scope": "public",
+      "role": "Entertainment platform",
+      "stage": "audit"
+    },
+    {
+      "id": 16,
+      "name": "ATech Network",
+      "url": "https://atechnetwork.atechspot.com/",
+      "scope": "public",
+      "role": "Media network",
+      "stage": "audit"
+    },
+    {
+      "id": 17,
+      "name": "A+ Techucation Figures",
+      "url": "https://atechucationfigures.atechspot.com/",
+      "scope": "public",
+      "role": "Educational IP and products",
+      "stage": "audit"
+    },
+    {
+      "id": 18,
+      "name": "Royal Up With The Hughes",
+      "url": "https://royalupwiththehughes.atechspot.com/",
+      "scope": "public",
+      "role": "Wedding and family legacy media",
+      "stage": "audit"
+    },
+    {
+      "id": 19,
+      "name": "Mr. A Plus Portfolio",
+      "url": "https://mraplusportfolio.atechspot.com/",
+      "scope": "public",
+      "role": "Professional portfolio and proof",
+      "stage": "audit"
+    },
+    {
+      "id": 20,
+      "name": "WarriorJ",
+      "url": "https://warriorj.atechspot.com/",
+      "scope": "public",
+      "role": "Independent apparel brand",
+      "stage": "canonical-review"
+    },
+    {
+      "id": 21,
+      "name": "ATechSpot RemoteCare",
+      "url": "https://remotecare.atechspot.com/",
+      "fallback_url": "https://www.atechspot.com/remote-support/",
+      "scope": "public",
+      "role": "Paid remote technical support",
+      "stage": "domain-pending"
+    },
+    {
+      "id": 22,
+      "name": "ATechSpot Tech Guru",
+      "url": "https://techguru.atechspot.com/",
+      "scope": "public",
+      "role": "DIY technology help",
+      "stage": "audit"
+    },
+    {
+      "id": 23,
+      "name": "Start",
+      "url": "https://start.atechspot.com/",
+      "scope": "operations",
+      "role": "Customer start/router",
+      "stage": "audit"
+    },
+    {
+      "id": 24,
+      "name": "Client Portal",
+      "url": "https://clients.atechspot.com/",
+      "scope": "operations",
+      "role": "Client access",
+      "stage": "audit"
+    },
+    {
+      "id": 25,
+      "name": "Account",
+      "url": "https://account.atechspot.com/",
+      "scope": "operations",
+      "role": "Account management",
+      "stage": "audit"
+    },
+    {
+      "id": 26,
+      "name": "Intake",
+      "url": "https://intake.atechspot.com/",
+      "scope": "operations",
+      "role": "Lead and project intake",
+      "stage": "audit"
+    },
+    {
+      "id": 27,
+      "name": "Booking",
+      "url": "https://book.atechspot.com/",
+      "scope": "operations",
+      "role": "Scheduling",
+      "stage": "audit"
+    },
+    {
+      "id": 28,
+      "name": "Pay",
+      "url": "https://pay.atechspot.com/",
+      "scope": "operations",
+      "role": "Payment routing",
+      "stage": "audit"
+    },
+    {
+      "id": 29,
+      "name": "Support Center",
+      "url": "https://support.atechspot.com/",
+      "scope": "operations",
+      "role": "Customer support",
+      "stage": "audit"
+    },
+    {
+      "id": 30,
+      "name": "Help Center",
+      "url": "https://help.atechspot.com/",
+      "scope": "operations",
+      "role": "Knowledge and help",
+      "stage": "audit"
+    },
+    {
+      "id": 31,
+      "name": "Status",
+      "url": "https://status.atechspot.com/",
+      "scope": "operations",
+      "role": "Service status",
+      "stage": "audit"
+    },
+    {
+      "id": 32,
+      "name": "Partners",
+      "url": "https://partners.atechspot.com/",
+      "scope": "operations",
+      "role": "Partner program",
+      "stage": "audit"
+    },
+    {
+      "id": 33,
+      "name": "Vendor Portal",
+      "url": "https://vendors.atechspot.com/",
+      "scope": "operations",
+      "role": "Vendor operations",
+      "stage": "audit"
+    },
+    {
+      "id": 34,
+      "name": "Shop",
+      "url": "https://shop.atechspot.com/",
+      "scope": "operations",
+      "role": "Shared commerce entry",
+      "stage": "audit"
+    },
+    {
+      "id": 35,
+      "name": "Press / Media Center",
+      "url": "https://press.atechspot.com/",
+      "scope": "operations",
+      "role": "Press and media resources",
+      "stage": "audit"
+    },
+    {
+      "id": 36,
+      "name": "Developer Portal",
+      "url": "https://developers.atechspot.com/",
+      "scope": "operations",
+      "role": "Developer resources",
+      "stage": "audit"
+    },
+    {
+      "id": 37,
+      "name": "Internal Operations",
+      "url": "https://ops.atechspot.com/",
+      "scope": "operations-private",
+      "role": "Internal operating system",
+      "stage": "audit"
+    }
+  ]
+}
