@@ -1,4 +1,10 @@
 /* Customer-first homepage, retaining the established A+ TechSpot brand assets. */
+/* Shared color hierarchy: bright actions, readable secondary copy, quiet surfaces. */
+.site-header nav a{font-size:14px;color:#c3d4e3}
+.site-header nav a:hover,.site-header nav a:focus-visible{color:#ffffff}
+.footer-grid p,.footer-grid>div:not(:first-child) a{color:#a9bfd1}
+.footer-bottom{color:#9aafc1}
+.footer-grid>div:not(:first-child) a:hover,.footer-grid>div:not(:first-child) a:focus-visible{color:#79e6df}
 .customer-hero{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.06fr) minmax(330px,.94fr);gap:clamp(28px,5vw,78px);align-items:center;padding:90px 0 86px}
 .customer-hero-copy h1{max-width:850px;font:800 clamp(3.4rem,6.2vw,6.8rem)/.98 "Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;letter-spacing:-.06em;margin:23px 0 24px}
 .customer-hero-copy h1 em{font-style:normal;color:#67d6ee}
