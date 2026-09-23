@@ -29,4 +29,24 @@ document.getElementById('finderForm')?.addEventListener('submit',e=>{
   result.classList.add('show');
   result.scrollIntoView({behavior:'smooth',block:'nearest'});
 });
+
+const upload=document.getElementById('tryonUpload');
+const preview=document.getElementById('tryonPreview');
+const launch=document.getElementById('tryonLaunch');
+const status=document.getElementById('tryonStatus');
+upload?.addEventListener('change',()=>{
+  const file=upload.files?.[0];
+  if(!file||!preview)return;
+  const reader=new FileReader();
+  reader.onload=()=>{preview.innerHTML='<img alt="Your private virtual try-on preview photo" src="'+reader.result+'">';};
+  reader.readAsDataURL(file);
+});
+launch?.addEventListener('click',()=>{
+  const provider=window.ABC_VTO_URL||'';
+  if(provider){
+    window.location.href=provider;
+    return;
+  }
+  if(status)status.textContent='Virtual Try-On is ready to activate after the Shopify store, published Tapstitch apparel and a VTO app are connected. Your uploaded photo is previewed only in this browser and is not sent anywhere by this page.';
+});
 })();

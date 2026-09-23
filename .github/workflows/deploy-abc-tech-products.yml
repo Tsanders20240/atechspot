@@ -16,7 +16,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,6 +33,20 @@ jobs:
         run: |
           test -n "$CLOUDFLARE_API_TOKEN" || (echo "Missing CLOUDFLARE_API_TOKEN" && exit 1)
           test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "Missing CLOUDFLARE_ACCOUNT_ID" && exit 1)
+
+      - name: Store approved campaign mockup asset
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet pillow
+          python ABC-Tech-Products-Website/scripts/fetch_campaign_asset.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ABC-Tech-Products-Website/public/assets/campaign/a-plus-tech-generation-campaign.webp
+          if ! git diff --cached --quiet; then
+            git commit -m "Store approved ABC Tech Products campaign mockup [skip ci]"
+            git push origin HEAD:main || echo "Campaign asset commit could not be pushed; continuing current deployment."
+          fi
 
       - name: Validate ABC Tech Products next-gen source
         shell: bash
@@ -51,6 +65,8 @@ jobs:
           test -f "$ROOT/public/sitemap.xml"
           test -f "$ROOT/worker.js"
           test -f "$ROOT/OPERATIONS.md"
+          test -f "$ROOT/COMMERCE-PLAN.md"
+          test -s "$ROOT/public/assets/campaign/a-plus-tech-generation-campaign.webp"
 
           grep -q 'Website 5 of the 22-property ATechSpot ecosystem' "$HTML"
           grep -q 'A+ TECHUCATION × ABC TECH PRODUCTS' "$HTML"
@@ -62,6 +78,10 @@ jobs:
           grep -q 'PRODUCTION ENGINE' "$HTML"
           grep -q 'Tapstitch is the production and fulfillment platform' "$HTML"
           grep -q 'ABC STYLE FINDER' "$HTML"
+          grep -q 'VIRTUAL TRY-ON' "$HTML"
+          grep -q 'A+ FIT PREVIEW STUDIO' "$HTML"
+          grep -q 'A+ TECH LOOKBOOK' "$HTML"
+          grep -q '/assets/campaign/a-plus-tech-generation-campaign.webp' "$HTML"
           grep -q 'TECH GUIDES' "$HTML"
           grep -q 'CONNECTED ECOSYSTEM' "$HTML"
 
@@ -137,6 +157,11 @@ jobs:
           grep -q 'A+ Tech Core' /tmp/abc-products-live.html
           grep -q 'Tapstitch is the production and fulfillment platform' /tmp/abc-products-live.html
           grep -q 'ABC STYLE FINDER' /tmp/abc-products-live.html
+          grep -q 'VIRTUAL TRY-ON' /tmp/abc-products-live.html
+          grep -q 'A+ TECH LOOKBOOK' /tmp/abc-products-live.html
+          code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://abctechproducts.atechspot.com/assets/campaign/a-plus-tech-generation-campaign.webp")
+          echo "campaign asset -> $code"
+          test "$code" = "200"
           grep -q 'Website 5 of the 22-property ATechSpot ecosystem' /tmp/abc-products-live.html
           if grep -q 'tapstitch.com/account/dashboard' /tmp/abc-products-live.html; then
             echo 'Private Tapstitch dashboard is exposed publicly' && exit 1
