@@ -1,0 +1,113 @@
+name: Deploy A+ Automotive Technology
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Automotive-Technology-Website/**'
+      - '.github/workflows/deploy-automotive-technology.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: atechspot-automotive-technology-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Verify Cloudflare credentials
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+
+      - name: Validate automotive source
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT='Automotive-Technology-Website'
+          HTML="$ROOT/public/index.html"
+
+          test -f "$HTML"
+          test -f "$ROOT/public/styles.css"
+          test -f "$ROOT/public/app.js"
+          test -f "$ROOT/public/robots.txt"
+          test -f "$ROOT/public/sitemap.xml"
+          test -f "$ROOT/worker.js"
+          test -f "$ROOT/wrangler.jsonc"
+
+          grep -q 'WEBSITE 7 OF 22' "$HTML"
+          grep -q 'PROPERTY 07 · AUTOMOTIVE TECHNOLOGY EDUCATION' "$HTML"
+          grep -q 'INTERACTIVE TECH EXPLORER' "$HTML"
+          grep -q 'DRIVER ASSISTANCE / ADAS' "$HTML"
+          grep -q 'ELECTRIC VEHICLES' "$HTML"
+          grep -q 'OBD-II + DASHBOARD ALERTS' "$HTML"
+          grep -q 'CONNECTED CAR + PRIVACY' "$HTML"
+          grep -q 'SMART VEHICLE BUYER CHECKLIST' "$HTML"
+          grep -q 'TRUSTED SOURCE HUB' "$HTML"
+          grep -q 'https://www.nhtsa.gov/vehicle-safety/driver-assistance-technologies' "$HTML"
+          grep -q 'https://www.nhtsa.gov/vehicle-safety/automated-vehicle-safety' "$HTML"
+          grep -q 'https://www.nhtsa.gov/ratings' "$HTML"
+          grep -q 'https://afdc.energy.gov/stations/' "$HTML"
+          grep -q 'auto.atechspot.com' "$ROOT/wrangler.jsonc"
+          grep -q "property:'A+ Automotive Technology'" "$ROOT/worker.js"
+
+          node --check "$ROOT/public/app.js"
+          node --check "$ROOT/worker.js"
+
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          html=Path("Automotive-Technology-Website/public/index.html").read_text(encoding="utf-8")
+          class P(HTMLParser):
+              def __init__(self):
+                  super().__init__(); self.ids=set(); self.refs=[]
+              def handle_starttag(self,tag,attrs):
+                  d=dict(attrs)
+                  if d.get("id"): self.ids.add(d["id"])
+                  href=d.get("href","")
+                  if href.startswith("#") and len(href)>1: self.refs.append(href[1:])
+          p=P(); p.feed(html)
+          missing=sorted(set(p.refs)-p.ids)
+          if missing: raise SystemExit("Broken internal anchors: "+", ".join(missing))
+          print(f"Automotive internal anchors verified: {len(p.refs)} links, {len(p.ids)} ids.")
+          PY
+
+          echo 'Automotive source assertions passed.'
+
+      - name: Deploy automotive custom-domain Worker
+        working-directory: Automotive-Technology-Website
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@latest deploy
+
+      - name: Verify live automotive experience
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 6
+          curl -L -fsS -A 'Mozilla/5.0' -H 'Cache-Control: no-cache' "https://auto.atechspot.com/?qa=${GITHUB_SHA}" -o /tmp/auto-live.html
+          curl -L -fsS -A 'Mozilla/5.0' "https://auto.atechspot.com/api/health" -o /tmp/auto-health.json
+
+          grep -q 'WEBSITE 7 OF 22' /tmp/auto-live.html
+          grep -q 'PROPERTY 07 · AUTOMOTIVE TECHNOLOGY EDUCATION' /tmp/auto-live.html
+          grep -q 'INTERACTIVE TECH EXPLORER' /tmp/auto-live.html
+          grep -q 'DRIVER ASSISTANCE / ADAS' /tmp/auto-live.html
+          grep -q 'ELECTRIC VEHICLES' /tmp/auto-live.html
+          grep -q 'SMART VEHICLE BUYER CHECKLIST' /tmp/auto-live.html
+          node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/auto-health.json','utf8'));if(j.ok!==true||j.property!=='A+ Automotive Technology')process.exit(1)"
+          echo 'Live A+ Automotive Technology experience verified.'
