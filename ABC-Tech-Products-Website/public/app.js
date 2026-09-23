@@ -48,6 +48,7 @@ const garmentMain=document.getElementById('garmentMain');
 const garmentSub=document.getElementById('garmentSub');
 const launch=document.getElementById('tryonLaunch');
 const save=document.getElementById('tryonSave');
+const reset=document.getElementById('tryonReset');
 const status=document.getElementById('tryonStatus');
 const collection=document.getElementById('tryonCollection');
 const garment=document.getElementById('tryonGarment');
@@ -78,12 +79,12 @@ function applyDesign(){
 }
 function applyFit(){
   if(!overlay)return;
-  const s=Number(scale?.value||82)/100;
+  const s=Number(scale?.value||46)/100;
   const x=Number(xctrl?.value||0);
-  const y=Number(yctrl?.value||8);
-  overlay.style.width=(72*s)+'%';
+  const y=Number(yctrl?.value||4);
+  overlay.style.width=(88*s)+'%';
   overlay.style.left=(50+x)+'%';
-  overlay.style.top=(50+y)+'%';
+  overlay.style.top=(48+y)+'%';
 }
 function revealOverlay(){
   if(!loadedDataUrl){
@@ -92,7 +93,7 @@ function revealOverlay(){
   }
   overlay.hidden=false;
   applyDesign();applyFit();
-  if(status)status.textContent='Preview created. Drag the garment or use the fit controls to adjust it.';
+  if(status)status.textContent='A+ look applied. Drag the garment or use Size / Left-Right / Up-Down to fine-tune the fit.';
   return true;
 }
 
@@ -111,14 +112,23 @@ upload?.addEventListener('change',()=>{
   };
   reader.readAsDataURL(file);
 });
-[collection,garment].forEach(el=>el?.addEventListener('change',()=>{applyDesign();if(!overlay?.hidden)applyFit();}));
+[collection,garment].forEach(el=>el?.addEventListener('change',()=>{applyDesign();if(!overlay?.hidden){applyFit();if(status)status.textContent='Look updated for '+collection.value+'.';}}));
 [scale,xctrl,yctrl].forEach(el=>el?.addEventListener('input',applyFit));
 launch?.addEventListener('click',()=>{
   if(mode==='live'&&vto){location.href=vto;return;}
-  revealOverlay();
+  if(revealOverlay()) launch.textContent='Look Applied ✓';
 });
 
-let dragging=false,dragStartX=0,dragStartY=0,startLeft=50,startTop=58;
+reset?.addEventListener('click',()=>{
+  if(scale)scale.value='46';
+  if(xctrl)xctrl.value='0';
+  if(yctrl)yctrl.value='4';
+  applyFit();
+  if(status)status.textContent='Fit reset to the recommended starting position.';
+  if(launch)launch.textContent='Apply A+ Look →';
+});
+
+let dragging=false,dragStartX=0,dragStartY=0,startLeft=50,startTop=52;
 overlay?.addEventListener('pointerdown',e=>{
   if(overlay.hidden)return;
   dragging=true;overlay.setPointerCapture(e.pointerId);
