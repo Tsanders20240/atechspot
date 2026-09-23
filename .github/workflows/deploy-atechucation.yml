@@ -43,6 +43,12 @@ jobs:
           test -f A-Techucation-Website/privacy/index.html
           test -f A-Techucation-Website/payments-live.js
           test -f A-Techucation-Website/_headers
+          test -f A-Techucation-Website/academy-visual-2026.css
+          grep -q 'Technology education' A-Techucation-Website/app.js
+          grep -q 'academyHeroBadge' A-Techucation-Website/app.js
+          grep -q 'academyPathRail' A-Techucation-Website/app.js
+          grep -q 'academy-visual-2026.css' A-Techucation-Website/index.html
+          grep -q 'ACADEMY EXPERIENCE' A-Techucation-Website/academy-visual-2026.css
           grep -q 'A+ Techucation Academy' A-Techucation-Website/index.html
           grep -q 'A+ Techucation Academy' A-Techucation-Website/courses/grant-writing/index.html
           grep -q 'A+ Techucation Academy' A-Techucation-Website/courses/business-plan/index.html
