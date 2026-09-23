@@ -99,6 +99,11 @@ function transformHtml(response,url){
 export default{async fetch(request,env){
   const url=new URL(request.url);
   if(request.method==="OPTIONS"&&url.pathname.startsWith("/api/"))return new Response(null,{status:204,headers:JSON_HEADERS});
+  if(url.hostname==='remotecare.atechspot.com'){
+    url.hostname='www.atechspot.com';
+    if(url.pathname==='/')url.pathname='/remote-support/';
+    return Response.redirect(url.toString(),request.method==='GET'||request.method==='HEAD'?301:308);
+  }
   if(url.hostname==='atechspot.com'&&!url.pathname.startsWith('/.well-known/')){url.hostname='www.atechspot.com';return Response.redirect(url.toString(),request.method==='GET'||request.method==='HEAD'?301:308)}
   if(url.hostname==='www.atechspot.com'&&url.pathname.startsWith('/clients')){url.hostname='account.atechspot.com';return Response.redirect(url.toString(),request.method==='GET'||request.method==='HEAD'?301:308)}
   if(url.hostname==='account.atechspot.com'){
