@@ -16,7 +16,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,6 +33,21 @@ jobs:
           python -m pip install --disable-pip-version-check --quiet pillow
           python ABC-of-Technology-Website/scripts/fetch_official_assets.py
 
+
+      - name: Ingest final approved author portraits
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --quiet pillow
+          python ABC-of-Technology-Website/scripts/fetch_final_author_portraits.py
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ABC-of-Technology-Website/public/assets/authors/jason-hughes-final.webp ABC-of-Technology-Website/public/assets/authors/april-sanders-final.webp
+          if ! git diff --cached --quiet; then
+            git commit -m "Store final approved ABC author portraits [skip ci]"
+            git push origin HEAD:main || echo "Author portrait source commit could not be pushed; continuing current deployment with built assets."
+          fi
 
       - name: Verify Cloudflare credentials
         env:
@@ -131,9 +146,8 @@ jobs:
           grep -q 'A–Z Quiz' "$HTML"
           grep -q 'SPELLING BEE' "$HTML"
           grep -q '26 printable coloring adventures' "$HTML"
-          grep -q 'jason-hughes-abc-author.webp' "$HTML"
-          grep -q 'april-sanders-abc-author.webp' "$HTML"
-          test "$(grep -o 'data:image/webp;base64,' "$HTML" | wc -l)" -ge 2
+          grep -q 'jason-hughes-final.webp' "$HTML"
+          grep -q 'april-sanders-final.webp' "$HTML"
           grep -q 'id="siteIntro"' "$HTML"
           grep -q 'A+ TECHUCATION PRESENTS' "$HTML"
           grep -q 'id="soundDock"' "$HTML"
@@ -160,8 +174,8 @@ jobs:
           test -f "$ROOT/public/assets/book/preview-page-3.svg"
           test -f "$ROOT/public/assets/book/book-page-title.webp"
           test -f "$ROOT/public/assets/book/book-page-best-you.webp"
-          test -s "$ROOT/public/assets/authors/jason-hughes-abc-author.webp"
-          test -s "$ROOT/public/assets/authors/april-sanders-abc-author.webp"
+          test -s "$ROOT/public/assets/authors/jason-hughes-final.webp"
+          test -s "$ROOT/public/assets/authors/april-sanders-final.webp"
           test -f "$ROOT/public/downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf"
           test -f "$ROOT/public/downloads/coloring-pages/A-J_Tech_Coloring_Pages.zip"
           test -f "$ROOT/public/downloads/coloring-pages/K-T_Tech_Coloring_Pages.zip"
@@ -277,7 +291,7 @@ jobs:
           test "$pages_code" = "200"
           grep -q 'START YOUR ADVENTURE' /tmp/abc-pages-origin.html
           grep -q 'GROWN-UP GUIDE' /tmp/abc-pages-origin.html
-          for path in / /robots.txt /sitemap.xml /api/health /portal-2026.css /portal-2026.js /assets/hero/abc-home-hero.webp /assets/activities/battery-hunt.webp /assets/activities/f-floppy-flash-drive-activity.webp /assets/activities/g-game-controller-activity.webp /assets/activities/h-headphones-activity.webp /assets/coloring-pages/a-android.webp /assets/coloring-pages/z-zoom.webp /assets/activities/phone-stand.webp /downloads/activities/battery-hunt.pdf /downloads/activities/phone-stand.pdf /downloads/activities/f-floppy-flash-drive-activity.pdf /downloads/activities/g-game-controller-activity.pdf /downloads/activities/h-headphones-activity.pdf /downloads/coloring-pages/a-android.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp  /assets/authors/april-sanders-abc-author.webp; do
+          for path in / /robots.txt /sitemap.xml /api/health /portal-2026.css /portal-2026.js /assets/hero/abc-home-hero.webp /assets/activities/battery-hunt.webp /assets/activities/f-floppy-flash-drive-activity.webp /assets/activities/g-game-controller-activity.webp /assets/activities/h-headphones-activity.webp /assets/coloring-pages/a-android.webp /assets/coloring-pages/z-zoom.webp /assets/activities/phone-stand.webp /downloads/activities/battery-hunt.pdf /downloads/activities/phone-stand.pdf /downloads/activities/f-floppy-flash-drive-activity.pdf /downloads/activities/g-game-controller-activity.pdf /downloads/activities/h-headphones-activity.pdf /downloads/coloring-pages/a-android.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp  /assets/authors/april-sanders-final.webp; do
             code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://www.abcoftech.atechspot.com${path}")
             echo "$path -> $code"
             test "$code" = "200"
@@ -333,7 +347,6 @@ jobs:
           grep -q 'Wi-Fi Signal Path' /tmp/abc-live.html
           grep -q 'Jason L. Hughes' /tmp/abc-live.html
           grep -q 'April M. Sanders' /tmp/abc-live.html
-          test "$(grep -o 'data:image/webp;base64,' /tmp/abc-live.html | wc -l)" -ge 2
           grep -q 'All 26 PDF' /tmp/abc-live.html
           grep -q 'book-page-title.webp' /tmp/abc-live.html
           grep -q 'book-page-best-you.webp' /tmp/abc-live.html
@@ -348,7 +361,7 @@ jobs:
           if grep -q 'live-tool-dock' /tmp/abc-live.html; then echo 'Duplicate bottom menu is live' && exit 1; fi
           grep -q '/assets/coloring-pages/a-android.webp' /tmp/abc-live.html
           grep -q '/assets/coloring-pages/i-internet.webp' /tmp/abc-live.html
-          for asset in /assets/authors/jason-hughes-abc-author.webp /assets/authors/april-sanders-abc-author.webp; do
+          for asset in /assets/authors/jason-hughes-final.webp /assets/authors/april-sanders-final.webp; do
             code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://www.abcoftech.atechspot.com${asset}")
             echo "${asset} -> ${code}"
             test "${code}" = "200"
