@@ -16,7 +16,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,14 +34,21 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || (echo "Missing CLOUDFLARE_API_TOKEN" && exit 1)
           test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "Missing CLOUDFLARE_ACCOUNT_ID" && exit 1)
 
-      - name: Verify approved campaign mockup asset
+      - name: Store final storefront visual assets
         shell: bash
         run: |
           set -euo pipefail
           python -m pip install --disable-pip-version-check --quiet pillow
           python ABC-Tech-Products-Website/scripts/fetch_campaign_asset.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ABC-Tech-Products-Website/public/assets/storefront/
+          if ! git diff --cached --quiet; then
+            git commit -m "Store final ABC Tech Products storefront assets [skip ci]"
+            git push origin HEAD:main || echo "Storefront asset commit could not be pushed; continuing current deployment."
+          fi
 
-      - name: Validate ABC Tech Products next-gen source
+      - name: Validate complete ABC Tech Products storefront
         shell: bash
         run: |
           set -euo pipefail
@@ -52,45 +59,44 @@ jobs:
           test -f "$ROOT/public/styles.css"
           test -f "$ROOT/public/app.js"
           test -f "$ROOT/public/about/index.html"
-          test -f "$ROOT/public/affiliate-disclosure/index.html"
           test -f "$ROOT/public/privacy/index.html"
+          test -f "$ROOT/public/affiliate-disclosure/index.html"
           test -f "$ROOT/public/robots.txt"
           test -f "$ROOT/public/sitemap.xml"
           test -f "$ROOT/worker.js"
           test -f "$ROOT/OPERATIONS.md"
           test -f "$ROOT/COMMERCE-PLAN.md"
-          test -s "$ROOT/public/assets/campaign/a-plus-tech-generation-campaign.webp"
 
-          grep -q 'Website 5 of the 22-property ATechSpot ecosystem' "$HTML"
+          test -s "$ROOT/public/assets/storefront/storefront-showcase.webp"
+          test -s "$ROOT/public/assets/storefront/generation-campaign.webp"
+          test -s "$ROOT/public/assets/storefront/abc-book-cover.webp"
+
           grep -q 'A+ TECHUCATION × ABC TECH PRODUCTS' "$HTML"
-          grep -q 'Wear the' "$HTML"
-          grep -q 'THE DROP SYSTEM' "$HTML"
-          grep -q 'ABC Tech Kids' "$HTML"
-          grep -q 'Future Mode' "$HTML"
-          grep -q 'A+ Tech Core' "$HTML"
-          grep -q 'PRODUCTION ENGINE' "$HTML"
-          grep -q 'Tapstitch is the production and fulfillment platform' "$HTML"
-          grep -q 'ABC STYLE FINDER' "$HTML"
-          grep -q 'VIRTUAL TRY-ON' "$HTML"
-          grep -q 'A+ FIT PREVIEW STUDIO' "$HTML"
+          grep -q 'Wear. Create.' "$HTML"
+          grep -q 'FEATURED DROPS' "$HTML"
+          grep -q 'Built Next Tee' "$HTML"
+          grep -q 'Outcode the Ordinary Hoodie' "$HTML"
+          grep -q 'Future Loading Tee' "$HTML"
+          grep -q 'Bright Minds Hoodie' "$HTML"
           grep -q 'A+ TECH LOOKBOOK' "$HTML"
-          grep -q '/assets/campaign/a-plus-tech-generation-campaign.webp' "$HTML"
-          grep -q 'TECH GUIDES' "$HTML"
-          grep -q 'CONNECTED ECOSYSTEM' "$HTML"
+          grep -q 'ABC TECH KIDS' "$HTML"
+          grep -q 'FUTURE MODE' "$HTML"
+          grep -q 'A+ TECH CORE' "$HTML"
+          grep -q 'CREATOR EDITION' "$HTML"
+          grep -q 'FROM THE ACTUAL BOOK WORLD' "$HTML"
+          grep -q 'A+ FIT PREVIEW STUDIO' "$HTML"
+          grep -q 'PERSONALIZATION ROADMAP' "$HTML"
+          grep -q 'LAUNCH WHEN READY' "$HTML"
+          grep -q "window.ABC_COMMERCE_MODE='preview'" "$HTML"
 
-          grep -q 'https://www.atechspot.com/' "$HTML"
-          grep -q 'https://atechucation.atechspot.com/' "$HTML"
-          grep -q 'https://creator.atechspot.com/' "$HTML"
-          grep -q 'https://www.abcoftech.atechspot.com/' "$HTML"
-          grep -q 'https://support.atechspot.com/' "$HTML"
-
-          grep -q 'https://www.tapstitch.com/account/dashboard' "$ROOT/OPERATIONS.md"
-          if grep -q 'tapstitch.com/account/dashboard' "$HTML"; then
-            echo 'Private Tapstitch dashboard must not be exposed publicly' && exit 1
+          if grep -qi 'tapstitch' "$HTML"; then
+            echo 'Tapstitch must remain behind the scenes on the public storefront' && exit 1
           fi
 
-          grep -q 'abctechproducts.atechspot.com' "$ROOT/wrangler.jsonc"
-          grep -q '/api/health' "$ROOT/worker.js"
+          grep -q '/assets/storefront/generation-campaign.webp' "$HTML"
+          grep -q '/assets/storefront/storefront-showcase.webp' "$HTML"
+          grep -q '/assets/storefront/abc-book-cover.webp' "$HTML"
+
           node --check "$ROOT/public/app.js"
           node --check "$ROOT/worker.js"
 
@@ -100,19 +106,19 @@ jobs:
           html=Path("ABC-Tech-Products-Website/public/index.html").read_text(encoding="utf-8")
           class P(HTMLParser):
               def __init__(self):
-                  super().__init__(); self.ids=set(); self.hashrefs=[]
+                  super().__init__(); self.ids=set(); self.refs=[]
               def handle_starttag(self,tag,attrs):
                   d=dict(attrs)
                   if d.get("id"): self.ids.add(d["id"])
                   href=d.get("href","")
-                  if href.startswith("#") and len(href)>1: self.hashrefs.append(href[1:])
+                  if href.startswith("#") and len(href)>1: self.refs.append(href[1:])
           p=P(); p.feed(html)
-          missing=sorted(set(p.hashrefs)-p.ids)
+          missing=sorted(set(p.refs)-p.ids)
           if missing: raise SystemExit("Broken internal anchors: "+", ".join(missing))
-          print(f"ABC Tech Products internal anchor validation passed: {len(p.hashrefs)} links, {len(p.ids)} ids.")
+          print(f"Internal anchors verified: {len(p.refs)} links, {len(p.ids)} ids.")
           PY
 
-          echo 'ABC Tech Products next-generation source assertions passed.'
+          echo 'Complete ABC Tech Products storefront source assertions passed.'
 
       - name: Deploy dedicated custom-domain Worker
         working-directory: ABC-Tech-Products-Website
@@ -136,28 +142,29 @@ jobs:
           done
 
 
-      - name: Verify live next-generation storefront
+      - name: Verify live complete storefront
         shell: bash
         run: |
           set -euo pipefail
-          sleep 4
+          sleep 5
           curl -L -fsS -A 'Mozilla/5.0' -H 'Cache-Control: no-cache' "https://abctechproducts.atechspot.com/?qa=${GITHUB_SHA}" -o /tmp/abc-products-live.html
           curl -L -fsS -A 'Mozilla/5.0' "https://abctechproducts.atechspot.com/api/health" -o /tmp/abc-products-health.json
 
           grep -q 'A+ TECHUCATION × ABC TECH PRODUCTS' /tmp/abc-products-live.html
-          grep -q 'ABC Tech Kids' /tmp/abc-products-live.html
-          grep -q 'Future Mode' /tmp/abc-products-live.html
-          grep -q 'A+ Tech Core' /tmp/abc-products-live.html
-          grep -q 'Tapstitch is the production and fulfillment platform' /tmp/abc-products-live.html
-          grep -q 'ABC STYLE FINDER' /tmp/abc-products-live.html
-          grep -q 'VIRTUAL TRY-ON' /tmp/abc-products-live.html
+          grep -q 'Built Next Tee' /tmp/abc-products-live.html
           grep -q 'A+ TECH LOOKBOOK' /tmp/abc-products-live.html
-          code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://abctechproducts.atechspot.com/assets/campaign/a-plus-tech-generation-campaign.webp")
-          echo "campaign asset -> $code"
-          test "$code" = "200"
-          grep -q 'Website 5 of the 22-property ATechSpot ecosystem' /tmp/abc-products-live.html
-          if grep -q 'tapstitch.com/account/dashboard' /tmp/abc-products-live.html; then
-            echo 'Private Tapstitch dashboard is exposed publicly' && exit 1
+          grep -q 'FROM THE ACTUAL BOOK WORLD' /tmp/abc-products-live.html
+          grep -q 'A+ FIT PREVIEW STUDIO' /tmp/abc-products-live.html
+          grep -q 'LAUNCH WHEN READY' /tmp/abc-products-live.html
+          if grep -qi 'tapstitch' /tmp/abc-products-live.html; then
+            echo 'Tapstitch is exposed publicly' && exit 1
           fi
+
+          for asset in /assets/storefront/generation-campaign.webp /assets/storefront/storefront-showcase.webp /assets/storefront/abc-book-cover.webp; do
+            code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://abctechproducts.atechspot.com${asset}")
+            echo "${asset} -> ${code}"
+            test "${code}" = "200"
+          done
+
           node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/abc-products-health.json','utf8'));if(j.ok!==true)process.exit(1)"
-          echo 'Live ABC Tech Products next-generation storefront verified.'
+          echo 'Live complete ABC Tech Products storefront verified.'
