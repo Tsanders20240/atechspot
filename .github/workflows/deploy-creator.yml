@@ -34,32 +34,81 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || (echo "Missing CLOUDFLARE_API_TOKEN" && exit 1)
           test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "Missing CLOUDFLARE_ACCOUNT_ID" && exit 1)
 
-      - name: Validate Creator 10/10 source
+      - name: Validate Creator 22-ecosystem source
         shell: bash
         run: |
           set -euo pipefail
-          test -f ATechSpot-Creator-Website/public/index.html
-          test -f ATechSpot-Creator-Website/public/assessment/index.html
-          test -f ATechSpot-Creator-Website/worker.js
-          grep -q 'Build digital products people can' ATechSpot-Creator-Website/public/index.html
-          grep -q 'Creator websites' ATechSpot-Creator-Website/public/index.html
-          grep -q 'Business Template Vault' ATechSpot-Creator-Website/public/index.html
-          grep -q 'AI Visual Prompt Library' ATechSpot-Creator-Website/public/index.html
-          grep -q 'Social Content Reel Library' ATechSpot-Creator-Website/public/index.html
-          grep -q 'CUSTOM B2B DIGITAL PRODUCT STUDIO' ATechSpot-Creator-Website/public/index.html
-          grep -q 'Website 3 of the 22-property ATechSpot ecosystem' ATechSpot-Creator-Website/public/index.html
-          grep -q 'Create One for My Company' ATechSpot-Creator-Website/public/index.html
-          grep -q 'Digital-product systems' ATechSpot-Creator-Website/public/index.html
-          grep -q 'Business automation' ATechSpot-Creator-Website/public/index.html
-          grep -q 'Launch infrastructure' ATechSpot-Creator-Website/public/index.html
-          grep -q 'Create the product, brand system' ATechSpot-Creator-Website/public/index.html
-          grep -q 'https://atechucation.atechspot.com/' ATechSpot-Creator-Website/public/index.html
-          grep -q 'https://abcoftech.atechspot.com/' ATechSpot-Creator-Website/public/index.html
-          test -f ATechSpot-Creator-Website/public/creator-2026.css
-          grep -q 'CREATOR BUSINESS ASSESSMENT' ATechSpot-Creator-Website/public/assessment/index.html
-          grep -q 'creator.atechspot.com' ATechSpot-Creator-Website/wrangler.jsonc
-          grep -q '/api/creator-assessment' ATechSpot-Creator-Website/worker.js
-          echo 'Creator source assertions passed.'
+          ROOT='ATechSpot-Creator-Website'
+          HTML="$ROOT/public/index.html"
+          ASSESSMENT="$ROOT/public/assessment/index.html"
+
+          test -f "$HTML"
+          test -f "$ASSESSMENT"
+          test -f "$ROOT/public/styles.css"
+          test -f "$ROOT/public/creator-2026.css"
+          test -f "$ROOT/public/app.js"
+          test -f "$ROOT/worker.js"
+          test -f "$ROOT/public/robots.txt"
+          test -f "$ROOT/public/sitemap.xml"
+
+          grep -q 'Website 3 of the 22-property ATechSpot ecosystem' "$HTML"
+          grep -q 'PROPERTY 03 · CREATOR BUSINESS SYSTEMS' "$HTML"
+          grep -q 'THE CREATOR BUSINESS OS' "$HTML"
+          grep -q 'Build the system behind' "$HTML"
+          grep -q 'one specialist inside a' "$HTML"
+          grep -q 'Explore All 22 Properties' "$HTML"
+
+          grep -q 'Creator websites' "$HTML"
+          grep -q 'Digital-product systems' "$HTML"
+          grep -q 'Business automation' "$HTML"
+          grep -q 'Launch infrastructure' "$HTML"
+          grep -q 'CUSTOM B2B DIGITAL PRODUCT STUDIO' "$HTML"
+          grep -q 'Business Template Vault' "$HTML"
+          grep -q 'AI Visual Prompt Library' "$HTML"
+          grep -q 'Social Content Reel Library' "$HTML"
+
+          grep -q 'https://www.atechspot.com/' "$HTML"
+          grep -q 'https://atechucation.atechspot.com/' "$HTML"
+          grep -q 'https://www.abcoftech.atechspot.com/' "$HTML"
+          grep -q 'https://abctechproducts.atechspot.com/' "$HTML"
+          grep -q 'https://visionofsanders.atechspot.com/' "$HTML"
+          grep -q 'https://astudiomx.atechspot.com/' "$HTML"
+          grep -q 'https://atechnetwork.atechspot.com/' "$HTML"
+          grep -q 'https://book.atechspot.com/' "$HTML"
+          grep -q 'https://support.atechspot.com/' "$HTML"
+
+          grep -q 'CREATOR BUSINESS ASSESSMENT' "$ASSESSMENT"
+          grep -q '/#creator-os' "$ASSESSMENT"
+          grep -q '/#ecosystem' "$ASSESSMENT"
+          grep -q '/api/creator-assessment' "$ROOT/worker.js"
+          grep -q '/api/creator-contact' "$ROOT/worker.js"
+          grep -q 'creator.atechspot.com' "$ROOT/wrangler.jsonc"
+          node --check "$ROOT/public/app.js"
+          node --check "$ROOT/worker.js"
+
+          grep -q '<link rel="canonical" href="https://creator.atechspot.com/">' "$HTML"
+          grep -q 'ProfessionalService' "$HTML"
+          grep -q 'creator.atechspot.com/assessment/' "$ROOT/public/sitemap.xml"
+
+          python - <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          html=Path("ATechSpot-Creator-Website/public/index.html").read_text(encoding="utf-8")
+          class P(HTMLParser):
+              def __init__(self):
+                  super().__init__(); self.ids=set(); self.links=[]
+              def handle_starttag(self,tag,attrs):
+                  d=dict(attrs)
+                  if d.get("id"): self.ids.add(d["id"])
+                  href=d.get("href","")
+                  if href.startswith("#") and len(href)>1: self.links.append(href[1:])
+          p=P(); p.feed(html)
+          missing=sorted(set(p.links)-p.ids)
+          if missing: raise SystemExit("Broken internal anchors: "+", ".join(missing))
+          print(f"Creator internal anchor validation passed: {len(p.links)} links, {len(p.ids)} ids.")
+          PY
+
+          echo 'Creator 22-ecosystem source assertions passed.'
 
       - name: Deploy Creator custom-domain Worker
         working-directory: ATechSpot-Creator-Website
@@ -111,3 +160,22 @@ jobs:
           cat /tmp/creator-qa-result.json
           test "$code" = "200"
           node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/creator-qa-result.json','utf8'));if(j.ok!==true||j.confirmationSent!==true)process.exit(1)"
+
+
+      - name: Verify live Creator 22-ecosystem experience
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 4
+          curl -L -fsS -A 'Mozilla/5.0' -H 'Cache-Control: no-cache' "https://creator.atechspot.com/?qa=${GITHUB_SHA}" -o /tmp/creator-live.html
+          curl -L -fsS -A 'Mozilla/5.0' -H 'Cache-Control: no-cache' "https://creator.atechspot.com/assessment/?qa=${GITHUB_SHA}" -o /tmp/creator-assessment.html
+          curl -L -fsS -A 'Mozilla/5.0' "https://creator.atechspot.com/api/health" -o /tmp/creator-health.json
+
+          grep -q 'PROPERTY 03 · CREATOR BUSINESS SYSTEMS' /tmp/creator-live.html
+          grep -q 'THE CREATOR BUSINESS OS' /tmp/creator-live.html
+          grep -q 'Explore All 22 Properties' /tmp/creator-live.html
+          grep -q 'Business Template Vault' /tmp/creator-live.html
+          grep -q 'Custom B2B Digital Product' /tmp/creator-live.html
+          grep -q 'CREATOR BUSINESS ASSESSMENT' /tmp/creator-assessment.html
+          node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/creator-health.json','utf8'));if(j.ok!==true||j.property!=='ATechSpot Creator')process.exit(1)"
+          echo 'Live ATechSpot Creator 22-ecosystem experience verified.'
