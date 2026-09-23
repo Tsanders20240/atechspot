@@ -234,6 +234,8 @@ jobs:
             jq -r 'if .success then "RemoteCare domain attached; certificate/DNS activation may still be pending." else (.errors[]?.message // "Domain attachment failed.") end' /tmp/remotecare-domain.json
             test "$(jq -r '.success' /tmp/remotecare-domain.json)" = "true"
           fi
+          curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$domains_url" -o /tmp/pages-domains-after.json
+          jq -r '.result[] | select(.name == "remotecare.atechspot.com") | "RemoteCare Pages status: \(.status); validation: \(.validation_data.status // "unknown"); verification: \(.verification_data.status // "unknown")"' /tmp/pages-domains-after.json
 
       - name: Verify deployed preview
         shell: bash
