@@ -56,3 +56,26 @@ body{background:#f8fcff;color:var(--abc-ink)}
 .sound-dock{box-shadow:0 12px 36px rgba(0,35,85,.24)!important}
 @media(max-width:900px){.launch-grid{grid-template-columns:1fr 1fr}.grownup-grid{grid-template-columns:1fr}.grownup-points{grid-template-columns:1fr 1fr}}
 @media(max-width:620px){.launch-grid,.grownup-points{grid-template-columns:1fr}.section{padding:62px 0}.launch-card{min-height:auto}.site-control-bar{overflow-x:auto;justify-content:flex-start!important}.site-control-bar>a,.site-control-bar>button{flex:0 0 auto}.book-layout{gap:28px!important}}
+
+/* Final 10/10 content polish */
+.book-product-mockup img{width:min(100%,430px);display:block;margin:0 auto;filter:drop-shadow(0 22px 28px rgba(8,37,91,.18))}
+.color-download-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}
+.color-download-grid .btn{width:100%;text-align:center;justify-content:center}
+.printable-activity-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important}
+.printable-activity-grid .activity-poster{display:block;text-decoration:none;background:#fff;border:1px solid var(--abc-line);overflow:hidden}
+.printable-activity-grid .activity-poster img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+.printable-activity-grid .activity-meta{padding:15px}
+.printable-activity-grid .activity-meta strong{display:block;color:var(--abc-navy);font-size:17px;margin-bottom:4px}
+.printable-activity-grid .activity-meta span{color:#1870c8;font-size:13px;font-weight:850}
+.creator-heading{text-align:center;max-width:780px;margin:0 auto 34px}
+.creator-photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;max-width:900px;margin:0 auto}
+.creator-card{margin:0;background:#fff;border:1px solid var(--abc-line);border-radius:28px;overflow:hidden;box-shadow:0 24px 60px rgba(8,37,91,.11)}
+.creator-card img{display:block;width:100%;height:460px;object-fit:cover;object-position:center top}
+.creator-card figcaption{padding:20px 22px 24px}
+.creator-card strong{display:block;font-size:22px;color:var(--abc-navy)}
+.creator-card span{display:block;margin-top:3px;color:var(--abc-muted);font-weight:800}
+@media(max-width:900px){.printable-activity-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:620px){
+  .color-download-grid,.printable-activity-grid,.creator-photo-grid{grid-template-columns:1fr!important}
+  .creator-card img{height:390px}
+}
