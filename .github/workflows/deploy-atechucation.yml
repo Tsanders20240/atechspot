@@ -42,6 +42,14 @@ jobs:
           test -f A-Techucation-Website/terms/index.html
           test -f A-Techucation-Website/privacy/index.html
           test -f A-Techucation-Website/payments-live.js
+          test -f A-Techucation-Website/_headers
+          grep -q 'A+ Techucation Academy' A-Techucation-Website/index.html
+          grep -q 'Technology Education for the AI Era' A-Techucation-Website/index.html
+          grep -q 'AI study guides' A-Techucation-Website/index.html
+          ! grep -q '24/7 AI study support' A-Techucation-Website/app.js
+          grep -q 'Content-Security-Policy' A-Techucation-Website/_headers
+          grep -q 'X-Frame-Options: DENY' A-Techucation-Website/_headers
+          grep -q 'onboarding/\*' A-Techucation-Website/_headers
           grep -q 'payments-live.js' A-Techucation-Website/index.html
           grep -q 'https://buy.stripe.com/9B628s9Pw7D8bdpdma6EU01' A-Techucation-Website/payments-live.js
           grep -q 'https://buy.stripe.com/8x2fZi0eWg9EepBfui6EU02' A-Techucation-Website/payments-live.js
