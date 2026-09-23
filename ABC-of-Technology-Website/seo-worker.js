@@ -1,6 +1,6 @@
 import baseWorker from './worker.js';
 
-const ORIGIN='https://abcoftech.atechspot.com';
+const ORIGIN='https://www.abcoftech.atechspot.com';
 const LANDINGS={
   '/free-resources/virtual-reality-coloring-page/':{
     title:'VR Headset Coloring Page – Free Printable PDF | ABC’s of Technology',
@@ -63,7 +63,12 @@ const resourceNav='<section style="padding:34px 18px;background:#f4f9ff;border-t
 
 export default {
   async fetch(request, env, ctx) {
-    const url=new URL(request.url),path=url.pathname.endsWith('/')?url.pathname:url.pathname+'/';
+    const url=new URL(request.url);
+    if(url.hostname==='abcoftech.atechspot.com'){
+      url.hostname='www.abcoftech.atechspot.com';
+      return Response.redirect(url.toString(),301);
+    }
+    const path=url.pathname.endsWith('/')?url.pathname:url.pathname+'/';
     if((request.method==='GET'||request.method==='HEAD')&&LANDINGS[path]) return landing(path,LANDINGS[path]);
     if((request.method==='GET'||request.method==='HEAD')&&path==='/technology-alphabet-a-to-z/') return alphabetLanding();
     if(request.method==='GET'&&url.pathname==='/sitemap.xml') return sitemap();
