@@ -5,7 +5,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 from reportlab.lib.colors import black, white
 from pathlib import Path
-import math, os, shutil
+import math, os, shutil, zipfile
 
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'public'/'downloads'/'coloring-pages'
@@ -16,7 +16,33 @@ for path,name in [('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf','DejaVu'),(
     if os.path.exists(path): pdfmetrics.registerFont(TTFont(name,path))
 
 DATA=[
-('A','Analog Phone','Talk about how phones changed from old to new.'),('B','Battery','Name something at home that uses a battery.'),('C','Computer','Point to the screen, keyboard and mouse.'),('D','Drone','What can a drone see from the sky?'),('E','Email','Who might a grown-up send an email to?'),('F','Flash Drive','What kinds of files can a flash drive hold?'),('G','Game Controller','Name one button you use while playing a game.'),('H','Headphones','Why do headphones help us listen quietly?'),('I','Internet','Name one safe thing you can learn online with a grown-up.'),('J','Joystick','Which direction can a joystick move?'),('K','Keyboard','Find the first letter of your name on a keyboard.'),('L','Laptop','What makes a laptop easy to carry?'),('M','Mouse','How does a computer mouse help us point and click?'),('N','Network','How can computers share information with each other?'),('O','Online','Name one thing a grown-up may do online.'),('P','Programming','What instructions would you give a robot?'),('Q','QR Code','Ask a grown-up where they have seen a QR code.'),('R','Robot','What job would you give a helpful robot?'),('S','Smartphone','Name one helpful thing a smartphone can do.'),('T','Tablet','How is a tablet different from a laptop?'),('U','USB','What can a USB connection plug into?'),('V','Virtual Reality','What imaginary place would you visit in VR?'),('W','Wi-Fi','Where do you see the Wi-Fi symbol?'),('X','X-Ray','How can an X-ray help a doctor see inside the body?'),('Y','YouTube','What kind of educational video would you watch with a grown-up?'),('Z','Zoom','Who could you talk to on a video call?')]
+('A','Android','What can an Android device help a grown-up do?'),
+('B','Bitcoin','Bitcoin is a kind of digital money. Ask a grown-up where digital money is used.'),
+('C','Cache','A cache stores information temporarily to help technology work faster.'),
+('D','Drone','What can a drone see from the sky?'),
+('E','Email','Who might a grown-up send an email to?'),
+('F','Floppy Disk','How did people save computer files before flash drives?'),
+('G','Gaming','Name one thing you can learn while playing a good game.'),
+('H','Hardware','Point to a piece of computer hardware you can touch.'),
+('I','Internet','Name one safe thing you can learn online with a grown-up.'),
+('J','Joystick','Which direction can a joystick move?'),
+('K','Keyboard','Find the first letter of your name on a keyboard.'),
+('L','Laptop','What makes a laptop easy to carry?'),
+('M','Mouse','How does a computer mouse help us point and click?'),
+('N','Network','How can computers share information with each other?'),
+('O','Operating System','An operating system helps a device run apps and manage its parts.'),
+('P','Programming','What instructions would you give a robot?'),
+('Q','QR Code','Ask a grown-up where they have seen a QR code.'),
+('R','Robot','What job would you give a helpful robot?'),
+('S','Smartphone','Name one helpful thing a smartphone can do.'),
+('T','Technology','Name one kind of technology you use to learn or create.'),
+('U','USB','What can a USB connection plug into?'),
+('V','Virtual Reality','What imaginary place would you visit in VR?'),
+('W','Wi-Fi','Where do you see the Wi-Fi symbol?'),
+('X','XTC','XTC is an ABC of Technology learning term. Practice saying the letters X-T-C.'),
+('Y','YouTube','What kind of educational video would you watch with a grown-up?'),
+('Z','Zoom','Who could you talk to on a video call?')
+]
 
 W,H=letter
 
@@ -116,4 +142,25 @@ for i,(l,w,p) in enumerate(DATA,1):
     slug=w.lower().replace(' ','-').replace('/','-').replace('wi-fi','wifi'); path=IND/f'{l.lower()}-{slug}.pdf'; cc=canvas.Canvas(str(path),pagesize=letter,pageCompression=1); draw_page(cc,l,w,p,1); cc.save()
 combined=OUT/'abc-technology-coloring-pages-a-z-26-pages.pdf'; cc=canvas.Canvas(str(combined),pagesize=letter,pageCompression=1)
 for i,(l,w,p) in enumerate(DATA,1): draw_page(cc,l,w,p,i)
-cc.save(); print(combined); print('generated individual PDFs',len([p for p in IND.glob('[a-z]-*.pdf')]))
+cc.save()
+
+# Package the exact A–Z printable sets requested for the website.
+groups=[
+    ('A-J_Tech_Coloring_Pages.zip', list('abcdefghij')),
+    ('K-T_Tech_Coloring_Pages.zip', list('klmnopqrst')),
+    ('U-Z_Tech_Coloring_Pages.zip', list('uvwxyz')),
+]
+for zip_name, letters in groups:
+    zip_path=OUT/zip_name
+    with zipfile.ZipFile(zip_path,'w',zipfile.ZIP_DEFLATED) as z:
+        for letter in letters:
+            for pdf in sorted(IND.glob(f'{letter}-*.pdf')):
+                z.write(pdf,arcname=pdf.name)
+combined_zip=OUT/'ABC_Tech_Coloring_Pages_A-Z_26_Page_Combined.zip'
+with zipfile.ZipFile(combined_zip,'w',zipfile.ZIP_DEFLATED) as z:
+    for pdf in sorted(IND.glob('[a-z]-*.pdf')):
+        z.write(pdf,arcname=pdf.name)
+
+print(combined)
+print('generated individual PDFs',len([p for p in IND.glob('[a-z]-*.pdf')]))
+print('generated coloring ZIPs',*[p.name for p in OUT.glob('*Tech_Coloring_Pages*.zip')])
