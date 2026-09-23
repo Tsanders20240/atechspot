@@ -170,3 +170,32 @@ body{background:#f8fcff;color:var(--abc-ink)}
   .hero-proof-grid article{min-height:82px;padding:13px 9px}
   .hero-proof-grid span{font-size:11px}
 }
+
+
+/* Final author portrait + coloring consistency polish */
+.creator-card img{
+  width:100%;
+  height:460px;
+  object-fit:cover;
+  object-position:center 18%;
+  display:block;
+  background:#eef6ff;
+}
+.color-card-large .color-page-thumb{
+  aspect-ratio:3/4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background:#fff;
+}
+.color-card-large .color-page-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  display:block;
+}
+@media(max-width:620px){
+  .creator-card img{height:390px}
+}
