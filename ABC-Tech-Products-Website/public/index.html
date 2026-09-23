@@ -85,12 +85,37 @@
 
 <section id="try-on" class="tryon section">
   <div class="shell tryon-grid">
-    <div><p class="eyebrow">A+ FIT PREVIEW STUDIO</p><h2>See your look<br><em>before launch.</em></h2><p>The site is ready for true AI garment try-on once live commerce is connected. Right now you can preview your photo locally in your browser and choose a collection without sending the image anywhere.</p><div class="tryon-steps"><span><b>1</b> Upload photo</span><span><b>2</b> Choose collection</span><span><b>3</b> Preview locally</span><span><b>4</b> Activate AI try-on at launch</span></div></div>
+    <div><p class="eyebrow">A+ FIT PREVIEW STUDIO</p><h2>Put the look<br><em>on your photo now.</em></h2><p>This version works immediately in the browser. Upload a photo, choose a collection and garment style, then drag and resize the A+ garment overlay until it sits correctly on the person. Nothing is uploaded by this page.</p><div class="tryon-steps"><span><b>1</b> Upload photo</span><span><b>2</b> Choose collection</span><span><b>3</b> Fit the garment</span><span><b>4</b> Save preview</span></div><p class="fine light-fine">For best results, use a front-facing photo that includes shoulders and upper torso. A true AI cloth-warping provider can replace this local fitting mode later when you launch commerce.</p></div>
     <div class="tryon-card">
-      <div id="tryonPreview" class="tryon-preview"><strong>YOUR PHOTO</strong><span>Private browser preview</span></div>
-      <label>Choose photo<input id="tryonUpload" type="file" accept="image/*"></label>
-      <label>Collection<select id="tryonCollection"><option>ABC Tech Kids</option><option>Future Mode</option><option>A+ Tech Core</option><option>Creator Edition</option></select></label>
-      <button id="tryonLaunch" class="btn dark" type="button">Check Try-On Status →</button><p id="tryonStatus" class="status" role="status" aria-live="polite"></p>
+      <div id="tryonPreview" class="tryon-preview tryon-stage">
+        <img id="tryonPhoto" alt="" hidden>
+        <svg id="garmentOverlay" class="garment-overlay" viewBox="0 0 420 520" role="img" aria-label="A+ Tech garment overlay" hidden>
+          <path id="garmentShape" d="M120 70 L170 35 Q210 60 250 35 L300 70 L380 125 L335 205 L300 180 L300 470 L120 470 L120 180 L85 205 L40 125 Z" fill="#0b1220" stroke="#ffffff" stroke-width="5"/>
+          <text id="garmentMain" x="210" y="220" text-anchor="middle" fill="#ffffff" font-size="42" font-weight="900">A+ TECH</text>
+          <text id="garmentSub" x="210" y="270" text-anchor="middle" fill="#46e5ff" font-size="23" font-weight="900">CREATE • CODE • CONNECT</text>
+          <circle cx="210" cy="335" r="48" fill="none" stroke="#ff4fc3" stroke-width="8"/>
+          <path d="M185 335h50M210 310v50" stroke="#f4ff3b" stroke-width="8" stroke-linecap="round"/>
+        </svg>
+        <div id="tryonEmpty" class="tryon-empty"><strong>UPLOAD A PHOTO</strong><span>Front-facing upper-body photos work best</span></div>
+      </div>
+
+      <div class="tryon-form-grid">
+        <label>Choose photo<input id="tryonUpload" type="file" accept="image/*"></label>
+        <label>Collection<select id="tryonCollection"><option>ABC Tech Kids</option><option>Future Mode</option><option>A+ Tech Core</option><option>Creator Edition</option></select></label>
+        <label>Garment<select id="tryonGarment"><option value="tee">T-Shirt</option><option value="hoodie">Hoodie</option></select></label>
+      </div>
+
+      <div class="fit-controls">
+        <label>Size <input id="tryonScale" type="range" min="55" max="120" value="82"></label>
+        <label>Left / Right <input id="tryonX" type="range" min="-35" max="35" value="0"></label>
+        <label>Up / Down <input id="tryonY" type="range" min="-35" max="45" value="8"></label>
+      </div>
+
+      <div class="tryon-actions">
+        <button id="tryonLaunch" class="btn dark" type="button">Create Try-On Preview →</button>
+        <button id="tryonSave" class="btn line" type="button">Save Preview</button>
+      </div>
+      <p id="tryonStatus" class="status" role="status" aria-live="polite"></p>
     </div>
   </div>
 </section>
