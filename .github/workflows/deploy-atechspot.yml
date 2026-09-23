@@ -375,7 +375,7 @@ jobs:
             url="https://www.atechspot.com/?deploy=$GITHUB_SHA&attempt=$attempt"
             code=$(curl -sS -L -H 'Cache-Control: no-cache' -o /tmp/prod-home.html -w '%{http_code}' "$url" || true)
             echo "Production homepage -> $code (attempt $attempt/10)"
-            if [ "$code" = "200" ]               && grep -q 'Technology problem?' /tmp/prod-home.html               && grep -q 'Start my business' /tmp/prod-home.html               && grep -q 'Grow my business' /tmp/prod-home.html               && grep -q 'Price confirmed first' /tmp/prod-home.html               && grep -q 'href="/remote-support/"' /tmp/prod-home.html; then
+            if [ "$code" = "200" ]               && grep -q 'Technology problem?' /tmp/prod-home.html               && grep -q 'Start my business' /tmp/prod-home.html               && grep -q 'Grow my business' /tmp/prod-home.html               && grep -q 'Price confirmed first' /tmp/prod-home.html               && grep -q 'https://remotecare.atechspot.com/' /tmp/prod-home.html; then
               dr_code=$(curl -sS -L -H 'Cache-Control: no-cache' -o /tmp/prod-data-recovery.html -w '%{http_code}' "https://www.atechspot.com/data-recovery/?deploy=$GITHUB_SHA&attempt=$attempt" || true)
               echo "Production data recovery -> $dr_code (attempt $attempt/10)"
               if [ "$dr_code" = "200" ]                 && grep -q 'ATECH<span>SPOT</span>' /tmp/prod-data-recovery.html                 && grep -q 'DS25379' /tmp/prod-data-recovery.html                 && grep -q 'https://quote.drivesavers.com/' /tmp/prod-data-recovery.html                 && grep -q 'Get DriveSavers Quote' /tmp/prod-data-recovery.html; then
@@ -390,8 +390,18 @@ jobs:
                     account_code=$(curl -sS -L -H 'Cache-Control: no-cache' -o /tmp/prod-account.html -w '%{http_code}' "https://account.atechspot.com/?deploy=$GITHUB_SHA&attempt=$attempt" || true)
                     echo "Production account portal -> $account_code"
                     if [ "$account_code" = "200" ] && grep -q 'SECURE CLIENT ACCESS' /tmp/prod-account.html; then
-                      echo 'Production ATechSpot + DriveSavers + Client Portal verification passed.'
-                      exit 0
+                      dji_code=$(curl -sS -L -H 'Cache-Control: no-cache' -o /tmp/prod-dji.html -w '%{http_code}' "https://www.atechspot.com/dji/?deploy=$GITHUB_SHA&attempt=$attempt" || true)
+                      echo "Production DJI hub -> $dji_code (attempt $attempt/10)"
+                      if [ "$dji_code" = "200" ] \
+                        && grep -q 'WEBSITE 6 OF 22' /tmp/prod-dji.html \
+                        && grep -q 'Pick the right DJI drone for the' /tmp/prod-dji.html \
+                        && grep -q '01 / DRONE MISSION FINDER' /tmp/prod-dji.html \
+                        && grep -q '02 / FIVE CLEAR PICKS' /tmp/prod-dji.html \
+                        && grep -q '05 / U.S. FLIGHT READINESS' /tmp/prod-dji.html \
+                        && grep -q 'UPDATED SEP 23, 2026' /tmp/prod-dji.html; then
+                        echo 'Production ATechSpot + DJI #6 + DriveSavers + Client Portal verification passed.'
+                        exit 0
+                      fi
                     fi
                   fi
                 fi
