@@ -16,7 +16,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,19 +34,12 @@ jobs:
           test -n "$CLOUDFLARE_API_TOKEN" || (echo "Missing CLOUDFLARE_API_TOKEN" && exit 1)
           test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "Missing CLOUDFLARE_ACCOUNT_ID" && exit 1)
 
-      - name: Store final storefront visual assets
+      - name: Verify final storefront visual assets
         shell: bash
         run: |
           set -euo pipefail
           python -m pip install --disable-pip-version-check --quiet pillow
           python ABC-Tech-Products-Website/scripts/fetch_campaign_asset.py
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ABC-Tech-Products-Website/public/assets/storefront/
-          if ! git diff --cached --quiet; then
-            git commit -m "Store final ABC Tech Products storefront assets [skip ci]"
-            git push origin HEAD:main || echo "Storefront asset commit could not be pushed; continuing current deployment."
-          fi
 
       - name: Validate complete ABC Tech Products storefront
         shell: bash
