@@ -12,6 +12,19 @@
 .customer-path h2{font-size:clamp(1.45rem,2vw,1.9rem);margin:8px 0 4px}
 .customer-path p{font-size:1rem;color:#adc0d1;margin:0 0 11px;line-height:1.5}
 .customer-path b{font-size:.94rem;color:#7ae7df}
+.solution-section{background:#06111e;padding-block:85px}
+.solution-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.solution-grid a{padding:30px;border:1px solid #24506c;border-radius:22px;background:linear-gradient(145deg,#0c2337,#071625);transition:border-color .2s,transform .2s}
+.solution-grid a:hover,.solution-grid a:focus-visible{transform:translateY(-3px);border-color:#64d3ed}
+.solution-grid small{font-size:.8rem;font-weight:800;color:#70dced;letter-spacing:.1em}
+.solution-grid h3{font-size:1.55rem;margin:25px 0 10px}
+.solution-grid p{font-size:1rem;color:#b2c5d3;line-height:1.55;min-height:75px}
+.solution-grid b{font-size:.94rem;color:#7ae7df}
+.featured-properties{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:24px 0 30px;max-width:760px}
+.featured-properties a{display:grid;gap:4px;padding:15px;border:1px solid #2b5671;border-radius:14px;background:#081b2bea}
+.featured-properties a:hover,.featured-properties a:focus-visible{border-color:#66d5ec}
+.featured-properties strong{font-size:1rem;color:#f4f9ff}
+.featured-properties span{font-size:.87rem;color:#8fb9ca}
 .flagship-hero{min-height:0}
 .help-route h3,.journey-step h3{font-size:1.4rem}
 .help-route p,.journey-step p,.case-study-card dd,.price-card p,.buyer-confidence span{font-size:.95rem;line-height:1.55}
@@ -29,5 +42,5 @@
 .footer-grid a{font-size:.92rem!important}
 .footer-grid p{font-size:.94rem}
 @media(max-width:1020px){.customer-hero{grid-template-columns:1fr;padding:75px 0}.customer-paths{grid-template-columns:repeat(3,minmax(0,1fr))}.customer-path{padding:20px}.customer-path h2{font-size:1.35rem}}
-@media(max-width:720px){.customer-hero{padding:56px 0 66px}.customer-hero-copy h1{font-size:clamp(3rem,12vw,4.5rem)}.customer-paths{grid-template-columns:1fr}.customer-path h2{font-size:1.55rem}.customer-path p{font-size:1rem}.customer-hero-copy .hero-actions{flex-direction:column}.customer-hero-copy .hero-actions .btn{width:100%}}
+@media(max-width:720px){.customer-hero{padding:56px 0 66px}.customer-hero-copy h1{font-size:clamp(3rem,12vw,4.5rem)}.customer-paths,.solution-grid,.featured-properties{grid-template-columns:1fr}.customer-path h2{font-size:1.55rem}.customer-path p{font-size:1rem}.customer-hero-copy .hero-actions{flex-direction:column}.customer-hero-copy .hero-actions .btn{width:100%}.solution-grid p{min-height:0}}
 @media(prefers-reduced-motion:reduce){.customer-path{transition:none}}
