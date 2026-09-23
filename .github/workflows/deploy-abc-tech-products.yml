@@ -78,7 +78,8 @@ jobs:
           grep -q 'CREATOR EDITION' "$HTML"
           grep -q 'FROM THE ACTUAL BOOK WORLD' "$HTML"
           grep -q 'A+ FIT PREVIEW STUDIO' "$HTML"
-          grep -q 'Create Try-On Preview' "$HTML"
+          grep -q 'Apply A+ Look' "$HTML"
+          grep -q 'Reset Fit' "$HTML"
           grep -q 'Save Preview' "$HTML"
           grep -q 'garmentOverlay' "$HTML"
           grep -q 'tryonScale' "$HTML"
@@ -152,7 +153,8 @@ jobs:
           grep -q 'A+ TECH LOOKBOOK' /tmp/abc-products-live.html
           grep -q 'FROM THE ACTUAL BOOK WORLD' /tmp/abc-products-live.html
           grep -q 'A+ FIT PREVIEW STUDIO' /tmp/abc-products-live.html
-          grep -q 'Create Try-On Preview' /tmp/abc-products-live.html
+          grep -q 'Apply A+ Look' /tmp/abc-products-live.html
+          grep -q 'Reset Fit' /tmp/abc-products-live.html
           grep -q 'Save Preview' /tmp/abc-products-live.html
           grep -q 'garmentOverlay' /tmp/abc-products-live.html
           grep -q 'LAUNCH WHEN READY' /tmp/abc-products-live.html
