@@ -157,7 +157,9 @@ jobs:
             echo 'On-site payment or card collection code detected' && exit 1
           fi
 
-          grep -q 'www.abcoftech.atechspot.com' "$ROOT/wrangler.jsonc"
+          if grep -q '"pattern": "www.abcoftech.atechspot.com"' "$ROOT/wrangler.jsonc"; then
+            echo 'www hostname must belong to Cloudflare Pages, not the redirect Worker' && exit 1
+          fi
           grep -q 'abcoftech.atechspot.com' "$ROOT/wrangler.jsonc"
           grep -q 'https://www.abcoftech.atechspot.com/' "$HTML"
 
@@ -182,18 +184,66 @@ jobs:
 
           echo 'ABC standalone A-Z ecosystem portal source assertions passed.'
 
-      - name: Deploy dedicated custom-domain Worker
+      - name: Deploy non-www redirect Worker
         working-directory: ABC-of-Technology-Website
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: npx --yes wrangler@latest deploy
 
+      - name: Deploy ABC public site to Cloudflare Pages
+        working-directory: ABC-of-Technology-Website
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          npx --yes wrangler@latest pages deploy public \
+            --project-name=abcoftechatechspot \
+            --branch=main \
+            --commit-hash="$GITHUB_SHA"
+
+      - name: Attach www hostname to ABC Pages project
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          project='abcoftechatechspot'
+          domain='www.abcoftech.atechspot.com'
+          endpoint="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$project/domains"
+
+          echo "Checking Pages project custom domains."
+          curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$endpoint" -o /tmp/abc-pages-domains.json
+          jq -e '.success == true' /tmp/abc-pages-domains.json >/dev/null
+
+          if jq -e --arg domain "$domain" '.result[]? | select(.name == $domain)' /tmp/abc-pages-domains.json >/dev/null; then
+            echo "$domain is already attached to $project."
+          else
+            echo "Attaching $domain to Pages project $project."
+            curl -fsS -X POST \
+              -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              "$endpoint" \
+              --data "{"name":"$domain"}" \
+              -o /tmp/abc-pages-domain-create.json
+            cat /tmp/abc-pages-domain-create.json
+            jq -e '.success == true' /tmp/abc-pages-domain-create.json >/dev/null
+          fi
+
+          curl -fsS -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$endpoint" -o /tmp/abc-pages-domains-after.json
+          jq -r --arg domain "$domain" '.result[]? | select(.name == $domain) | "Pages domain status: \(.status); validation: \(.validation_data.status // "unknown"); verification: \(.verification_data.status // "unknown")"' /tmp/abc-pages-domains-after.json
+
       - name: Verify canonical production routes
         shell: bash
         run: |
           set -euo pipefail
-          sleep 7
+          sleep 10
+          pages_code=$(curl -L -sS -A 'Mozilla/5.0' -o /tmp/abc-pages-origin.html -w '%{http_code}' "https://abcoftechatechspot.pages.dev/?qa=$GITHUB_SHA")
+          echo "Pages origin -> $pages_code"
+          test "$pages_code" = "200"
+          grep -q 'START YOUR ADVENTURE' /tmp/abc-pages-origin.html
+          grep -q 'GROWN-UP GUIDE' /tmp/abc-pages-origin.html
           for path in / /robots.txt /sitemap.xml /api/health /portal-2026.css /portal-2026.js /assets/hero/abc-home-hero.webp /assets/activities/battery-hunt.webp /assets/activities/f-floppy-flash-drive-activity.webp /assets/activities/g-game-controller-activity.webp /assets/activities/h-headphones-activity.webp /assets/coloring-pages/a-analog-phone.webp /assets/coloring-pages/z-zoom.webp /assets/activities/phone-stand.webp /downloads/activities/battery-hunt.pdf /downloads/activities/phone-stand.pdf /downloads/activities/f-floppy-flash-drive-activity.pdf /downloads/activities/g-game-controller-activity.pdf /downloads/activities/h-headphones-activity.pdf /downloads/coloring-pages/a-analog-phone.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp /assets/book/book-page-a.webp /assets/authors/april-sanders-original-crop.webp; do
             code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://www.abcoftech.atechspot.com${path}")
             echo "$path -> $code"
