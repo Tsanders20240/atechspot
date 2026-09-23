@@ -105,9 +105,9 @@ jobs:
           grep -q 'ABC Tech Products' "$HTML"
 
           # Core learning experiences remain intact.
-          grep -q 'book-page-title.svg' "$HTML"
-          grep -q 'book-page-best-you.svg' "$HTML"
-          grep -q 'book-page-a.svg' "$HTML"
+          grep -q 'book-page-title.webp' "$HTML"
+          grep -q 'book-page-best-you.webp' "$HTML"
+          grep -q 'book-page-a.webp' "$HTML"
           grep -q 'ACTUAL SUPPLIED BOOK PAGES' "$HTML"
           if grep -q 'preview-f-floppy-flash.svg\|preview-f-flash-facts.svg\|preview-gh-game-headphones.svg' "$HTML"; then
             echo 'Recreated fake book pages are still referenced' && exit 1
@@ -321,9 +321,9 @@ jobs:
           grep -q 'Jason L. Hughes' /tmp/abc-live.html
           grep -q 'April M. Sanders' /tmp/abc-live.html
           grep -q 'All 26 PDF' /tmp/abc-live.html
-          grep -q 'book-page-title.svg' /tmp/abc-live.html
-          grep -q 'book-page-best-you.svg' /tmp/abc-live.html
-          grep -q 'book-page-a.svg' /tmp/abc-live.html
+          grep -q 'book-page-title.webp' /tmp/abc-live.html
+          grep -q 'book-page-best-you.webp' /tmp/abc-live.html
+          grep -q 'book-page-a.webp' /tmp/abc-live.html
           grep -q 'ACTUAL SUPPLIED BOOK PAGES' /tmp/abc-live.html
           if grep -q 'preview-f-floppy-flash.svg\|preview-f-flash-facts.svg\|preview-gh-game-headphones.svg' /tmp/abc-live.html; then
             echo 'Recreated fake book pages are live' && exit 1
