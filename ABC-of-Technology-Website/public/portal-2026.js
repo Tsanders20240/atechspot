@@ -33,13 +33,13 @@ const I18N={
   'nav.home':'Home','nav.book':'Book','nav.play':'Play','nav.color':'Color','nav.watch':'Watch','nav.spelling':'Spelling Bee','nav.about':'About','nav.getBook':'Get the Book →',
   'world.eyebrow':'INTERACTIVE WORLD','world.title':'Choose your path.','world.explore':'Explore','world.learn':'Learn','world.create':'Create','world.imagine':'Imagine','world.belong':'Belong',
   'learn.eyebrow':'A–Z ADVENTURE','learn.title':'Every letter opens a technology world.','learn.hear':'🔊 Hear','learn.surprise':'🎲 Surprise',
-  'book.eyebrow':'THE BOOK','book.title':'Look inside the real book.','book.body':'Three actual supplied pages, shown from the original source artwork for sharper reading.',
+  'book.eyebrow':'THE BOOK','book.title':'Look inside the real book.','book.body':'Two verified supplied pages, shown from the original source artwork for sharper reading.',
   'play.eyebrow':'PLAY','play.title':'Learn through games.',
   'stem.eyebrow':'STEM ACTIVITY LAB','stem.title':'Build. Experiment. Create.','stem.body':'Start with two full printable activities, then explore four quick challenges.',
   'spell.eyebrow':'SPELLING BEE','spell.title':'Listen. Spell. Learn.','spell.body':'26 technology words. No account required.','spell.placeholder':'Type the word','spell.check':'Check','spell.next':'Next',
   'color.eyebrow':'COLORING WORLD','color.title':'Color your way through A–Z technology.','color.body':'Choose a page, print it, color it and learn the technology word with a grown-up.','color.adventures':'26 printable adventures','color.description':'Big A–Z letters, kid-friendly technology drawings and conversation prompts.','color.openBook':'Open the Full Coloring Book →','color.seePack':'See the complete 26-page pack →',
   'watch.eyebrow':'WATCH & LISTEN','watch.title':'Technology comes alive.','watch.body':'Play the ABC Tech theme, follow the words on screen, or listen to A–Z vocabulary.','watch.lyricEyebrow':'ABC TECH LYRIC VIDEO','watch.lyricTitle':"Sing, watch and learn with ABC's of Technology.",'watch.lyricBody':'Play the official lyric video, then explore the A–Z words, coloring pages and activities.','watch.youtube':'Open on YouTube ↗','watch.watchHere':'Watch Here →',
-  'about.eyebrow':'THE CREATORS','about.title':'A brighter tomorrow.','about.body':'Created to make technology vocabulary fun, approachable and memorable for young learners and families.',
+  'about.eyebrow':'THE CREATORS','about.title':'Jason L. Hughes & April M. Sanders','about.body':'Created to make technology vocabulary fun, approachable and memorable for young learners and families.',
   'shop.eyebrow':'FOR GROWN-UPS','shop.title':'Bring the adventure home.','shop.body':"Choose a book format or continue to ABC Tech Products. Purchases open on the seller's site."
  },
  es:{
@@ -47,13 +47,13 @@ const I18N={
   'nav.home':'Inicio','nav.book':'Libro','nav.play':'Jugar','nav.color':'Colorear','nav.watch':'Ver','nav.spelling':'Concurso de ortografía','nav.about':'Acerca de','nav.getBook':'Obtener el libro →',
   'world.eyebrow':'MUNDO INTERACTIVO','world.title':'Elige tu camino.','world.explore':'Explorar','world.learn':'Aprender','world.create':'Crear','world.imagine':'Imaginar','world.belong':'Pertenecer',
   'learn.eyebrow':'AVENTURA A–Z','learn.title':'Cada letra abre un mundo de tecnología.','learn.hear':'🔊 Escuchar','learn.surprise':'🎲 Sorpresa',
-  'book.eyebrow':'EL LIBRO','book.title':'Mira dentro del libro real.','book.body':'Tres páginas reales proporcionadas, mostradas desde el arte original para una lectura más clara.',
+  'book.eyebrow':'EL LIBRO','book.title':'Mira dentro del libro real.','book.body':'Dos páginas reales verificadas, mostradas desde el arte original para una lectura más clara.',
   'play.eyebrow':'JUGAR','play.title':'Aprende jugando.',
   'stem.eyebrow':'LABORATORIO STEM','stem.title':'Construye. Experimenta. Crea.','stem.body':'Comienza con dos actividades imprimibles completas y luego explora cuatro desafíos rápidos.',
   'spell.eyebrow':'CONCURSO DE ORTOGRAFÍA','spell.title':'Escucha. Deletrea. Aprende.','spell.body':'26 palabras de tecnología. No se requiere cuenta.','spell.placeholder':'Escribe la palabra','spell.check':'Comprobar','spell.next':'Siguiente',
   'color.eyebrow':'MUNDO PARA COLOREAR','color.title':'Colorea tu camino por la tecnología de la A a la Z.','color.body':'Elige una página, imprímela, coloréala y aprende la palabra tecnológica con un adulto.','color.adventures':'26 aventuras imprimibles','color.description':'Letras grandes de la A a la Z, dibujos tecnológicos para niños y preguntas para conversar.','color.openBook':'Abrir el libro completo para colorear →','color.seePack':'Ver el paquete completo de 26 páginas →',
   'watch.eyebrow':'VER Y ESCUCHAR','watch.title':'La tecnología cobra vida.','watch.body':'Reproduce el tema de ABC Tech, sigue las palabras en pantalla o escucha el vocabulario de la A a la Z.','watch.lyricEyebrow':'VIDEO CON LETRA DE ABC TECH','watch.lyricTitle':"Canta, mira y aprende con ABC's of Technology.",'watch.lyricBody':'Reproduce el video oficial con letra y luego explora las palabras de la A a la Z, las páginas para colorear y las actividades.','watch.youtube':'Abrir en YouTube ↗','watch.watchHere':'Ver aquí →',
-  'about.eyebrow':'LOS CREADORES','about.title':'Un futuro más brillante.','about.body':'Creado para hacer que el vocabulario tecnológico sea divertido, accesible y memorable para niños y familias.',
+  'about.eyebrow':'LOS CREADORES','about.title':'Jason L. Hughes & April M. Sanders','about.body':'Creado para hacer que el vocabulario tecnológico sea divertido, accesible y memorable para niños y familias.',
   'shop.eyebrow':'PARA ADULTOS','shop.title':'Lleva la aventura a casa.','shop.body':'Elige un formato del libro o continúa a ABC Tech Products. Las compras se abren en el sitio del vendedor.'
  }
 };
