@@ -1,0 +1,47 @@
+name: Verify Ecosystem Matrix 2026-09-24
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-ecosystem-matrix-20260924.yml'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check every repaired hostname independently
+        shell: bash
+        run: |
+          set +e
+          urls=(
+            "https://ops.atechspot.com/growthcare"
+            "https://ops.atechspot.com/assessment"
+            "https://astudiomx.atechspot.com/"
+            "https://astudiomx.atechspot.com/services.html"
+            "https://royalupwiththehughes.atechspot.com/"
+            "https://www.atechucationfigures.atechspot.com/"
+            "https://warriorj.atechspot.com/contact.html"
+            "https://vendors.atechspot.com/"
+            "https://vendors.atechspot.com/api/health"
+            "https://press.atechspot.com/"
+            "https://press.atechspot.com/api/health"
+            "https://developers.atechspot.com/"
+            "https://developers.atechspot.com/api/health"
+          )
+          echo "=== DNS ==="
+          for host in ops.atechspot.com astudiomx.atechspot.com royalupwiththehughes.atechspot.com www.atechucationfigures.atechspot.com warriorj.atechspot.com vendors.atechspot.com press.atechspot.com developers.atechspot.com; do
+            printf "%s -> " "$host"
+            getent ahosts "$host" | head -n1 || echo "UNRESOLVED"
+          done
+          echo "=== HTTP ==="
+          for url in "${urls[@]}"; do
+            code=$(curl -L -sS --max-time 20 -o /tmp/body -w '%{http_code}' "$url")
+            rc=$?
+            title=$(grep -o -i '<title>[^<]*' /tmp/body 2>/dev/null | head -n1 | sed 's/<title>//I')
+            printf "%s | curl=%s | http=%s | title=%s\n" "$url" "$rc" "$code" "$title"
+          done
+          exit 0
