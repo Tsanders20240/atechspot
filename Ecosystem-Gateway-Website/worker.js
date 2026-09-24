@@ -1,0 +1,51 @@
+const YEAR='2026';
+const MAIN='https://www.atechspot.com';
+const START='https://office.builderall.com/us/franchise/share/1053992';
+const SECURITY={
+  'x-content-type-options':'nosniff',
+  'x-frame-options':'DENY',
+  'referrer-policy':'strict-origin-when-cross-origin',
+  'permissions-policy':'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
+  'strict-transport-security':'max-age=31536000'
+};
+const css=`:root{--bg:#06111c;--panel:#0d1c2a;--line:#1b3650;--text:#eef8ff;--muted:#9eb3c4;--accent:#74d3ff;--green:#70e1b5}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 80% 0,#123a5b 0,transparent 34%),var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif}.wrap{width:min(1120px,calc(100% - 32px));margin:auto}.top{padding:9px;text-align:center;background:#0a2135;font-size:10px;font-weight:900;letter-spacing:.13em}.nav{border-bottom:1px solid var(--line);background:#06111cee;position:sticky;top:0;z-index:10}.nav .wrap{height:72px;display:flex;align-items:center;gap:20px}.brand{margin-right:auto;font-size:21px;font-weight:900;color:var(--text);text-decoration:none}.brand b{color:var(--accent)}.nav a{color:#c8d8e5;text-decoration:none;font-size:13px}.btn{display:inline-block;padding:13px 18px;border-radius:999px;background:var(--accent);color:#03111b!important;font-weight:900;text-decoration:none}.hero{padding:100px 0 74px}.eyebrow{color:var(--green);font-size:11px;font-weight:900;letter-spacing:.17em;text-transform:uppercase}.hero h1,.section h2{font-size:clamp(42px,6vw,78px);line-height:.97;letter-spacing:-.055em;margin:14px 0 22px}.hero p,.lead{max-width:800px;color:var(--muted);font-size:18px;line-height:1.75}.section{padding:74px 0;border-top:1px solid var(--line)}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{padding:24px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,#10263a,#0a1723)}.card h3{margin:6px 0 9px}.card p{color:var(--muted);line-height:1.65}.card a{color:var(--accent);font-weight:800;text-decoration:none}.foot{padding:44px 0;border-top:1px solid var(--line);color:var(--muted);font-size:12px}.foot a{color:#d8ecfa;margin-right:14px}.status{display:flex;align-items:center;gap:9px}.dot{width:10px;height:10px;border-radius:50%;background:var(--green)}.dot.bad{background:#ff9b9b}@media(max-width:800px){.grid{grid-template-columns:1fr 1fr}.nav a:not(.brand){display:none}}@media(max-width:560px){.grid{grid-template-columns:1fr}.hero{padding-top:70px}}`;
+function head(title,desc){return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title><meta name="description" content="${desc}"><meta name="theme-color" content="#06111c"><style>${css}</style></head><body>`}
+const nav=`<div class="top">A+ TECHUCATION • ATECHSPOT OPERATING ECOSYSTEM</div><nav class="nav"><div class="wrap"><a class="brand" href="${MAIN}/">A+ <b>ATechSpot</b></a><a href="${MAIN}/ecosystem/">Ecosystem</a><a href="https://support.atechspot.com/">Support</a><a href="${MAIN}/contact/">Contact</a></div></nav>`;
+const foot=`<footer class="foot"><div class="wrap"><strong>ATechSpot Operating Ecosystem</strong><p><a href="${MAIN}/ecosystem/">22 Public Brands</a><a href="${MAIN}/privacy/">Privacy</a><a href="${MAIN}/terms/">Terms</a><a href="${MAIN}/contact/">Contact</a></p><p>© ${YEAR} A+ Techucation.</p></div></footer>`;
+function shell(title,desc,kicker,headline,body){return head(title,desc)+nav+`<main><section class="hero"><div class="wrap"><div class="eyebrow">${kicker}</div><h1>${headline}</h1>${body}</div></section></main>`+foot+`</body></html>`}
+function supportPage(){
+ return head('ATechSpot Support Center | Help for Customers','ATechSpot support center for service help, remote support, account access and general assistance.')+nav+`<main><section class="hero"><div class="wrap"><div class="eyebrow">Customer Support</div><h1>Get to the right help quickly.</h1><p>Choose the path that matches what you need. Support is connected to the same ATechSpot customer system used for intake, booking, payments and account access.</p></div></section><section class="section"><div class="wrap"><div class="grid"><article class="card"><h3>Remote technology help</h3><p>Get guided remote support for eligible technology issues.</p><a href="${MAIN}/remote-support/">Open Remote Support →</a></article><article class="card"><h3>Client account</h3><p>Access active client resources and project information.</p><a href="https://account.atechspot.com/clients/">Open Client Access →</a></article><article class="card"><h3>General support</h3><p>Questions about services, billing, projects or next steps.</p><a href="${MAIN}/contact/">Contact ATechSpot →</a></article></div></div></section></main>`+foot+`</body></html>`;
+}
+function helpPage(){
+ return head('ATechSpot Help Center | Resources & Answers','ATechSpot help center for resources, common questions, service guidance and support.')+nav+`<main><section class="hero"><div class="wrap"><div class="eyebrow">Help Center</div><h1>Answers before you need a ticket.</h1><p>Use self-service resources first, then move directly into support, intake or booking when you need a person.</p></div></section><section class="section"><div class="wrap"><div class="grid"><article class="card"><h3>Resources</h3><p>Guides and practical technology information from ATechSpot.</p><a href="${MAIN}/resources/">Browse resources →</a></article><article class="card"><h3>Start a project</h3><p>Tell us what you need and route the request into the right workflow.</p><a href="https://intake.atechspot.com/">Start intake →</a></article><article class="card"><h3>Need support?</h3><p>Move from self-service into customer support.</p><a href="https://support.atechspot.com/">Open Support Center →</a></article></div></div></section></main>`+foot+`</body></html>`;
+}
+function partnersPage(){
+ return head('ATechSpot Partners | Partnerships Across the Ecosystem','Partnership opportunities across the ATechSpot ecosystem for vendors, creators, media, technology and business relationships.')+nav+`<main><section class="hero"><div class="wrap"><div class="eyebrow">Partnerships</div><h1>Build useful things with the ATechSpot ecosystem.</h1><p>Partnerships are routed by relationship type so vendors, media collaborators, creators and strategic partners enter the right process.</p></div></section><section class="section"><div class="wrap"><div class="grid"><article class="card"><h3>Vendors & suppliers</h3><p>Apply to support approved ecosystem delivery needs.</p><a href="https://vendors.atechspot.com/">Vendor Network →</a></article><article class="card"><h3>Media & sponsorship</h3><p>Explore brand and content relationships through ATech Network.</p><a href="https://atechnetwork.atechspot.com/">ATech Network →</a></article><article class="card"><h3>Strategic partnership</h3><p>Discuss technology, education, distribution or business collaboration.</p><a href="${MAIN}/contact/">Start a conversation →</a></article></div></div></section></main>`+foot+`</body></html>`;
+}
+async function statusPage(){
+ const checks=[
+  ['ATechSpot','https://www.atechspot.com/'],
+  ['Account','https://account.atechspot.com/clients/'],
+  ['Vendor Network','https://vendors.atechspot.com/api/health'],
+  ['Pressroom','https://press.atechspot.com/api/health'],
+  ['Developers','https://developers.atechspot.com/api/health'],
+  ['WarriorJ','https://warriorj.atechspot.com/api/health']
+ ];
+ const rows=await Promise.all(checks.map(async ([name,url])=>{try{const r=await fetch(url,{redirect:'follow'});return [name,r.ok]}catch{return [name,false]}}));
+ const cards=rows.map(([name,ok])=>`<article class="card"><div class="status"><span class="dot ${ok?'':'bad'}"></span><strong>${name}</strong></div><p>${ok?'Responding normally':'Needs review'}</p></article>`).join('');
+ return head('ATechSpot Status | Service Availability','Live service availability checks for core ATechSpot ecosystem services.')+nav+`<main><section class="hero"><div class="wrap"><div class="eyebrow">Live Status</div><h1>Core ecosystem availability.</h1><p>Status is generated from live service checks at request time. A successful response does not certify every downstream payment, email or third-party dependency.</p></div></section><section class="section"><div class="wrap"><div class="grid">${cards}</div></div></section></main>`+foot+`</body></html>`;
+}
+function response(body,status=200,type='text/html; charset=utf-8'){return new Response(body,{status,headers:{'content-type':type,'cache-control':status===200?'public, max-age=60':'no-store',...SECURITY}})}
+export default{async fetch(request){const u=new URL(request.url),h=u.hostname,p=u.pathname;
+ if(p==='/api/health')return response(JSON.stringify({ok:true,property:h,canonical:'https://'+h}),200,'application/json; charset=utf-8');
+ if(h==='start.atechspot.com')return Response.redirect(START,302);
+ if(h==='intake.atechspot.com')return Response.redirect(MAIN+'/intake/',302);
+ if(h==='book.atechspot.com')return Response.redirect(MAIN+'/booking/',302);
+ if(h==='pay.atechspot.com')return Response.redirect(MAIN+'/payment/',302);
+ if(h==='shop.atechspot.com')return Response.redirect(MAIN+'/shop/',302);
+ if(h==='support.atechspot.com')return response(supportPage());
+ if(h==='help.atechspot.com')return response(helpPage());
+ if(h==='partners.atechspot.com')return response(partnersPage());
+ if(h==='status.atechspot.com')return response(await statusPage());
+ return response(shell('ATechSpot Operations','ATechSpot operating gateway.','ATechSpot','Connected operating infrastructure.',`<p class="lead">Use the main ATechSpot website to continue.</p><p><a class="btn" href="${MAIN}/">Go to ATechSpot →</a></p>`),404);
+}};
