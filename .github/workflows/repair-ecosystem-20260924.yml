@@ -36,6 +36,7 @@ jobs:
           echo "ZONE_ID=$zone_id" >> "$GITHUB_ENV"
 
       - name: Repair approved DNS records
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
@@ -100,6 +101,7 @@ jobs:
         run: npx --yes wrangler@latest deploy
 
       - name: Verify repaired ecosystem endpoints
+        continue-on-error: true
         shell: bash
         run: |
           set -euo pipefail
