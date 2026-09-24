@@ -1,0 +1,44 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "atechspot-ecosystem-gateway",
+  "compatibility_date": "2026-09-24",
+  "main": "worker.js",
+  "routes": [
+    {
+      "pattern": "start.atechspot.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "intake.atechspot.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "book.atechspot.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "pay.atechspot.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "support.atechspot.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "help.atechspot.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "shop.atechspot.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "status.atechspot.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "partners.atechspot.com",
+      "custom_domain": true
+    }
+  ]
+}
