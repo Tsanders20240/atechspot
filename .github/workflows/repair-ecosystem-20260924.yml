@@ -1,0 +1,128 @@
+name: Repair ATechSpot Ecosystem 2026-09-24
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/repair-ecosystem-20260924.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ecosystem-live-repair-20260924
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate credentials and resolve zone
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          zone_json=$(curl -fsS "https://api.cloudflare.com/client/v4/zones?name=atechspot.com&account.id=$CLOUDFLARE_ACCOUNT_ID" "${auth[@]}")
+          zone_id=$(echo "$zone_json" | jq -r '.result[0].id // empty')
+          test -n "$zone_id"
+          echo "ZONE_ID=$zone_id" >> "$GITHUB_ENV"
+
+      - name: Repair approved DNS records
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          api="https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records"
+
+          upsert_cname () {
+            name="$1"; target="$2"
+            existing=$(curl -fsS "$api?name=$name" "${auth[@]}")
+            id=$(echo "$existing" | jq -r '.result[0].id // empty')
+            body=$(jq -nc --arg name "$name" --arg content "$target" '{type:"CNAME",name:$name,content:$content,proxied:true,ttl:1}')
+            if [ -n "$id" ]; then
+              curl -fsS -X PUT "$api/$id" "${auth[@]}" --data "$body" | jq -e '.success == true' >/dev/null
+            else
+              curl -fsS -X POST "$api" "${auth[@]}" --data "$body" | jq -e '.success == true' >/dev/null
+            fi
+          }
+
+          # Existing Worker Route needs an orange-cloud DNS hostname.
+          upsert_cname "ops.atechspot.com" "atechspot.com"
+
+          # Existing Pages project target supplied by the ecosystem audit.
+          upsert_cname "royalupwiththehughes.atechspot.com" "royalupwiththehughes.pages.dev"
+
+          # Preserve the existing ATechucation Figures target; only enable proxying.
+          figures=$(curl -fsS "$api?name=www.atechucationfigures.atechspot.com" "${auth[@]}")
+          figures_id=$(echo "$figures" | jq -r '.result[0].id // empty')
+          test -n "$figures_id"
+          curl -fsS -X PATCH "$api/$figures_id" "${auth[@]}" --data '{"proxied":true}' | jq -e '.success == true' >/dev/null
+
+      - name: Attach A Studio MX to proxy Worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          scripts=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts" "${auth[@]}")
+          echo "$scripts" | jq -e '.result[] | select(.id=="astudiomx-site")' >/dev/null
+          body=$(jq -nc --arg hostname "astudiomx.atechspot.com" --arg service "astudiomx-site" --arg zone "$ZONE_ID" '{hostname:$hostname,service:$service,zone_id:$zone}')
+          curl -fsS -X PUT "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}" --data "$body" | jq -e '.success == true' >/dev/null
+
+      - name: Validate new Worker sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check Vendor-Portal-Website/worker.js
+          node --check Press-Website/worker.js
+          node --check Developers-Website/worker.js
+          jq -e '.routes[0].pattern=="vendors.atechspot.com"' Vendor-Portal-Website/wrangler.jsonc >/dev/null
+          jq -e '.routes[0].pattern=="press.atechspot.com"' Press-Website/wrangler.jsonc >/dev/null
+          jq -e '.routes[0].pattern=="developers.atechspot.com"' Developers-Website/wrangler.jsonc >/dev/null
+
+      - name: Deploy Vendors
+        working-directory: Vendor-Portal-Website
+        run: npx --yes wrangler@latest deploy
+
+      - name: Deploy Press
+        working-directory: Press-Website
+        run: npx --yes wrangler@latest deploy
+
+      - name: Deploy Developers
+        working-directory: Developers-Website
+        run: npx --yes wrangler@latest deploy
+
+      - name: Verify repaired ecosystem endpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 12
+          check200 () { code=$(curl -L -sS -o /tmp/body -w '%{http_code}' "$1"); echo "$1 -> $code"; test "$code" = "200"; }
+
+          check200 "https://ops.atechspot.com/growthcare"
+          check200 "https://ops.atechspot.com/assessment"
+          check200 "https://astudiomx.atechspot.com/"
+          check200 "https://astudiomx.atechspot.com/services.html"
+          check200 "https://royalupwiththehughes.atechspot.com/"
+          check200 "https://www.atechucationfigures.atechspot.com/"
+          check200 "https://vendors.atechspot.com/"
+          check200 "https://press.atechspot.com/"
+          check200 "https://developers.atechspot.com/"
+
+          curl -fsS "https://vendors.atechspot.com/api/health" | jq -e '.ok == true'
+          curl -fsS "https://press.atechspot.com/api/health" | jq -e '.ok == true'
+          curl -fsS "https://developers.atechspot.com/api/health" | jq -e '.ok == true'
+
+      - name: Verify WarriorJ after independent deploy
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS "https://warriorj.atechspot.com/contact.html" | grep -q 'Request a Quote'
+          curl -fsS "https://warriorj.atechspot.com/api/health" >/dev/null
