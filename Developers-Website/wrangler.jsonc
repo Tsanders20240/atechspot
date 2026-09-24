@@ -1,0 +1,12 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "atechspot-developers",
+  "compatibility_date": "2026-09-24",
+  "main": "worker.js",
+  "routes": [
+    {
+      "pattern": "developers.atechspot.com",
+      "custom_domain": true
+    }
+  ]
+}
