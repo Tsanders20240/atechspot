@@ -5,7 +5,11 @@
   "main": "worker.js",
   "routes": [
     {
-      "pattern": "figures.atechspot.com",
+      "pattern": "www.atechucationfigures.atechspot.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "atechucationfigures.atechspot.com",
       "custom_domain": true
     }
   ]
