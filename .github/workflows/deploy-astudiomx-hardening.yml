@@ -1,0 +1,40 @@
+name: Harden A Studio MX Production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'A-Studio-MX-Gateway/**'
+      - '.github/workflows/deploy-astudiomx-hardening.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Validate source
+        run: node --check A-Studio-MX-Gateway/worker.js
+      - name: Update existing A Studio MX Worker
+        run: npx --yes wrangler@latest deploy A-Studio-MX-Gateway/worker.js --name astudiomx-site --compatibility-date 2026-09-25
+      - name: Verify production
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 10
+          curl -fsS https://astudiomx.atechspot.com/api/health | jq -e '.ok == true'
+          curl -fsS https://astudiomx.atechspot.com/ | grep -Fq 'A Studio MX'
+          curl -fsSI https://astudiomx.atechspot.com/ > /tmp/h
+          grep -qi '^content-security-policy:' /tmp/h
+          grep -qi '^strict-transport-security:' /tmp/h
+          grep -qi '^x-content-type-options: nosniff' /tmp/h
+          echo 'ASTUDIOMX=GREEN'
