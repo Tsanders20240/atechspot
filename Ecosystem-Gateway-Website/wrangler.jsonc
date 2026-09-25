@@ -17,6 +17,10 @@
       "custom_domain": true
     },
     {
+      "pattern": "clients.atechspot.com",
+      "custom_domain": true
+    },
+    {
       "pattern": "pay.atechspot.com",
       "custom_domain": true
     },
