@@ -39,6 +39,24 @@ jobs:
               echo "$url$path | http=$code | bytes=$bytes | title=$title"
             done
           done
+      - name: Release stale Figures DNS records for Worker custom domains
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          zone_json=$(curl -fsS "https://api.cloudflare.com/client/v4/zones?name=atechspot.com&account.id=$CLOUDFLARE_ACCOUNT_ID" "${auth[@]}")
+          zone_id=$(echo "$zone_json" | jq -r '.result[0].id // empty')
+          test -n "$zone_id"
+          api="https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records"
+          for host in www.atechucationfigures.atechspot.com atechucationfigures.atechspot.com; do
+            records=$(curl -fsS "$api?name=$host" "${auth[@]}")
+            mapfile -t ids < <(echo "$records" | jq -r '.result[].id')
+            for id in "${ids[@]}"; do
+              echo "Deleting stale DNS record for $host: $id"
+              curl -fsS -X DELETE "$api/$id" "${auth[@]}" | jq -e '.success == true' >/dev/null
+            done
+          done
+
       - name: Deploy A+ Techucation Figures clean alias
         working-directory: ATechucation-Figures-Website
         run: npx --yes wrangler@latest deploy
