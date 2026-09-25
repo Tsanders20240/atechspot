@@ -24,7 +24,7 @@ jobs:
 
           echo '=== MATCHING WORKER DOMAINS ==='
           curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}" \
-            | jq '{success,errors,result:[.result[]? | select((.hostname|ascii_downcase|test("techguru|hazilflix|mraplus|portfolio|hazil|atechucationfigures|atechnetwork|royalup")) or (.service|ascii_downcase|test("techguru|hazil|portfolio|figures|network|royal"))) | {hostname,service,environment,zone_id,id}]}'
+            | jq '{success,errors,result:[.result[]? | select((.hostname|ascii_downcase|test("techguru|hazilflix|mraplus|portfolio|hazil|atechucationfigures|atechnetwork|royalup|iammodeling|modeling")) or (.service|ascii_downcase|test("techguru|hazil|portfolio|figures|network|royal"))) | {hostname,service,environment,zone_id,id}]}'
 
           echo '=== MATCHING WORKER SCRIPTS ==='
           curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts" "${auth[@]}" \
