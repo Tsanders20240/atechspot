@@ -37,16 +37,16 @@ jobs:
           test -n "$CLOUDFLARE_ACCOUNT_ID"
           test -f I-Am-Modeling-Website/index.html
           test -f I-Am-Modeling-Website/styles.css
-          test -f I-Am-Modeling-Website/site.js
+          test -f I-Am-Modeling-Website/site-no-images.js
           test -f I-Am-Modeling-Website/_headers
           grep -q 'I AM MODELING' I-Am-Modeling-Website/index.html
           grep -q '17-SLOT PORTFOLIO SYSTEM' I-Am-Modeling-Website/index.html
           grep -q 'Not a modeling agency' I-Am-Modeling-Website/index.html
           grep -q 'No guaranteed jobs' I-Am-Modeling-Website/index.html
           grep -q 'AI-generated, composited or materially altered imagery should be clearly disclosed' I-Am-Modeling-Website/index.html
-          grep -q 'Signature Look' I-Am-Modeling-Website/site.js
-          ! grep -q 'images.unsplash.com' I-Am-Modeling-Website/site.js
-          node --check I-Am-Modeling-Website/site.js
+          grep -q 'Signature Look' I-Am-Modeling-Website/site-no-images.js
+          ! grep -q 'images.unsplash.com' I-Am-Modeling-Website/site-no-images.js
+          node --check I-Am-Modeling-Website/site-no-images.js
           echo 'I Am Modeling source validation passed.'
 
       - name: Deploy to Cloudflare Pages
@@ -63,7 +63,7 @@ jobs:
           curl -fsS --retry 5 --retry-delay 5 -o /tmp/index.html https://iammodeling.atechspot.com/
           grep -q 'I AM MODELING' /tmp/index.html
           grep -q '17-SLOT PORTFOLIO SYSTEM' /tmp/index.html
-          curl -fsS --retry 5 --retry-delay 5 -o /tmp/site.js https://iammodeling.atechspot.com/site.js
+          curl -fsS --retry 5 --retry-delay 5 -o /tmp/site.js https://iammodeling.atechspot.com/site-no-images.js
           grep -q 'IMAGE PLACEHOLDER' /tmp/site.js
           ! grep -q 'images.unsplash.com' /tmp/site.js
           grep -q '01 / 17 · AGENCY-READY HEADSHOT' /tmp/index.html
