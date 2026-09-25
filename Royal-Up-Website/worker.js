@@ -17,7 +17,7 @@ export default{async fetch(request,env){const u=new URL(request.url);const origi
  if(!type.includes('text/html'))return new Response(upstream.body,{status:upstream.status,statusText:upstream.statusText,headers:withHeaders(upstream)});
  let html=await upstream.text();
  // royalup-canonical-hardening
- if(!/<link\b[^>]*rel=["'][^"']*canonical/i.test(html)) html=html.replace(/<\/head>/i,'<link rel="canonical" href="https://royalupwiththehughes.atechspot.com/"></head>');
+ if(!/<link\b[^>]*rel=["'][^"']*canonical/i.test(html)) html=html.replace(/<\/head>/i,'<link rel="canonical" href="https://royalupwiththehughes.atechspot.com/"><meta name="robots" content="index,follow,max-image-preview:large"></head>'); else if(!/<meta\b[^>]*name=["']robots["']/i.test(html)) html=html.replace(/<\/head>/i,'<meta name="robots" content="index,follow,max-image-preview:large"></head>');
  const ribbon=`<div id="atechspot-ecosystem-ribbon" style="position:relative;z-index:99999;background:#081525;color:#ddecf7;padding:9px 14px;text-align:center;font:700 11px/1.4 Arial,sans-serif;letter-spacing:.05em">ROYAL UP WITH THE HUGHES · FAMILY & LEGACY MEDIA · <a href="https://www.atechspot.com/ecosystem/" style="color:#7edcff;text-decoration:none">ATechSpot Ecosystem →</a></div>`;
  html=html.includes('<body')?html.replace(/(<body[^>]*>)/i,'$1'+ribbon):ribbon+html;
  html=html.replace(/<\/body>/i,`<footer style="padding:18px;text-align:center;background:#081525;color:#9db0c1;font:12px Arial,sans-serif">Connected to the ATechSpot ecosystem · © ${YEAR} Royal Up With The Hughes</footer></body>`);
