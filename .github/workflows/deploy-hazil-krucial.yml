@@ -78,8 +78,8 @@ jobs:
           set -euo pipefail
           auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
 
-          zone_json=$(curl -fsS "https://api.cloudflare.com/client/v4/zones?name=atechspot.com&account.id=$CLOUDFLARE_ACCOUNT_ID" "${auth[@]}")
-          zone_id=$(echo "$zone_json" | jq -r '.result[0].id // empty')
+          worker_domains_seed=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}")
+          zone_id=$(echo "$worker_domains_seed" | jq -r '[.result[] | select(.zone_id != null)][0].zone_id // empty')
           test -n "$zone_id"
 
           # Remove Pages ownership if the old broad HAZIL build still owns the hostname.
