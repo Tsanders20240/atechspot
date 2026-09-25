@@ -1,0 +1,51 @@
+name: Diagnose Start Redirect Rule
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/diagnose-start-redirect.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Find redirect source
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          domains=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}")
+          zone_id=$(echo "$domains" | jq -r '.result[] | select(.hostname=="start.atechspot.com") | .zone_id')
+          test -n "$zone_id"
+          echo "ZONE=$zone_id"
+
+          echo '=== PAGE RULES ==='
+          curl -fsS "https://api.cloudflare.com/client/v4/zones/$zone_id/pagerules?status=active&per_page=100" "${auth[@]}"             | jq -c '.result[]? | select((.targets|tostring|contains("start.atechspot.com")) or (.actions|tostring|contains("builderall"))) | {id,status,priority,targets,actions}'
+
+          echo '=== ZONE RULESETS ==='
+          rulesets=$(curl -fsS "https://api.cloudflare.com/client/v4/zones/$zone_id/rulesets" "${auth[@]}")
+          echo "$rulesets" | jq -c '.result[]? | {id,name,phase,kind}'
+          mapfile -t ids < <(echo "$rulesets" | jq -r '.result[].id')
+          for id in "${ids[@]}"; do
+            rs=$(curl -fsS "https://api.cloudflare.com/client/v4/zones/$zone_id/rulesets/$id" "${auth[@]}")
+            hit=$(echo "$rs" | jq -c '.result.rules[]? | select((.expression // "" | contains("start.atechspot.com")) or (tostring | contains("builderall"))) | {ruleset_id:"'"$id"'",id,description,expression,action,action_parameters,enabled}')
+            if [ -n "$hit" ]; then echo "$hit"; fi
+          done
+
+          echo '=== ACCOUNT RULESETS ==='
+          ar=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/rulesets" "${auth[@]}" || true)
+          echo "$ar" | jq -c '.result[]? | {id,name,phase,kind}' || true
+          mapfile -t aids < <(echo "$ar" | jq -r '.result[]?.id' 2>/dev/null || true)
+          for id in "${aids[@]}"; do
+            rs=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/rulesets/$id" "${auth[@]}" || true)
+            hit=$(echo "$rs" | jq -c '.result.rules[]? | select((.expression // "" | contains("start.atechspot.com")) or (tostring | contains("builderall"))) | {ruleset_id:"'"$id"'",id,description,expression,action,action_parameters,enabled}' 2>/dev/null || true)
+            if [ -n "$hit" ]; then echo "$hit"; fi
+          done
