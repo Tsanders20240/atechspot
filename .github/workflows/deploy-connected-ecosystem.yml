@@ -38,7 +38,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check Ecosystem-Gateway-Website/worker.js
-          jq -e '.routes | length == 9' Ecosystem-Gateway-Website/wrangler.jsonc >/dev/null
+          jq -e '.routes | length == 10' Ecosystem-Gateway-Website/wrangler.jsonc >/dev/null
 
       - name: Deploy shared customer operations gateway
         working-directory: Ecosystem-Gateway-Website
@@ -70,6 +70,7 @@ jobs:
             "https://start.atechspot.com/"
             "https://intake.atechspot.com/"
             "https://book.atechspot.com/"
+            "https://clients.atechspot.com/"
             "https://pay.atechspot.com/"
             "https://support.atechspot.com/"
             "https://help.atechspot.com/"
