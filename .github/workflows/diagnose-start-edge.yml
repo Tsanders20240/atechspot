@@ -1,0 +1,34 @@
+name: Diagnose Start Edge Redirect
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/diagnose-start-edge.yml'
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Inspect Start routing
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          echo '=== WORKER DOMAIN ==='
+          curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}" | jq '.result[] | select(.hostname=="start.atechspot.com")'
+          echo '=== RAW HEADERS ==='
+          curl -sSI --max-time 20 https://start.atechspot.com/ || true
+          echo '=== ZONE ==='
+          zone=$(curl -fsS "https://api.cloudflare.com/client/v4/zones?name=atechspot.com&account.id=$CLOUDFLARE_ACCOUNT_ID" "${auth[@]}")
+          echo "$zone" | jq '{success,result:[.result[]|{id,name,status}]}'
+          zid=$(echo "$zone" | jq -r '.result[0].id // empty')
+          [ -n "$zid" ] || exit 0
+          echo '=== RULESETS ==='
+          curl -sS "https://api.cloudflare.com/client/v4/zones/$zid/rulesets" "${auth[@]}" | jq '{success,errors,result:[.result[]? | {id,name,kind,phase}]}' || true
+          echo '=== PAGE RULES ==='
+          curl -sS "https://api.cloudflare.com/client/v4/zones/$zid/pagerules?status=active&per_page=100" "${auth[@]}" | jq '{success,errors,result:[.result[]? | {id,status,targets,actions}]}' || true
