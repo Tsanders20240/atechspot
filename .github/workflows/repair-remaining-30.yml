@@ -1,0 +1,96 @@
+name: Repair Remaining 30 Metadata Batch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'HazilFlix-Website/**'
+      - 'Royal-Up-Website/**'
+      - 'Vendor-Portal-Website/**'
+      - 'Press-Website/**'
+      - 'Developers-Website/**'
+      - 'ATechucation-Figures-Website/**'
+      - 'Ecosystem-Gateway-Website/**'
+      - '.github/workflows/repair-remaining-30.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validate Worker sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check HazilFlix-Website/worker.js
+          node --check Royal-Up-Website/worker.js
+          node --check Vendor-Portal-Website/worker.js
+          node --check Press-Website/worker.js
+          node --check Developers-Website/worker.js
+          node --check ATechucation-Figures-Website/worker.js
+          node --check Ecosystem-Gateway-Website/worker.js
+
+      - name: Deploy HazilFlix
+        working-directory: HazilFlix-Website
+        run: npx --yes wrangler@latest deploy
+      - name: Deploy Royal Up
+        working-directory: Royal-Up-Website
+        run: npx --yes wrangler@latest deploy
+      - name: Deploy Vendor Portal
+        working-directory: Vendor-Portal-Website
+        run: npx --yes wrangler@latest deploy
+      - name: Deploy Press
+        working-directory: Press-Website
+        run: npx --yes wrangler@latest deploy
+      - name: Deploy Developers
+        working-directory: Developers-Website
+        run: npx --yes wrangler@latest deploy
+      - name: Deploy Figures
+        working-directory: ATechucation-Figures-Website
+        run: npx --yes wrangler@latest deploy
+      - name: Deploy shared gateway
+        working-directory: Ecosystem-Gateway-Website
+        run: npx --yes wrangler@latest deploy
+
+      - name: Verify repaired production properties
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 12
+          check_meta(){
+            url="$1"; canon="$2"
+            curl -fsSL --retry 5 --retry-delay 4 --max-time 30 -o /tmp/page "$url"
+            grep -Fq "rel=\"canonical\" href=\"$canon\"" /tmp/page || { echo "canonical failed: $url"; exit 1; }
+            grep -qi 'name="robots"' /tmp/page || { echo "robots missing: $url"; exit 1; }
+            echo "GREEN metadata | $url"
+          }
+          check_meta https://hazilflix.atechspot.com/ https://hazilflix.atechspot.com/
+          check_meta https://royalupwiththehughes.atechspot.com/ https://royalupwiththehughes.atechspot.com/
+          check_meta https://vendors.atechspot.com/ https://vendors.atechspot.com/
+          check_meta https://press.atechspot.com/ https://press.atechspot.com/
+          check_meta https://developers.atechspot.com/ https://developers.atechspot.com/
+          check_meta https://atechucationfigures.atechspot.com/ https://atechucationfigures.atechspot.com/
+
+          # Figures aliases must consolidate to the registry canonical.
+          for alias in figures.atechspot.com www.atechucationfigures.atechspot.com; do
+            final=$(curl -LsS --max-time 25 -o /dev/null -w '%{url_effective}' "https://$alias/")
+            [ "$final" = 'https://atechucationfigures.atechspot.com/' ] || { echo "$alias did not canonicalize: $final"; exit 1; }
+          done
+
+          # Start must remain on ATechSpot until the visitor chooses the affiliate handoff.
+          curl -fsSL --max-time 25 -o /tmp/start https://start.atechspot.com/
+          grep -Fq 'Review the platform before you leave ATechSpot.' /tmp/start
+          grep -Fq 'Affiliate disclosure:' /tmp/start
+          grep -Fq 'rel="canonical" href="https://start.atechspot.com/"' /tmp/start
+          echo 'METADATA_REPAIR_BATCH=GREEN'
