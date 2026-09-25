@@ -1,10 +1,19 @@
 const ORIGIN='https://851eae33.royalupwiththehughes.pages.dev';
+const CURRENT='https://royalupwiththehughes.pages.dev';
 const YEAR='2026';
 const SECURITY={'x-content-type-options':'nosniff','referrer-policy':'strict-origin-when-cross-origin','permissions-policy':'camera=(), microphone=(), geolocation=(), payment=(), usb=()','strict-transport-security':'max-age=31536000'};
 function withHeaders(r){const h=new Headers(r.headers);for(const[k,v]of Object.entries(SECURITY))h.set(k,v);return h}
-export default{async fetch(request){const u=new URL(request.url);if(u.pathname==='/api/health')return new Response(JSON.stringify({ok:true,property:'Royal Up With The Hughes',mode:'pinned-stable-production',origin:ORIGIN}),{headers:{'content-type':'application/json; charset=utf-8',...SECURITY}});
- const target=new URL(u.pathname+u.search,ORIGIN);
- const upstream=await fetch(new Request(target,request));
+async function getUpstream(path,search,request){
+ const headers=new Headers();
+ const ua=request.headers.get('user-agent'); if(ua)headers.set('user-agent',ua);
+ const accept=request.headers.get('accept'); if(accept)headers.set('accept',accept);
+ let r=await fetch(ORIGIN+path+search,{method:request.method,headers,redirect:'follow'});
+ if(r.status===404 && path==='/')r=await fetch(ORIGIN+'/index.html'+search,{method:request.method,headers,redirect:'follow'});
+ if(r.status===404)r=await fetch(CURRENT+path+search,{method:request.method,headers,redirect:'follow'});
+ return r;
+}
+export default{async fetch(request){const u=new URL(request.url);if(u.pathname==='/api/health')return new Response(JSON.stringify({ok:true,property:'Royal Up With The Hughes',mode:'pinned-stable-with-safe-fallback',origin:ORIGIN}),{headers:{'content-type':'application/json; charset=utf-8',...SECURITY}});
+ const upstream=await getUpstream(u.pathname,u.search,request);
  const type=upstream.headers.get('content-type')||'';
  if(!type.includes('text/html'))return new Response(upstream.body,{status:upstream.status,statusText:upstream.statusText,headers:withHeaders(upstream)});
  let html=await upstream.text();
