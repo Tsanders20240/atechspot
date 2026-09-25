@@ -1,0 +1,37 @@
+name: Map Warned Property Hosting
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/map-warned-hosting.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  map:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Print Worker and Pages ownership for warned hostnames
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          targets='creator.atechspot.com www.abcoftech.atechspot.com auto.atechspot.com credit.atechspot.com ascrfinancial.atechspot.com acleansweep.atechspot.com astudiomx.atechspot.com hazilflix.atechspot.com atechnetwork.atechspot.com atechucationfigures.atechspot.com royalupwiththehughes.atechspot.com www.mraplusportfolio.atechspot.com techguru.atechspot.com vendors.atechspot.com press.atechspot.com developers.atechspot.com ops.atechspot.com reseller.atechspot.com'
+
+          echo '=== WORKER CUSTOM DOMAINS ==='
+          workers=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}")
+          for h in $targets; do
+            echo "$workers" | jq -r --arg h "$h" '.result[]? | select(.hostname==$h) | "WORKER | "+.hostname+" | service="+(.service//"-")+" | env="+(.environment//"-")'
+          done
+
+          echo '=== PAGES CUSTOM DOMAINS ==='
+          projects=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" "${auth[@]}")
+          for h in $targets; do
+            echo "$projects" | jq -r --arg h "$h" '.result[]? | select((.domains//[]) | index($h)) | "PAGES | "+$h+" | project="+.name+" | subdomain="+(.subdomain//"-")'
+          done
