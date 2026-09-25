@@ -5,7 +5,7 @@
   "main": "worker.js",
   "routes": [
     {
-      "pattern": "atechucationfigures.atechspot.com",
+      "pattern": "figures.atechspot.com",
       "custom_domain": true
     }
   ]
