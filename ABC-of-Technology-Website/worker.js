@@ -4,7 +4,9 @@ const HTML_HEADERS={
   'referrer-policy':'strict-origin-when-cross-origin',
   'permissions-policy':'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
   'cross-origin-opener-policy':'same-origin',
-  'x-frame-options':'SAMEORIGIN'
+  'x-frame-options':'SAMEORIGIN',
+  'strict-transport-security':'max-age=31536000; includeSubDomains',
+  'content-security-policy':"default-src 'self' https: data: blob:; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; font-src 'self' data: https:; frame-src 'self' https:; form-action 'self' https:; upgrade-insecure-requests"
 };
 const TEXT_HEADERS={'content-type':'text/plain; charset=utf-8','cache-control':'public, max-age=3600','x-content-type-options':'nosniff'};
 const XML_HEADERS={'content-type':'application/xml; charset=utf-8','cache-control':'public, max-age=3600','x-content-type-options':'nosniff'};
