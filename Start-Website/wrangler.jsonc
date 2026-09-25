@@ -1,0 +1,7 @@
+{
+  "$schema":"../node_modules/wrangler/config-schema.json",
+  "name":"atechspot-start",
+  "compatibility_date":"2026-09-25",
+  "main":"worker.js",
+  "routes":[{"pattern":"start.atechspot.com","custom_domain":true}]
+}
