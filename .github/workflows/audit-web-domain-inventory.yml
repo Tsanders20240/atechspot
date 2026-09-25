@@ -1,0 +1,60 @@
+name: Audit ATechSpot Web Domain Inventory
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/audit-web-domain-inventory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Discover and test web hostnames
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          zone=$(curl -fsS "https://api.cloudflare.com/client/v4/zones?name=atechspot.com&account.id=$CLOUDFLARE_ACCOUNT_ID" "${auth[@]}")
+          zid=$(echo "$zone" | jq -r '.result[0].id // empty')
+          test -n "$zid"
+          records=$(curl -fsS "https://api.cloudflare.com/client/v4/zones/$zid/dns_records?per_page=5000" "${auth[@]}")
+          echo "$records" | jq -r '
+            .result[]
+            | select(.type=="A" or .type=="AAAA" or .type=="CNAME")
+            | .name
+            | ascii_downcase
+            | select(endswith("atechspot.com"))
+          ' | sort -u > /tmp/all-hosts.txt
+
+          # Remove infrastructure/mail-only hostnames that are not websites.
+          grep -Ev '^(mail|smtp|imap|pop|autodiscover|ftp|cpanel|webmail|_).*' /tmp/all-hosts.txt > /tmp/web-candidates.txt || true
+
+          total=$(wc -l < /tmp/web-candidates.txt | tr -d ' ')
+          echo "DISCOVERED_WEB_CANDIDATES=$total"
+          echo "=== WEB HOST INVENTORY ==="
+          nl -ba /tmp/web-candidates.txt
+
+          echo "=== HTTPS HEALTH ==="
+          green=0
+          review=0
+          while IFS= read -r host; do
+            url="https://$host/"
+            code=$(curl -L -sS --connect-timeout 8 --max-time 20 -o /tmp/body -w '%{http_code}' "$url" || printf '000')
+            title=$(grep -o -i '<title>[^<]*' /tmp/body 2>/dev/null | head -n1 | sed 's/<title>//I' || true)
+            case "$code" in
+              200|201|202|204|301|302|303|307|308|401|403)
+                status="GREEN"; green=$((green+1));;
+              *)
+                status="REVIEW"; review=$((review+1));;
+            esac
+            printf '%s | %s | %s | %s\n' "$status" "$code" "$host" "$title"
+          done < /tmp/web-candidates.txt
+          echo "SUMMARY discovered=$total green=$green review=$review"
