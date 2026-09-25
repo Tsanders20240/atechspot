@@ -1,4 +1,4 @@
-const CURRENT='https://royalupwiththehughes.pages.dev';
+const CURRENT='https://605e440a.royalupwiththehughes.pages.dev';
 const YEAR='2026';
 const SECURITY={'x-content-type-options':'nosniff','referrer-policy':'strict-origin-when-cross-origin','permissions-policy':'camera=(), microphone=(), geolocation=(), payment=(), usb=()','strict-transport-security':'max-age=31536000','content-security-policy':"default-src 'self' https: data: blob:; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; font-src 'self' data: https:; frame-src 'self' https:; form-action 'self' https:; upgrade-insecure-requests"};
 function withHeaders(r){const h=new Headers(r.headers);for(const[k,v]of Object.entries(SECURITY))h.set(k,v);return h}
