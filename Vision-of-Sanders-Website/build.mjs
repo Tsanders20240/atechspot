@@ -16,7 +16,7 @@ let html=fs.readFileSync(path.join(src,'index.template.html'),'utf8');
 for (const n of [1,2,3]) {
   const b64=readParts('img'+n);
   if (!b64) throw new Error('Missing image data for img'+n);
-  html=html.replaceAll('__IMG'+n+'__','data:image/jpeg;base64,'+b64);
+  html=html.replaceAll('__IMG'+n+'__','data:image/webp;base64,'+b64);
 }
 if (/__IMG[123]__/.test(html)) throw new Error('Unresolved image placeholder');
 fs.writeFileSync(path.join(out,'index.html'),html);
