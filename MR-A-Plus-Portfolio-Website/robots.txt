@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://mraplusportfolio.atechspot.com/sitemap.xml
+Sitemap: https://www.mraplusportfolio.atechspot.com/sitemap.xml
