@@ -1,0 +1,15 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "vision-of-sanders-site",
+  "compatibility_date": "2026-09-24",
+  "main": "worker.js",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": true,
+    "not_found_handling": "single-page-application"
+  },
+  "routes": [
+    {"pattern":"visionofsanders.atechspot.com","custom_domain":true}
+  ]
+}
