@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/restore-techguru.yml'
+      - 'TechGuru-Website/**'
   workflow_dispatch:
 
 jobs:
@@ -16,67 +17,63 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
-      - name: Verify TechGuru Pages project
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate TechGuru source
         shell: bash
         run: |
           set -euo pipefail
-          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
-          project_url="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/techguru"
-          project=$(curl -fsS "$project_url" "${auth[@]}")
-          echo "$project" | jq -e '.success == true and .result.name == "techguru"' >/dev/null
-          echo "$project" | jq '{name:.result.name,subdomain:.result.subdomain,production_branch:.result.production_branch,domains:.result.domains}'
+          test -f TechGuru-Website/worker.js
+          test -f TechGuru-Website/wrangler.jsonc
+          grep -q "ATechSpot Tech Guru" TechGuru-Website/worker.js
+          grep -q "techguru.atechspot.com" TechGuru-Website/wrangler.jsonc
 
-      - name: Probe current TechGuru Pages origin
-        shell: bash
-        run: |
-          set -euo pipefail
-          code=$(curl -L -sS --max-time 25 -o /tmp/techguru -w '%{http_code}' https://techguru-373.pages.dev/)
-          echo "techguru-373.pages.dev -> $code"
-          test "$code" = "200"
-          title=$(grep -o -i '<title>[^<]*' /tmp/techguru | head -n1 | sed 's/<title>//I')
-          echo "title=$title"
-
-      - name: Roll back to prior successful TechGuru production deployment
-        shell: bash
-        run: |
-          set -euo pipefail
-          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
-          deployments=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/techguru/deployments" "${auth[@]}")
-          mapfile -t ids < <(echo "$deployments" | jq -r '.result[] | select(.environment=="production" and .latest_stage.status=="success") | .id' | head -n 2)
-          if [ "${#ids[@]}" -ge 2 ]; then
-            target="${ids[1]}"
-            echo "Rolling TechGuru back to prior successful production deployment: $target"
-            curl -fsS -X POST "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/techguru/deployments/$target/rollback" "${auth[@]}" --data '{}' | jq -e '.success == true' >/dev/null
-          else
-            echo "No older successful production deployment found; preserving current successful Pages artifact."
-          fi
-
-      - name: Attach TechGuru custom domain
+      - name: Detach broken Pages custom domain if present
         shell: bash
         run: |
           set -euo pipefail
           auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
           base="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/techguru"
-          domains=$(curl -fsS "$base/domains" "${auth[@]}")
-          if echo "$domains" | jq -e '.result[]? | select(.name=="techguru.atechspot.com")' >/dev/null; then
-            echo "TechGuru custom domain already attached."
+          code=$(curl -sS -o /tmp/pages-project.json -w '%{http_code}' "$base" "${auth[@]}" || true)
+          if [ "$code" = "200" ] && jq -e '.success == true' /tmp/pages-project.json >/dev/null; then
+            domains=$(curl -fsS "$base/domains" "${auth[@]}")
+            if echo "$domains" | jq -e '.result[]? | select(.name=="techguru.atechspot.com")' >/dev/null; then
+              echo "Removing broken Pages custom-domain binding..."
+              curl -fsS -X DELETE "$base/domains/techguru.atechspot.com" "${auth[@]}" | tee /tmp/delete-domain.json
+              jq -e '.success == true' /tmp/delete-domain.json >/dev/null
+            fi
           else
-            curl -fsS -X POST "$base/domains" "${auth[@]}" \
-              --data '{"name":"techguru.atechspot.com"}' | tee /tmp/domain.json
-            jq -e '.success == true' /tmp/domain.json >/dev/null
+            echo "No usable Pages project found; continuing with Worker restore."
           fi
 
-      - name: Verify public TechGuru
+      - name: Deploy TechGuru Worker
         shell: bash
         run: |
           set -euo pipefail
-          for attempt in 1 2 3 4 5 6; do
-            code=$(curl -L -sS --max-time 25 -o /tmp/live -w '%{http_code}' https://techguru.atechspot.com/ || true)
-            echo "techguru.atechspot.com -> $code (attempt $attempt/6)"
-            if [ "$code" = "200" ]; then
-              grep -o -i '<title>[^<]*' /tmp/live | head -n1 || true
-              exit 0
+          npx --yes wrangler@latest deploy --config TechGuru-Website/wrangler.jsonc
+
+      - name: Verify Worker health
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5 6 7 8; do
+            code=$(curl -L -sS --max-time 25 -o /tmp/health -w '%{http_code}' https://techguru.atechspot.com/api/health || true)
+            echo "health -> $code (attempt $attempt/8)"
+            if [ "$code" = "200" ] && jq -e '.ok == true and .property == "ATechSpot Tech Guru"' /tmp/health >/dev/null 2>&1; then
+              break
             fi
-            sleep 5
+            sleep 8
           done
-          exit 1
+          test "$code" = "200"
+          jq -e '.ok == true' /tmp/health >/dev/null
+
+      - name: Verify public TechGuru homepage
+        shell: bash
+        run: |
+          set -euo pipefail
+          code=$(curl -L -sS --max-time 25 -o /tmp/live -w '%{http_code}' https://techguru.atechspot.com/)
+          echo "techguru.atechspot.com -> $code"
+          test "$code" = "200"
+          grep -qi '<title>ATechSpot Tech Guru' /tmp/live
+          grep -qi 'Technology help that starts with the simplest safe step' /tmp/live
