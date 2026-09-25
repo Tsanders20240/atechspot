@@ -1,0 +1,51 @@
+name: Deploy Reseller Production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Reseller-Website/**'
+      - '.github/workflows/deploy-reseller.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Validate source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f Reseller-Website/index.html
+          test -f Reseller-Website/_headers
+          grep -Fq '<link rel="canonical" href="https://reseller.atechspot.com/">' Reseller-Website/index.html
+          grep -Fq 'Request a Reseller Audit' Reseller-Website/index.html
+          grep -Fq 'Seller status is never guaranteed' Reseller-Website/index.html
+      - name: Deploy to existing Reseller Pages project
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@latest pages deploy Reseller-Website --project-name reseller --branch main --commit-dirty=true
+      - name: Verify production
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 12
+          curl -fsSL --retry 5 --retry-delay 4 -o /tmp/page https://reseller.atechspot.com/
+          grep -Fq '<link rel="canonical" href="https://reseller.atechspot.com/">' /tmp/page
+          grep -Fq 'Request a Reseller Audit' /tmp/page
+          curl -fsSI --retry 5 --retry-delay 4 https://reseller.atechspot.com/ > /tmp/headers
+          grep -qi '^x-content-type-options: nosniff' /tmp/headers
+          grep -qi '^content-security-policy:' /tmp/headers
+          curl -fsSL https://reseller.atechspot.com/robots.txt | grep -Fq 'Sitemap: https://reseller.atechspot.com/sitemap.xml'
+          echo 'RESELLER=GREEN'
