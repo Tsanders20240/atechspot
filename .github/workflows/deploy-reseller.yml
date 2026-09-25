@@ -48,7 +48,7 @@ jobs:
       - name: Verify production
         shell: bash
         run: |
-          set -euo pipefail
+          set -euxo pipefail
           sleep 12
           curl -fsSL --retry 5 --retry-delay 4 -o /tmp/page https://reseller.atechspot.com/
           grep -Fq '<link rel="canonical" href="https://reseller.atechspot.com/">' /tmp/page
