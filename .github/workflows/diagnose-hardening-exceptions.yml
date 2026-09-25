@@ -1,0 +1,49 @@
+name: Diagnose Remaining Hardening Exceptions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/diagnose-hardening-exceptions.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Inspect remaining property hosting
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+
+          echo '=== PAGES PROJECT DETAILS ==='
+          for project in credit-atechspot-com reseller; do
+            echo "--- $project ---"
+            curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$project" "${auth[@]}"               | jq '{success,result:{name:.result.name,subdomain:.result.subdomain,production_branch:.result.production_branch,build_config:.result.build_config,source:.result.source,domains:.result.domains}}'
+            curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$project/deployments" "${auth[@]}"               | jq '{latest:(.result[0] | {id,url,environment,created_on,source,aliases,latest_stage})}'
+          done
+
+          echo '=== WORKER SCRIPT SOURCE HEAD ==='
+          for script in astudiomx-site ops-atechspot; do
+            echo "--- $script ---"
+            code=$(curl -sS -o "/tmp/$script" -w '%{http_code}' "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/scripts/$script" "${auth[@]}")
+            echo "HTTP $code"
+            head -c 12000 "/tmp/$script" || true
+            echo
+          done
+
+          echo '=== DNS FOR EXTERNAL EXCEPTIONS ==='
+          zone=$(curl -fsS "https://api.cloudflare.com/client/v4/zones?name=atechspot.com&account.id=$CLOUDFLARE_ACCOUNT_ID" "${auth[@]}")
+          zid=$(echo "$zone" | jq -r '.result[0].id // empty')
+          test -n "$zid"
+          for host in ascrfinancial.atechspot.com acleansweep.atechspot.com; do
+            echo "--- $host ---"
+            curl -fsS "https://api.cloudflare.com/client/v4/zones/$zid/dns_records?name=$host" "${auth[@]}"               | jq '{success,result:[.result[] | {id,type,name,content,proxied,ttl}]}'
+          done
