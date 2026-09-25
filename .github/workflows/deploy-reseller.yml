@@ -29,8 +29,17 @@ jobs:
           test -f Reseller-Website/index.html
           test -f Reseller-Website/_headers
           grep -Fq '<link rel="canonical" href="https://reseller.atechspot.com/">' Reseller-Website/index.html
-          grep -Fq 'Request a Reseller Audit' Reseller-Website/index.html
-          grep -Fq 'Seller status is never guaranteed' Reseller-Website/index.html
+          grep -Fq 'Reseller Health Audit' Reseller-Website/index.html
+          grep -Fq 'Seller Growth Optimization' Reseller-Website/index.html
+          grep -Fq 'Multi-Channel Pro System' Reseller-Website/index.html
+          grep -Fq 'Vinted' Reseller-Website/index.html
+          grep -Fq 'Personal closet only' Reseller-Website/index.html
+          grep -Fq 'eBay Top Rated Readiness' Reseller-Website/index.html
+          grep -Fq 'Walmart Pro Seller Readiness' Reseller-Website/index.html
+          grep -Fq 'Amazon FBA Readiness' Reseller-Website/index.html
+          grep -Fq 'TikTok Shop Performance' Reseller-Website/index.html
+          grep -Fq 'Shopify / Clothing Store Build' Reseller-Website/index.html
+          grep -Fq 'Platform status is never guaranteed' Reseller-Website/index.html
       - name: Deploy to existing Reseller Pages project
         shell: bash
         run: |
@@ -43,7 +52,11 @@ jobs:
           sleep 12
           curl -fsSL --retry 5 --retry-delay 4 -o /tmp/page https://reseller.atechspot.com/
           grep -Fq '<link rel="canonical" href="https://reseller.atechspot.com/">' /tmp/page
-          grep -Fq 'Request a Reseller Audit' /tmp/page
+          grep -Fq 'Reseller Health Audit' /tmp/page
+          grep -Fq 'Seller Growth Optimization' /tmp/page
+          grep -Fq 'Multi-Channel Pro System' /tmp/page
+          grep -Fq 'Personal closet only' /tmp/page
+          grep -Fq 'Marketplace-status disclosure:' /tmp/page
           curl -fsSI --retry 5 --retry-delay 4 https://reseller.atechspot.com/ > /tmp/headers
           grep -qi '^x-content-type-options: nosniff' /tmp/headers
           grep -qi '^content-security-policy:' /tmp/headers
