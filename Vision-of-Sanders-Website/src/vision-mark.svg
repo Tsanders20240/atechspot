@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Vision of Sanders</title>
+  <desc id="desc">VS monogram in a square photographic frame</desc>
+  <rect x="3" y="3" width="90" height="90" rx="2" fill="#090909" stroke="#f8f5ef" stroke-width="3"/>
+  <path d="M19 24 38 72h8L65 24h-9L42 61 28 24Z" fill="#f8f5ef"/>
+  <path d="M70 30c-4-5-9-7-15-7-9 0-15 5-15 12 0 8 7 11 14 13 6 2 10 4 10 8 0 4-4 7-9 7-6 0-11-3-15-8l-6 6c5 7 12 11 21 11 11 0 18-6 18-16 0-9-7-12-15-15-6-2-9-3-9-7 0-3 3-5 7-5 4 0 8 2 11 5Z" fill="#67d5ff"/>
+</svg>

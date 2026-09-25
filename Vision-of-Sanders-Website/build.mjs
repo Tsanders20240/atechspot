@@ -20,4 +20,6 @@ for (const n of [1,2,3]) {
 }
 if (/__IMG[123]__/.test(html)) throw new Error('Unresolved image placeholder');
 fs.writeFileSync(path.join(out,'index.html'),html);
+fs.copyFileSync(path.join(src,'vision-mark.svg'),path.join(out,'vision-mark.svg'));
 console.log('Built public/index.html',Buffer.byteLength(html),'bytes');
+console.log('Copied public/vision-mark.svg');
