@@ -1,0 +1,92 @@
+name: Certify Remaining 30 ATechSpot Properties
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/certify-remaining-30.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  certify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Audit 30 canonical destinations
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/targets.tsv <<'EOF'
+          ATechSpot|https://www.atechspot.com/
+          A+ Techucation Academy|https://atechucation.atechspot.com/
+          ATechSpot Creator|https://creator.atechspot.com/
+          ABC of Technology|https://www.abcoftech.atechspot.com/
+          ABC Tech Products|https://abctechproducts.atechspot.com/
+          ATechSpot DJI|https://www.atechspot.com/dji/
+          A+ Automotive Technology|https://auto.atechspot.com/
+          A+ Credit Education|https://credit.atechspot.com/
+          ASCR Financial|https://ascrfinancial.atechspot.com/
+          A Clean Sweep|https://acleansweep.atechspot.com/
+          Vision of Sanders|https://visionofsanders.atechspot.com/
+          A Studio MX|https://astudiomx.atechspot.com/
+          I Am Modeling|https://iammodeling.atechspot.com/
+          HAZIL|https://hazil.atechspot.com/
+          HazilFlix|https://hazilflix.atechspot.com/
+          ATech Network|https://atechnetwork.atechspot.com/
+          A+ Techucation Figures|https://atechucationfigures.atechspot.com/
+          Royal Up With The Hughes|https://royalupwiththehughes.atechspot.com/
+          Mr. A Plus Portfolio|https://mraplusportfolio.atechspot.com/
+          WarriorJ|https://warriorj.atechspot.com/
+          ATechSpot RemoteCare|https://remotecare.atechspot.com/
+          ATechSpot Tech Guru|https://techguru.atechspot.com/
+          Start|https://start.atechspot.com/
+          Partners|https://partners.atechspot.com/
+          Vendor Portal|https://vendors.atechspot.com/
+          Shop|https://shop.atechspot.com/
+          Press / Media Center|https://press.atechspot.com/
+          Developer Portal|https://developers.atechspot.com/
+          Internal Operations|https://ops.atechspot.com/
+          Reseller|https://reseller.atechspot.com/
+          EOF
+
+          total=0
+          green=0
+          review=0
+          : > /tmp/report.txt
+
+          while IFS='|' read -r name url; do
+            total=$((total+1))
+            rm -f /tmp/body /tmp/headers
+            code=$(curl -L -sS --connect-timeout 10 --max-time 30 -D /tmp/headers -o /tmp/body -w '%{http_code}' "$url" || printf '000')
+            final=$(curl -L -sS --connect-timeout 10 --max-time 30 -o /dev/null -w '%{url_effective}' "$url" || true)
+            title=$(grep -o -i '<title>[^<]*' /tmp/body 2>/dev/null | head -n1 | sed 's/<title>//I' | tr '\n' ' ' || true)
+            canonical=$(grep -o -i 'rel="canonical"[^>]*href="[^"]*"\|href="[^"]*"[^>]*rel="canonical"' /tmp/body 2>/dev/null | head -n1 | grep -o 'https\?://[^" ]*' || true)
+            robots=$(grep -o -i '<meta[^>]*name="robots"[^>]*>' /tmp/body 2>/dev/null | head -n1 | sed -n 's/.*content="\([^"]*\)".*/\1/p' || true)
+            viewport=$(grep -qi '<meta[^>]*name="viewport"' /tmp/body && echo yes || echo no)
+
+            status=GREEN
+            reason=''
+            case "$code" in
+              200|201|202|204|301|302|303|307|308|401|403) ;;
+              *) status=REVIEW; reason="http=$code";;
+            esac
+            [ -n "$title" ] || { status=REVIEW; reason="${reason:+$reason,}missing-title"; }
+            [ "$viewport" = yes ] || { status=REVIEW; reason="${reason:+$reason,}missing-viewport"; }
+            case "$name" in
+              'Internal Operations') ;;
+              *) [ -n "$canonical" ] || { status=REVIEW; reason="${reason:+$reason,}missing-canonical"; };;
+            esac
+            if [ "$name" = 'Internal Operations' ]; then
+              if ! grep -qiE 'noindex|authorized personnel|login' /tmp/body; then
+                status=REVIEW; reason="${reason:+$reason,}private-indexing-review"
+              fi
+            fi
+            if [ "$status" = GREEN ]; then green=$((green+1)); else review=$((review+1)); fi
+            printf '%s | %s | http=%s | final=%s | canonical=%s | robots=%s | title=%s | %s\n' "$status" "$name" "$code" "$final" "$canonical" "$robots" "$title" "$reason" | tee -a /tmp/report.txt
+          done < /tmp/targets.tsv
+
+          echo "SUMMARY total=$total green=$green review=$review"
+          cat /tmp/report.txt
+          [ "$total" -eq 30 ]
