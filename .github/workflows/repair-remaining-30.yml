@@ -90,7 +90,7 @@ jobs:
 
           # Start must remain on ATechSpot until the visitor chooses the affiliate handoff.
           curl -fsSL --max-time 25 -o /tmp/start https://start.atechspot.com/
-          grep -Fq 'Review the platform before you leave ATechSpot.' /tmp/start
-          grep -Fq 'Affiliate disclosure:' /tmp/start
+          grep -Fq 'Choose the right next step.' /tmp/start
+          grep -Fq 'Free Growth Assessment' /tmp/start
           grep -Fq 'rel="canonical" href="https://start.atechspot.com/"' /tmp/start
           echo 'METADATA_REPAIR_BATCH=GREEN'
