@@ -1,0 +1,38 @@
+name: Inspect Remaining External Properties
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/inspect-remaining-external.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Inspect Reseller document and assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsS https://reseller.atechspot.com/ -o /tmp/reseller.html
+          echo '=== RESELLER HTML HEAD ==='
+          head -c 16000 /tmp/reseller.html
+          echo
+          echo '=== RESELLER ASSET REFS ==='
+          grep -Eo '(src|href)=["'''][^"''']+' /tmp/reseller.html | head -n 100 || true
+
+      - name: Inspect public DNS and response headers
+        shell: bash
+        run: |
+          set -euo pipefail
+          for host in ascrfinancial.atechspot.com acleansweep.atechspot.com reseller.atechspot.com; do
+            echo "=== $host DNS ==="
+            dig +short CNAME "$host" || true
+            dig +short A "$host" || true
+            echo "=== $host HEADERS ==="
+            curl -sSIL --max-time 25 "https://$host/" | sed -n '1,80p' || true
+          done
