@@ -9,6 +9,7 @@
     "run_worker_first": true
   },
   "routes": [
+    {"pattern":"www.mraplusportfolio.atechspot.com","custom_domain":true},
     {"pattern":"mraplusportfolio.atechspot.com","custom_domain":true}
   ]
 }
