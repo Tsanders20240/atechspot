@@ -1,0 +1,26 @@
+name: Diagnose Reseller And Shop Hosting
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/diagnose-reseller-shop.yml'
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Map hostnames to Cloudflare services
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          echo '=== WORKER CUSTOM DOMAIN MATCHES ==='
+          curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}" | jq -r '.result[] | select(.hostname=="reseller.atechspot.com" or .hostname=="shop.atechspot.com") | {hostname,service,environment,zone_name}'
+          echo '=== PAGES PROJECT MATCHES ==='
+          projects=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" "${auth[@]}")
+          echo "$projects" | jq -r '.result[] | select(any(.domains[]?; .=="reseller.atechspot.com" or .=="shop.atechspot.com")) | {name,domains,production_branch}'
