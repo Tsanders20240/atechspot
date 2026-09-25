@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - 'Ecosystem-Gateway-Website/**'
-      - 'ATechucation-Figures-Website/**'
       - '.github/workflows/deploy-connected-ecosystem.yml'
   workflow_dispatch:
 
@@ -39,9 +38,7 @@ jobs:
         run: |
           set -euo pipefail
           node --check Ecosystem-Gateway-Website/worker.js
-          node --check ATechucation-Figures-Website/worker.js
           jq -e '.routes | length == 9' Ecosystem-Gateway-Website/wrangler.jsonc >/dev/null
-          jq -e '.routes | length == 1' ATechucation-Figures-Website/wrangler.jsonc >/dev/null
 
       - name: Deploy shared customer operations gateway
         working-directory: Ecosystem-Gateway-Website
@@ -58,55 +55,11 @@ jobs:
           body=$(jq -nc --arg hostname "ops.atechspot.com" --arg service "ops-atechspot" --arg zone "$ZONE_ID" --arg zone_name "atechspot.com" '{hostname:$hostname,service:$service,zone_id:$zone,zone_name:$zone_name}')
           curl -fsS -X PUT "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}" --data "$body" | jq -e '.success == true' >/dev/null
 
-      - name: Roll back Royal Up to previous successful production deployment
-        continue-on-error: true
+      - name: Preserve independently managed public properties
         shell: bash
         run: |
-          set -euo pipefail
-          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
-          project="royalupwiththehughes"
-          deployments=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$project/deployments?per_page=50" "${auth[@]}")
-          mapfile -t ids < <(echo "$deployments" | jq -r '.result[] | select(.environment=="production" and .latest_stage.status=="success") | .id' | head -n 2)
-          if [ "${#ids[@]}" -ge 2 ]; then
-            target="${ids[1]}"
-            echo "Rolling back Royal Up to prior successful production deployment $target"
-            curl -fsS -X POST "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$project/deployments/$target/rollback" "${auth[@]}" --data '{}' | jq -e '.success == true' >/dev/null
-          else
-            echo "No earlier successful production deployment available; leaving current production unchanged."
-          fi
-
-      - name: Restore Royal Up custom domain
-        continue-on-error: true
-        shell: bash
-        run: |
-          set -euo pipefail
-          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
-          project="royalupwiththehughes"
-          domain="royalupwiththehughes.atechspot.com"
-          domains=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$project/domains" "${auth[@]}")
-          if echo "$domains" | jq -e --arg d "$domain" '.result[] | select(.name==$d)' >/dev/null; then
-            echo "Royal Up domain already attached."
-          else
-            curl -fsS -X POST "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$project/domains" "${auth[@]}" --data "$(jq -nc --arg name "$domain" '{name:$name}')" | jq -e '.success == true' >/dev/null
-          fi
-
-
-      - name: Replace pending Royal Up Pages domain with stable Worker proxy
-        shell: bash
-        run: |
-          set -euo pipefail
-          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
-          domain="royalupwiththehughes.atechspot.com"
-          curl -sS -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/royalupwiththehughes/domains/$domain" "${auth[@]}" >/tmp/royal-delete.json || true
-          selected="https://605e440a.royalupwiththehughes.pages.dev"
-          echo "Using verified Royal Up rollback origin: $selected"
-          cd Royal-Up-Website
-          npx --yes wrangler@latest deploy --var ORIGIN_URL:"$selected"
-
-      - name: Deploy A+ Techucation Figures
-        continue-on-error: true
-        working-directory: ATechucation-Figures-Website
-        run: npx --yes wrangler@latest deploy
+          echo 'Royal Up and A+ Techucation Figures are deployed by their dedicated rollback/deploy workflows.'
+          echo 'This shared operating-gateway workflow must not mutate those public-brand deployments.'
 
       - name: Verify connected operating domains
         shell: bash
