@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'ATechucation-Figures-Website/**'
       - '.github/workflows/probe-royalup-and-deploy-figures.yml'
   workflow_dispatch:
 
@@ -41,13 +42,15 @@ jobs:
       - name: Deploy A+ Techucation Figures clean alias
         working-directory: ATechucation-Figures-Website
         run: npx --yes wrangler@latest deploy
-      - name: Verify Figures alias
+      - name: Verify Figures ecosystem hostnames
         shell: bash
         run: |
-          set +e
+          set -euo pipefail
           sleep 10
-          code=$(curl -L -sS --max-time 20 -o /tmp/figures -w '%{http_code}' https://figures.atechspot.com/)
-          title=$(grep -o -i '<title>[^<]*' /tmp/figures 2>/dev/null | head -n1 | sed 's/<title>//I')
-          echo "figures.atechspot.com | http=$code | title=$title"
-          curl -L -sS --max-time 20 https://figures.atechspot.com/api/health || true
-          exit 0
+          for host in www.atechucationfigures.atechspot.com atechucationfigures.atechspot.com; do
+            code=$(curl -L -sS --max-time 20 -o /tmp/figures -w '%{http_code}' "https://${host}/")
+            title=$(grep -o -i '<title>[^<]*' /tmp/figures 2>/dev/null | head -n1 | sed 's/<title>//I')
+            echo "$host | http=$code | title=$title"
+            test "$code" = "200"
+            curl -L -fsS --max-time 20 "https://${host}/api/health" >/dev/null
+          done
