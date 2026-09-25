@@ -1,0 +1,64 @@
+name: Deploy Mr A+ Portfolio
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'MR-A-Plus-Portfolio-Website/**'
+      - '.github/workflows/deploy-mraplusportfolio.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: mraplusportfolio-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate portfolio source
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check MR-A-Plus-Portfolio-Website/worker.js
+          grep -q 'Proof before the' MR-A-Plus-Portfolio-Website/index.html
+          grep -q 'SELECTED LIVE PROOF' MR-A-Plus-Portfolio-Website/index.html
+          grep -q 'CAPABILITIES' MR-A-Plus-Portfolio-Website/index.html
+          grep -q 'PROJECT ROUTING' MR-A-Plus-Portfolio-Website/index.html
+          grep -q 'https://www.mraplusportfolio.atechspot.com/' MR-A-Plus-Portfolio-Website/index.html
+
+      - name: Deploy portfolio Worker
+        working-directory: MR-A-Plus-Portfolio-Website
+        run: npx --yes wrangler@latest deploy
+
+      - name: Verify canonical portfolio
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 10
+          for attempt in 1 2 3 4 5 6 7 8; do
+            code=$(curl -L -sS --max-time 25 -H 'Cache-Control: no-cache' -o /tmp/portfolio -w '%{http_code}' "https://www.mraplusportfolio.atechspot.com/?deploy=$GITHUB_SHA&attempt=$attempt" || true)
+            echo "www portfolio -> $code (attempt $attempt/8)"
+            if [ "$code" = "200" ]               && grep -q 'Proof before the' /tmp/portfolio               && grep -q 'Projects you can actually open' /tmp/portfolio               && grep -q 'Build the system, not just the page' /tmp/portfolio; then
+              break
+            fi
+            sleep 5
+          done
+          test "$code" = "200"
+          curl -fsS "https://www.mraplusportfolio.atechspot.com/api/health" | tee /tmp/health.json
+          jq -e '.ok == true and .mode == "portfolio"' /tmp/health.json >/dev/null
+
+      - name: Verify non-www canonical redirect
+        shell: bash
+        run: |
+          set -euo pipefail
+          headers=$(curl -sSI --max-time 20 https://mraplusportfolio.atechspot.com/ || true)
+          echo "$headers"
+          echo "$headers" | grep -Eiq '^location: https://www\.mraplusportfolio\.atechspot\.com/'
