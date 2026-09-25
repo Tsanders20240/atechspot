@@ -32,4 +32,4 @@ jobs:
 
           echo '=== MATCHING PAGES PROJECTS ==='
           curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" "${auth[@]}" \
-            | jq '{success,errors,result:[.result[]? | select(.name|ascii_downcase|test("techguru|hazilflix|hazil|mraplus|portfolio|figures|network|royal")) | {name,subdomain,production_branch,created_on,domains}]}'
+            | jq '{success,errors,result:[.result[]? | {name,subdomain,production_branch,created_on,domains}]}'
