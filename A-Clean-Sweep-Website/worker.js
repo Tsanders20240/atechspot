@@ -12,6 +12,7 @@ export default {
     headers.set('Referrer-Policy','strict-origin-when-cross-origin');
     headers.set('Permissions-Policy','camera=(), microphone=(), geolocation=(), payment=()');
     headers.set('X-Frame-Options','SAMEORIGIN');
+    headers.set('Strict-Transport-Security','max-age=31536000; includeSubDomains');
     headers.set('Content-Security-Policy',"default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action https://www.atechspot.com");
     return new Response(response.body,{status:response.status,statusText:response.statusText,headers});
   }
