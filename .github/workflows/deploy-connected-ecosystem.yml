@@ -97,8 +97,8 @@ jobs:
           set -euo pipefail
           auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
           domain="royalupwiththehughes.atechspot.com"
-          curl -sS -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/royalupwiththehughes/domains/$domain" "\${auth[@]}" >/tmp/royal-delete.json || true
-          deployments=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/royalupwiththehughes/deployments?per_page=50" "\${auth[@]}")
+          curl -sS -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/royalupwiththehughes/domains/$domain" "${auth[@]}" >/tmp/royal-delete.json || true
+          deployments=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/royalupwiththehughes/deployments?per_page=50" "${auth[@]}")
           selected=""
           index=0
           while IFS= read -r url; do
