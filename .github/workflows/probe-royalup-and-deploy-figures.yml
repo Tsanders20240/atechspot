@@ -1,0 +1,53 @@
+name: Probe Royal Up and Deploy Figures
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/probe-royalup-and-deploy-figures.yml'
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probe known Royal Up production deployments
+        shell: bash
+        run: |
+          set +e
+          urls=(
+            "https://aa900db6.royalupwiththehughes.pages.dev"
+            "https://851eae33.royalupwiththehughes.pages.dev"
+            "https://605e440a.royalupwiththehughes.pages.dev"
+            "https://106f9245.royalupwiththehughes.pages.dev"
+            "https://372d291d.royalupwiththehughes.pages.dev"
+            "https://fbb62d5c.royalupwiththehughes.pages.dev"
+            "https://4cf850a5.royalupwiththehughes.pages.dev"
+          )
+          for url in "${urls[@]}"; do
+            for path in "/" "/index.html"; do
+              code=$(curl -L -sS --max-time 15 -o /tmp/body -w '%{http_code}' "$url$path")
+              title=$(grep -o -i '<title>[^<]*' /tmp/body 2>/dev/null | head -n1 | sed 's/<title>//I')
+              bytes=$(wc -c </tmp/body 2>/dev/null || echo 0)
+              echo "$url$path | http=$code | bytes=$bytes | title=$title"
+            done
+          done
+      - name: Deploy A+ Techucation Figures clean alias
+        working-directory: ATechucation-Figures-Website
+        run: npx --yes wrangler@latest deploy
+      - name: Verify Figures alias
+        shell: bash
+        run: |
+          set +e
+          sleep 10
+          code=$(curl -L -sS --max-time 20 -o /tmp/figures -w '%{http_code}' https://figures.atechspot.com/)
+          title=$(grep -o -i '<title>[^<]*' /tmp/figures 2>/dev/null | head -n1 | sed 's/<title>//I')
+          echo "figures.atechspot.com | http=$code | title=$title"
+          curl -L -sS --max-time 20 https://figures.atechspot.com/api/health || true
+          exit 0
