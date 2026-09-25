@@ -48,13 +48,18 @@ jobs:
           set -euo pipefail
           cat > /tmp/atechspot-email-proxy.js <<'EOF'
           const BACKEND='https://atechspot.pages.dev';
-          const ALLOWED_ORIGINS=new Set(['https://www.atechspot.com','https://atechspot.com','https://atechucation.atechspot.com']);
+          function allowedOrigin(value){try{const u=new URL(value);return u.protocol==='https:'&&(u.hostname==='atechspot.com'||u.hostname.endsWith('.atechspot.com'))}catch{return false}}
           export default {
             async fetch(request) {
               const incoming=new URL(request.url);
               if(!incoming.pathname.startsWith('/api/')) return new Response('Not found',{status:404});
               const origin=request.headers.get('Origin');
-              if(origin && !ALLOWED_ORIGINS.has(origin)) return new Response('Forbidden',{status:403});
+              if(origin && !allowedOrigin(origin)) return new Response('Forbidden',{status:403});
+              if(request.method==='OPTIONS'){
+                const h=new Headers({'Access-Control-Allow-Methods':'GET,POST,OPTIONS','Access-Control-Allow-Headers':'content-type,accept','Vary':'Origin'});
+                if(origin)h.set('Access-Control-Allow-Origin',origin);
+                return new Response(null,{status:204,headers:h});
+              }
               const target=new URL(BACKEND);
               target.pathname=incoming.pathname;
               target.search=incoming.search;
@@ -65,7 +70,8 @@ jobs:
               if(request.method!=='GET'&&request.method!=='HEAD') init.body=request.body;
               const response=await fetch(new Request(target.toString(),init));
               const outHeaders=new Headers(response.headers);
-              outHeaders.set('X-ATechSpot-API','secure-email-v2');
+              outHeaders.set('X-ATechSpot-API','secure-email-v3-38');
+              if(origin){outHeaders.set('Access-Control-Allow-Origin',origin);outHeaders.set('Vary','Origin')}
               return new Response(response.body,{status:response.status,statusText:response.statusText,headers:outHeaders});
             }
           };
@@ -91,7 +97,7 @@ jobs:
           echo "Production form-health -> $health_code"
           cat /tmp/prod-health.json
           test "$health_code" = "200"
-          node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/prod-health.json','utf8'));if(j.ok!==true||j.resendConfigured!==true)process.exit(1)"
+          node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/prod-health.json','utf8'));if(j.ok!==true||j.resendConfigured!==true||j.propertyRoutingCount!==38||j.emailRoutingVersion!=='2026-09-25-38')process.exit(1)"
 
           empty_code=$(curl -sS -o /tmp/empty-intake.json -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{}' https://www.atechspot.com/api/intake)
           echo "Empty intake validation -> $empty_code"
@@ -137,3 +143,21 @@ jobs:
           cat /tmp/qa-atechucation-result.json
           test "$edu_submit_code" = "200"
           node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/qa-atechucation-result.json','utf8'));if(j.ok!==true)process.exit(1)"
+
+          cat > /tmp/qa-reseller.json <<EOF
+          {
+            "Full Name":"ATechSpot Reseller Email QA",
+            "Email":"aplustechucation@gmail.com",
+            "Message":"Automated QA verifies property-aware email routing from the reseller property.",
+            "Form Type":"ATechSpot Reseller QA",
+            "Origin Property":"reseller.atechspot.com",
+            "Department":"sales",
+            "form_started_at":"$started",
+            "website":""
+          }
+          EOF
+          reseller_code=$(curl -sS -o /tmp/qa-reseller-result.json -w '%{http_code}' -X POST -H 'content-type: application/json' -H 'Origin: https://reseller.atechspot.com' --data-binary @/tmp/qa-reseller.json https://www.atechspot.com/api/contact)
+          echo "Reseller cross-origin email QA -> $reseller_code"
+          cat /tmp/qa-reseller-result.json
+          test "$reseller_code" = "200"
+          node -e "const fs=require('fs');const j=JSON.parse(fs.readFileSync('/tmp/qa-reseller-result.json','utf8'));if(j.ok!==true||j.propertyId!==38||j.propertyName!=='ATechSpot Reseller'||j.routedTo!=='sales@atechspot.com')process.exit(1)"
