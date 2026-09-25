@@ -52,3 +52,9 @@ jobs:
             printf '%s | %s | %s | %s\n' "$status" "$code" "$host" "$title"
           done < /tmp/web-candidates.txt
           echo "SUMMARY discovered=$total green=$green review=$review"
+          echo "=== REGISTRY-ONLY CANONICAL CHECKS ==="
+          for host in ascrfinancial.atechspot.com acleansweep.atechspot.com clients.atechspot.com warriorj.atechspot.com; do
+            code=$(curl -L -sS --connect-timeout 8 --max-time 20 -o /tmp/body -w '%{http_code}' "https://$host/" || printf '000')
+            title=$(grep -o -i '<title>[^<]*' /tmp/body 2>/dev/null | head -n1 | sed 's/<title>//I' || true)
+            printf '%s | %s | %s\n' "$code" "$host" "$title"
+          done
