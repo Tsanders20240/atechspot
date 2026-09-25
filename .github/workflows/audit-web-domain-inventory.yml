@@ -27,16 +27,8 @@ jobs:
           workers=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}")
           echo "$workers" | jq -r '.result[]? | .hostname | ascii_downcase | select(endswith("atechspot.com"))' >> /tmp/hosts.txt
 
-          page=1
-          while :; do
-            projects=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects?page=$page&per_page=100" "${auth[@]}")
-            count=$(echo "$projects" | jq '.result | length')
-            [ "$count" -eq 0 ] && break
-            echo "$projects" | jq -r '.result[]? | .domains[]? | ascii_downcase | select(endswith("atechspot.com"))' >> /tmp/hosts.txt
-            total_pages=$(echo "$projects" | jq -r '.result_info.total_pages // 1')
-            [ "$page" -ge "$total_pages" ] && break
-            page=$((page+1))
-          done
+          projects=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" "${auth[@]}")
+          echo "$projects" | jq -r '.result[]? | .domains[]? | ascii_downcase | select(endswith("atechspot.com"))' >> /tmp/hosts.txt
 
           sort -u /tmp/hosts.txt > /tmp/web-candidates.txt
           total=$(wc -l < /tmp/web-candidates.txt | tr -d ' ')
