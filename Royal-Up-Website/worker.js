@@ -1,6 +1,6 @@
 const CURRENT='https://royalupwiththehughes.pages.dev';
 const YEAR='2026';
-const SECURITY={'x-content-type-options':'nosniff','referrer-policy':'strict-origin-when-cross-origin','permissions-policy':'camera=(), microphone=(), geolocation=(), payment=(), usb=()','strict-transport-security':'max-age=31536000'};
+const SECURITY={'x-content-type-options':'nosniff','referrer-policy':'strict-origin-when-cross-origin','permissions-policy':'camera=(), microphone=(), geolocation=(), payment=(), usb=()','strict-transport-security':'max-age=31536000','content-security-policy':"default-src 'self' https: data: blob:; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https:; connect-src 'self' https:; font-src 'self' data: https:; frame-src 'self' https:; form-action 'self' https:; upgrade-insecure-requests"};
 function withHeaders(r){const h=new Headers(r.headers);for(const[k,v]of Object.entries(SECURITY))h.set(k,v);return h}
 async function getUpstream(origin,path,search,request){
  const headers=new Headers();
@@ -16,6 +16,8 @@ export default{async fetch(request,env){const u=new URL(request.url);const origi
  const type=upstream.headers.get('content-type')||'';
  if(!type.includes('text/html'))return new Response(upstream.body,{status:upstream.status,statusText:upstream.statusText,headers:withHeaders(upstream)});
  let html=await upstream.text();
+ // royalup-canonical-hardening
+ if(!/<link\b[^>]*rel=["'][^"']*canonical/i.test(html)) html=html.replace(/<\/head>/i,'<link rel="canonical" href="https://royalupwiththehughes.atechspot.com/"></head>');
  const ribbon=`<div id="atechspot-ecosystem-ribbon" style="position:relative;z-index:99999;background:#081525;color:#ddecf7;padding:9px 14px;text-align:center;font:700 11px/1.4 Arial,sans-serif;letter-spacing:.05em">ROYAL UP WITH THE HUGHES · FAMILY & LEGACY MEDIA · <a href="https://www.atechspot.com/ecosystem/" style="color:#7edcff;text-decoration:none">ATechSpot Ecosystem →</a></div>`;
  html=html.includes('<body')?html.replace(/(<body[^>]*>)/i,'$1'+ribbon):ribbon+html;
  html=html.replace(/<\/body>/i,`<footer style="padding:18px;text-align:center;background:#081525;color:#9db0c1;font:12px Arial,sans-serif">Connected to the ATechSpot ecosystem · © ${YEAR} Royal Up With The Hughes</footer></body>`);
