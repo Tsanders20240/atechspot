@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://hazilflix.atechspot.com/sitemap.xml
