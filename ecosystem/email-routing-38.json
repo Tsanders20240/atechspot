@@ -1,0 +1,243 @@
+{
+  "version": "2026-09-25",
+  "count": 38,
+  "sender": "forms@atechspot.com",
+  "routing_identities": {
+    "jason": "jason@atechspot.com",
+    "hello": "hello@atechspot.com",
+    "sales": "sales@atechspot.com",
+    "support": "support@atechspot.com",
+    "billing": "billing@atechspot.com",
+    "legal": "legal@atechspot.com"
+  },
+  "properties": [
+    {
+      "id": 1,
+      "name": "ATechSpot",
+      "source": "www.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 2,
+      "name": "A+ Techucation Academy",
+      "source": "atechucation.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 3,
+      "name": "ATechSpot Creator",
+      "source": "creator.atechspot.com",
+      "route": "sales"
+    },
+    {
+      "id": 4,
+      "name": "ABC of Technology",
+      "source": "www.abcoftech.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 5,
+      "name": "ABC Tech Products",
+      "source": "abctechproducts.atechspot.com",
+      "route": "sales"
+    },
+    {
+      "id": 6,
+      "name": "ATechSpot DJI",
+      "source": "www.atechspot.com/dji/",
+      "route": "hello"
+    },
+    {
+      "id": 7,
+      "name": "A+ Automotive Technology",
+      "source": "auto.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 8,
+      "name": "A+ Credit Education",
+      "source": "credit.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 9,
+      "name": "ASCR Financial",
+      "source": "ascrfinancial.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 10,
+      "name": "A Clean Sweep",
+      "source": "acleansweep.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 11,
+      "name": "Vision of Sanders",
+      "source": "visionofsanders.atechspot.com",
+      "route": "sales"
+    },
+    {
+      "id": 12,
+      "name": "A Studio MX",
+      "source": "astudiomx.atechspot.com",
+      "route": "sales"
+    },
+    {
+      "id": 13,
+      "name": "I Am Modeling",
+      "source": "iammodeling.atechspot.com",
+      "route": "sales"
+    },
+    {
+      "id": 14,
+      "name": "HÄZIL",
+      "source": "hazil.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 15,
+      "name": "HazilFlix",
+      "source": "hazilflix.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 16,
+      "name": "ATech Network",
+      "source": "atechnetwork.atechspot.com",
+      "route": "sales"
+    },
+    {
+      "id": 17,
+      "name": "A+ Techucation Figures",
+      "source": "atechucationfigures.atechspot.com",
+      "route": "sales"
+    },
+    {
+      "id": 18,
+      "name": "Royal Up With The Hughes",
+      "source": "royalupwiththehughes.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 19,
+      "name": "Mr. A Plus Portfolio",
+      "source": "mraplusportfolio.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 20,
+      "name": "WarriorJ",
+      "source": "warriorj.atechspot.com",
+      "route": "sales"
+    },
+    {
+      "id": 21,
+      "name": "ATechSpot RemoteCare",
+      "source": "remotecare.atechspot.com",
+      "route": "support"
+    },
+    {
+      "id": 22,
+      "name": "ATechSpot Tech Guru",
+      "source": "techguru.atechspot.com",
+      "route": "support"
+    },
+    {
+      "id": 23,
+      "name": "Start",
+      "source": "start.atechspot.com",
+      "route": "sales"
+    },
+    {
+      "id": 24,
+      "name": "Client Portal",
+      "source": "clients.atechspot.com",
+      "route": "support"
+    },
+    {
+      "id": 25,
+      "name": "Account",
+      "source": "account.atechspot.com",
+      "route": "support"
+    },
+    {
+      "id": 26,
+      "name": "Intake",
+      "source": "intake.atechspot.com",
+      "route": "sales"
+    },
+    {
+      "id": 27,
+      "name": "Booking",
+      "source": "book.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 28,
+      "name": "Pay",
+      "source": "pay.atechspot.com",
+      "route": "billing"
+    },
+    {
+      "id": 29,
+      "name": "Support Center",
+      "source": "support.atechspot.com",
+      "route": "support"
+    },
+    {
+      "id": 30,
+      "name": "Help Center",
+      "source": "help.atechspot.com",
+      "route": "support"
+    },
+    {
+      "id": 31,
+      "name": "Status",
+      "source": "status.atechspot.com",
+      "route": "support"
+    },
+    {
+      "id": 32,
+      "name": "Partners",
+      "source": "partners.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 33,
+      "name": "Vendor Portal",
+      "source": "vendors.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 34,
+      "name": "Shop",
+      "source": "shop.atechspot.com",
+      "route": "sales"
+    },
+    {
+      "id": 35,
+      "name": "Press / Media Center",
+      "source": "press.atechspot.com",
+      "route": "hello"
+    },
+    {
+      "id": 36,
+      "name": "Developer Portal",
+      "source": "developers.atechspot.com",
+      "route": "support"
+    },
+    {
+      "id": 37,
+      "name": "Internal Operations",
+      "source": "ops.atechspot.com",
+      "route": "jason"
+    },
+    {
+      "id": 38,
+      "name": "ATechSpot Reseller",
+      "source": "reseller.atechspot.com",
+      "route": "sales"
+    }
+  ]
+}
