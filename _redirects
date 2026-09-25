@@ -16,8 +16,8 @@
 /ai-readiness/ /ai-readiness/index.html 200
 /booking /booking/index.html 200
 /booking/ /booking/index.html 200
-/growthcare https://ops.atechspot.com/growthcare 302
-/growthcare/ https://ops.atechspot.com/growthcare 302
+/growthcare /growthcare/ 301
+/growthcare/ /growthcare/index.html 200
 /intake /intake/ 301
 /intake/ /intake/index.html 200
 /onboarding /intake/ 301
