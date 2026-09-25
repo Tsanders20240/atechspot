@@ -41,7 +41,7 @@ jobs:
           node --check Ecosystem-Gateway-Website/worker.js
           node --check ATechucation-Figures-Website/worker.js
           jq -e '.routes | length == 9' Ecosystem-Gateway-Website/wrangler.jsonc >/dev/null
-          jq -e '.routes | length == 2' ATechucation-Figures-Website/wrangler.jsonc >/dev/null
+          jq -e '.routes | length == 1' ATechucation-Figures-Website/wrangler.jsonc >/dev/null
 
       - name: Deploy shared customer operations gateway
         working-directory: Ecosystem-Gateway-Website
@@ -89,6 +89,17 @@ jobs:
           else
             curl -fsS -X POST "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/$project/domains" "${auth[@]}" --data "$(jq -nc --arg name "$domain" '{name:$name}')" | jq -e '.success == true' >/dev/null
           fi
+
+
+      - name: Replace pending Royal Up Pages domain with stable Worker proxy
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          domain="royalupwiththehughes.atechspot.com"
+          curl -sS -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/royalupwiththehughes/domains/$domain" "\${auth[@]}" >/tmp/royal-delete.json || true
+          cd Royal-Up-Website
+          npx --yes wrangler@latest deploy
 
       - name: Deploy A+ Techucation Figures
         continue-on-error: true
