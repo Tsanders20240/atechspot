@@ -165,6 +165,11 @@ jobs:
           grep -q 'Request ATechSpot Remote Support' remote-support/index.html
           grep -q '^/payment /payments/ 301' _redirects
           test -f booking/index.html
+          test -f growthcare/index.html
+          grep -q 'Keep what you built' growthcare/index.html
+          grep -q 'From $750/mo' growthcare/index.html
+          grep -q 'https://www.atechspot.com/growthcare/' sitemap.xml
+          grep -q '^/growthcare /growthcare/ 301' _redirects
           test -f clients/index.html
           grep -q 'SECURE CLIENT ACCESS' clients/index.html
           grep -q 'AUTHENTICATED CLIENT DASHBOARD' _worker.js
@@ -245,7 +250,7 @@ jobs:
             return 1
           }
           echo "Testing $DEPLOY_URL"
-          for path in / /ecosystem/ /dji/ /dji/real-estate/ /dji/roofing-inspections/ /dji/mini-5-pro-vs-mavic-4-pro/ /dji/construction/ /dji/buying-guide/ /assessment/ /ai-readiness/ /intake/ /contact/ /resources/ /remote-support/ /data-recovery/ /booking/ /clients/ /payments/ /commerce-terms/ /payment-success/; do
+          for path in / /ecosystem/ /dji/ /dji/real-estate/ /dji/roofing-inspections/ /dji/mini-5-pro-vs-mavic-4-pro/ /dji/construction/ /dji/buying-guide/ /assessment/ /ai-readiness/ /growthcare/ /intake/ /contact/ /resources/ /remote-support/ /data-recovery/ /booking/ /clients/ /payments/ /commerce-terms/ /payment-success/; do
             check_path "$path"
           done
 
@@ -411,6 +416,27 @@ jobs:
           done
           echo 'Production custom domain is not serving the current B2B flagship.'
           head -n 80 /tmp/prod-home.html 2>/dev/null || true
+          exit 1
+
+      - name: Verify GrowthCare production route
+        shell: bash
+        run: |
+          set -euo pipefail
+          code="000"
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            code=$(curl -sS -L -H 'Cache-Control: no-cache' -o /tmp/prod-growthcare.html -w '%{http_code}' "https://www.atechspot.com/growthcare/?deploy=$GITHUB_SHA&attempt=$attempt" || true)
+            echo "Production GrowthCare -> $code (attempt $attempt/10)"
+            if [ "$code" = "200" ] \
+              && grep -q 'Keep what you built' /tmp/prod-growthcare.html \
+              && grep -q 'From $750/mo' /tmp/prod-growthcare.html \
+              && grep -q 'Discuss GrowthCare' /tmp/prod-growthcare.html; then
+              echo 'Production GrowthCare verification passed.'
+              exit 0
+            fi
+            sleep 6
+          done
+          echo 'GrowthCare production route did not pass verification.'
+          head -n 80 /tmp/prod-growthcare.html 2>/dev/null || true
           exit 1
 
       - name: Report custom-domain status
