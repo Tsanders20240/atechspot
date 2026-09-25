@@ -1,0 +1,120 @@
+name: Deploy HAZIL KRUCIAL Production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/deploy-hazil-krucial.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: hazil-krucial-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout deployment control repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Checkout HAZIL KRUCIAL source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth=1 https://github.com/Tsanders20240/hazil.git hazil-source
+          test -f hazil-source/worker.js
+          test -f hazil-source/wrangler.toml
+          test -f hazil-source/schema.sql
+          test -f hazil-source/public/index.html
+          grep -q 'KRUCIAL' hazil-source/public/index.html
+          grep -q 'HÄZIL — KRUCIAL' hazil-source/README_DEPLOY.md
+
+      - name: Resolve or create HAZIL D1 database
+        working-directory: hazil-source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+
+          npx --yes wrangler@latest d1 list --json > /tmp/d1-list.json
+          db_id=$(jq -r '[.[] | select(.name=="hazil-signups")][0] | .uuid // .id // empty' /tmp/d1-list.json)
+
+          if [ -z "$db_id" ]; then
+            echo "Creating hazil-signups D1 database"
+            npx --yes wrangler@latest d1 create hazil-signups
+            npx --yes wrangler@latest d1 list --json > /tmp/d1-list.json
+            db_id=$(jq -r '[.[] | select(.name=="hazil-signups")][0] | .uuid // .id // empty' /tmp/d1-list.json)
+          fi
+
+          test -n "$db_id"
+          echo "Using HAZIL D1 database: $db_id"
+          sed -i "s/database_id = \"[^\"]*\"/database_id = \"$db_id\"/" wrangler.toml
+          grep -q "$db_id" wrangler.toml
+
+          npx --yes wrangler@latest d1 execute hazil-signups --remote --file=./schema.sql --yes
+
+      - name: Deploy HAZIL KRUCIAL Worker
+        working-directory: hazil-source
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@latest deploy
+
+      - name: Transfer hazil.atechspot.com to HAZIL Worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+
+          zone_json=$(curl -fsS "https://api.cloudflare.com/client/v4/zones?name=atechspot.com&account.id=$CLOUDFLARE_ACCOUNT_ID" "${auth[@]}")
+          zone_id=$(echo "$zone_json" | jq -r '.result[0].id // empty')
+          test -n "$zone_id"
+
+          # Remove Pages ownership if the old broad HAZIL build still owns the hostname.
+          pages_domains=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/hazil-arks/domains" "${auth[@]}")
+          if echo "$pages_domains" | jq -e '.result[] | select(.name=="hazil.atechspot.com")' >/dev/null; then
+            curl -fsS -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/hazil-arks/domains/hazil.atechspot.com" "${auth[@]}" >/tmp/hazil-pages-delete.json
+          fi
+
+          # Remove any existing Worker custom-domain ownership for a different service.
+          worker_domains=$(curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}")
+          mapfile -t domain_ids < <(echo "$worker_domains" | jq -r '.result[] | select(.hostname=="hazil.atechspot.com") | .id')
+          for id in "${domain_ids[@]}"; do
+            curl -fsS -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains/$id" "${auth[@]}" >/dev/null
+          done
+
+          # Remove stale DNS so Worker Custom Domain can manage its own record/certificate.
+          dns_api="https://api.cloudflare.com/client/v4/zones/$zone_id/dns_records"
+          dns=$(curl -fsS "$dns_api?name=hazil.atechspot.com" "${auth[@]}")
+          mapfile -t dns_ids < <(echo "$dns" | jq -r '.result[].id')
+          for id in "${dns_ids[@]}"; do
+            curl -fsS -X DELETE "$dns_api/$id" "${auth[@]}" | jq -e '.success == true' >/dev/null
+          done
+
+          body=$(jq -nc --arg hostname "hazil.atechspot.com" --arg service "hazil-official" --arg zone "$zone_id" '{hostname:$hostname,service:$service,zone_id:$zone}')
+          curl -fsS -X PUT "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}" --data "$body" | jq -e '.success == true' >/dev/null
+
+      - name: Verify KRUCIAL production
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 12
+          curl -L -fsS --max-time 25 https://hazil.atechspot.com/ -o /tmp/hazil.html
+          grep -q 'KRUCIAL' /tmp/hazil.html
+          grep -q 'FEATURED PROMOTION' /tmp/hazil.html
+          grep -q 'WATCH KRUCIAL' /tmp/hazil.html
+          grep -q 'HÄZIL' /tmp/hazil.html
+          ! grep -q 'Eight billion possibilities. One independent signal' /tmp/hazil.html
+          echo 'HAZIL KRUCIAL production verification passed.'
