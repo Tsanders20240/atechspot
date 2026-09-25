@@ -1,0 +1,62 @@
+name: Refresh ATechucation Figures HazilFlix
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/refresh-three-public-sites.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validate sources
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f A-Techucation-Website/index.html
+          node --check ATechucation-Figures-Website/worker.js
+          node --check HazilFlix-Website/worker.js
+
+      - name: Redeploy A+ Techucation
+        working-directory: A-Techucation-Website
+        run: npx --yes wrangler@latest deploy
+
+      - name: Redeploy A+ Techucation Figures
+        working-directory: ATechucation-Figures-Website
+        run: npx --yes wrangler@latest deploy
+
+      - name: Redeploy HazilFlix
+        working-directory: HazilFlix-Website
+        run: npx --yes wrangler@latest deploy
+
+      - name: Verify repeated public availability
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 10
+          hosts=(atechucation.atechspot.com atechucationfigures.atechspot.com hazilflix.atechspot.com)
+          for round in $(seq 1 10); do
+            for host in "${hosts[@]}"; do
+              code=$(curl -sS -L --connect-timeout 8 --max-time 25 -o /tmp/body -w '%{http_code}' "https://$host/")
+              [ "$code" = "200" ] || { echo "$host failed HTTP $code round $round"; exit 1; }
+              if grep -Eqi 'access denied|attention required|error 1020|forbidden' /tmp/body; then
+                echo "$host returned a denial page round $round"
+                exit 1
+              fi
+            done
+            sleep 1
+          done
+          echo 'THREE_PUBLIC_SITES=GREEN'
