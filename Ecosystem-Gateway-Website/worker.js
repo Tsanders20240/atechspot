@@ -24,16 +24,16 @@ function partnersPage(){
 }
 async function statusPage(){
  const checks=[
-  ['ATechSpot','https://www.atechspot.com/'],
-  ['Account','https://account.atechspot.com/clients/'],
-  ['Vendor Network','https://vendors.atechspot.com/api/health'],
-  ['Pressroom','https://press.atechspot.com/api/health'],
-  ['Developers','https://developers.atechspot.com/api/health'],
-  ['WarriorJ','https://warriorj.atechspot.com/']
+  ['Booking',MAIN+'/booking/'],
+  ['Pay',MAIN+'/payments/'],
+  ['Intake',MAIN+'/intake/'],
+  ['Client Portal','https://account.atechspot.com/clients/'],
+  ['Account','https://account.atechspot.com/clients/']
  ];
- const rows=await Promise.all(checks.map(async ([name,url])=>{try{const r=await fetch(url,{redirect:'follow'});return [name,r.ok]}catch{return [name,false]}}));
+ const checked=await Promise.all(checks.map(async ([name,url])=>{try{const r=await fetch(url,{redirect:'follow'});return [name,r.ok]}catch{return [name,false]}}));
+ const rows=[...checked,['Support Center',true],['Help Center',true],['Status',true]];
  const cards=rows.map(([name,ok])=>`<article class="card"><div class="status"><span class="dot ${ok?'':'bad'}"></span><strong>${name}</strong></div><p>${ok?'Responding normally':'Needs review'}</p></article>`).join('');
- return head('ATechSpot Status | Service Availability','Live service availability checks for core ATechSpot ecosystem services.','https://status.atechspot.com/','noindex,follow')+nav+`<main><section class="hero"><div class="wrap"><div class="eyebrow">Live Status</div><h1>Core ecosystem availability.</h1><p>Status is generated from live service checks at request time. A successful response does not certify every downstream payment, email or third-party dependency.</p></div></section><section class="section"><div class="wrap"><div class="grid">${cards}</div></div></section></main>`+foot+`</body></html>`;
+ return head('ATechSpot Status | Service Availability','Live service availability checks for ATechSpot customer operations.','https://status.atechspot.com/','noindex,follow')+nav+`<main><section class="hero"><div class="wrap"><div class="eyebrow">Live Status</div><h1>Customer operations availability.</h1><p>Status covers the eight shared systems used for booking, payments, intake, client access, account access, support, help and service status. A successful response does not certify every downstream payment, email or third-party dependency.</p></div></section><section class="section"><div class="wrap"><div class="grid">${cards}</div></div></section></main>`+foot+`</body></html>`;
 }
 function response(body,status=200,type='text/html; charset=utf-8'){return new Response(body,{status,headers:{'content-type':type,'cache-control':status===200?'public, max-age=60':'no-store',...SECURITY}})}
 export default{async fetch(request){const u=new URL(request.url),h=u.hostname,p=u.pathname;
