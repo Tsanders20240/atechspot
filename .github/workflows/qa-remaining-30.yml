@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'scripts/audit-remaining-30.mjs'
       - '.github/workflows/qa-remaining-30.yml'
   workflow_dispatch:
 
@@ -14,124 +15,9 @@ jobs:
   certify:
     runs-on: ubuntu-latest
     steps:
-      - name: Technical baseline across remaining 30
-        shell: bash
-        run: |
-          set -u
-
-          cat > /tmp/targets.tsv <<'EOF'
-1	ATechSpot	https://www.atechspot.com/
-2	A+ Techucation Academy	https://atechucation.atechspot.com/
-3	ATechSpot Creator	https://creator.atechspot.com/
-4	ABC of Technology	https://www.abcoftech.atechspot.com/
-5	ABC Tech Products	https://abctechproducts.atechspot.com/
-6	ATechSpot DJI	https://www.atechspot.com/dji/
-7	A+ Automotive Technology	https://auto.atechspot.com/
-8	A+ Credit Education	https://credit.atechspot.com/
-9	ASCR Financial	https://ascrfinancial.atechspot.com/
-10	A Clean Sweep	https://acleansweep.atechspot.com/
-11	Vision of Sanders	https://visionofsanders.atechspot.com/
-12	A Studio MX	https://astudiomx.atechspot.com/
-13	I Am Modeling	https://iammodeling.atechspot.com/
-14	HÄZIL	https://hazil.atechspot.com/
-15	HazilFlix	https://hazilflix.atechspot.com/
-16	ATech Network	https://atechnetwork.atechspot.com/
-17	A+ Techucation Figures	https://atechucationfigures.atechspot.com/
-18	Royal Up With The Hughes	https://royalupwiththehughes.atechspot.com/
-19	Mr. A Plus Portfolio	https://mraplusportfolio.atechspot.com/
-20	WarriorJ	https://warriorj.atechspot.com/
-21	ATechSpot RemoteCare	https://remotecare.atechspot.com/
-22	ATechSpot Tech Guru	https://techguru.atechspot.com/
-23	Start	https://start.atechspot.com/
-32	Partners	https://partners.atechspot.com/
-33	Vendor Portal	https://vendors.atechspot.com/
-34	Shop	https://shop.atechspot.com/
-35	Press / Media Center	https://press.atechspot.com/
-36	Developer Portal	https://developers.atechspot.com/
-37	Internal Operations	https://ops.atechspot.com/
-38	ATechSpot Reseller	https://reseller.atechspot.com/
-EOF
-
-          green=0
-          review=0
-          : > /tmp/report.txt
-
-          while IFS=$'	' read -r id name url; do
-            rm -f /tmp/body /tmp/headers
-            code=$(curl -L -sS --connect-timeout 8 --max-time 25 -D /tmp/headers -o /tmp/body -w '%{http_code}' "$url" || printf '000')
-            final=$(curl -L -sS --connect-timeout 8 --max-time 25 -o /dev/null -w '%{url_effective}' "$url" || true)
-            title=$(grep -o -i '<title[^>]*>[^<]*' /tmp/body 2>/dev/null | head -n1 | sed -E 's/<title[^>]*>//I' || true)
-            desc=$(grep -o -i '<meta[^>]+name=["''']description["'''][^>]*>' /tmp/body 2>/dev/null | head -n1 || true)
-            viewport=$(grep -o -i '<meta[^>]+name=["''']viewport["'''][^>]*>' /tmp/body 2>/dev/null | head -n1 || true)
-            body_lower=$(tr '[:upper:]' '[:lower:]' < /tmp/body 2>/dev/null || true)
-
-            pass=1
-            reason=""
-            case "$code" in
-              200|201|202|204|301|302|303|307|308|401|403) ;;
-              *) pass=0; reason="$reason bad_http=$code";;
-            esac
-
-            if [ "$code" = "200" ]; then
-              [ -n "$title" ] || { pass=0; reason="$reason no_title"; }
-              [ -n "$viewport" ] || { pass=0; reason="$reason no_viewport"; }
-              if printf '%s' "$body_lower" | grep -Eq '404 not found|page not found|domain not configured|application error'; then
-                pass=0; reason="$reason error_page"
-              fi
-            fi
-
-            # Public/marketing properties should have descriptions.
-            case "$id" in
-              1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|38)
-                [ -n "$desc" ] || { pass=0; reason="$reason no_meta_description"; }
-                ;;
-            esac
-
-            # Private/internal ops may legitimately require auth.
-            if [ "$id" = "37" ]; then
-              case "$code" in 200|401|403) ;; *) pass=0; reason="$reason ops_not_protected_or_live";; esac
-            fi
-
-            if [ "$pass" -eq 1 ]; then
-              green=$((green+1))
-              printf 'GREEN | #%s | %s | %s | %s | %s
-' "$id" "$name" "$code" "$final" "$title" | tee -a /tmp/report.txt
-            else
-              review=$((review+1))
-              printf 'REVIEW | #%s | %s | %s | %s | %s |%s
-' "$id" "$name" "$code" "$final" "$title" "$reason" | tee -a /tmp/report.txt
-            fi
-          done < /tmp/targets.tsv
-
-          echo "=== SUMMARY ==="
-          echo "green=$green review=$review total=$((green+review))"
-          cat /tmp/report.txt
-          test "$((green+review))" -eq 30
-
-          if [ "$review" -gt 0 ]; then
-            echo "Technical review required for $review properties."
-            exit 1
-          fi
-
-      - name: Shared business-safety spot checks
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          check_text () {
-            url="$1"; needle="$2"
-            curl -fsS -L --max-time 25 "$url" | grep -Fqi "$needle"
-          }
-
-          check_text "https://www.atechspot.com/" "Start My Project"
-          check_text "https://remotecare.atechspot.com/" "support"
-          check_text "https://reseller.atechspot.com/" "resell"
-          check_text "https://visionofsanders.atechspot.com/" "Vision of Sanders"
-          check_text "https://iammodeling.atechspot.com/" "I AM MODELING"
-          check_text "https://credit.atechspot.com/" "education"
-          check_text "https://partners.atechspot.com/" "Partnership"
-          check_text "https://vendors.atechspot.com/" "Vendor"
-          check_text "https://press.atechspot.com/" "Press"
-          check_text "https://developers.atechspot.com/" "Developer"
-
-          echo "REMAINING_30_BASELINE=GREEN"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Run remaining-30 production certification
+        run: node scripts/audit-remaining-30.mjs
