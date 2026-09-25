@@ -45,7 +45,7 @@ jobs:
           grep -q 'No guaranteed jobs' I-Am-Modeling-Website/index.html
           grep -q 'AI-generated, composited or materially altered imagery should be clearly disclosed' I-Am-Modeling-Website/index.html
           grep -q 'Signature Look' I-Am-Modeling-Website/site.js
-          test "$(grep -o '\["[^"]*","#[0-9A-Fa-f]*","#[0-9A-Fa-f]*"\]' I-Am-Modeling-Website/site.js | wc -l)" -eq 17
+          test "$(grep -o 'https://images.unsplash.com/photo-' I-Am-Modeling-Website/site.js | wc -l)" -eq 17
           node --check I-Am-Modeling-Website/site.js
           echo 'I Am Modeling source validation passed.'
 
@@ -65,7 +65,8 @@ jobs:
           grep -q '17-SLOT PORTFOLIO SYSTEM' /tmp/index.html
           curl -fsS --retry 5 --retry-delay 5 -o /tmp/site.js https://iammodeling.atechspot.com/site.js
           grep -q 'IMAGE PLACEHOLDER' /tmp/site.js
-          test "$(grep -o '\["[^"]*","#[0-9A-Fa-f]*","#[0-9A-Fa-f]*"\]' /tmp/site.js | wc -l)" -eq 17
+          test "$(grep -o 'https://images.unsplash.com/photo-' /tmp/site.js | wc -l)" -eq 17
+          grep -q '01 / 17 · AGENCY-READY HEADSHOT' /tmp/index.html
           curl -fsSI --retry 5 --retry-delay 5 https://iammodeling.atechspot.com/ > /tmp/headers.txt
           grep -qi 'x-content-type-options: nosniff' /tmp/headers.txt
           grep -qi 'content-security-policy:' /tmp/headers.txt
