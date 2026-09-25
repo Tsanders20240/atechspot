@@ -58,7 +58,10 @@ jobs:
         run: |
           set -euo pipefail
           sleep 15
-          curl -fsS --retry 4 --retry-delay 5 https://visionofsanders.atechspot.com/api/health | tee /tmp/health.json
+          curl -fsS --retry 4 --retry-delay 5 -o /tmp/health.json https://visionofsanders.atechspot.com/api/health
+          cat /tmp/health.json
           jq -e '.ok == true and .property == "Vision of Sanders"' /tmp/health.json
-          curl -fsS --retry 4 --retry-delay 5 https://visionofsanders.atechspot.com/ | grep -q 'See it.'
-          curl -fsSI --retry 4 --retry-delay 5 https://visionofsanders.atechspot.com/ | grep -qi 'x-content-type-options: nosniff'
+          curl -fsS --retry 4 --retry-delay 5 -o /tmp/index.html https://visionofsanders.atechspot.com/
+          grep -q 'See it.' /tmp/index.html
+          curl -fsSI --retry 4 --retry-delay 5 https://visionofsanders.atechspot.com/ > /tmp/headers.txt
+          grep -qi 'x-content-type-options: nosniff' /tmp/headers.txt
