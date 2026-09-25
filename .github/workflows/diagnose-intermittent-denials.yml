@@ -1,0 +1,53 @@
+name: Diagnose Intermittent Domain Denials
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/diagnose-intermittent-denials.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Map custom-domain ownership
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          curl -fsS "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}" > /tmp/domains.json
+          jq -c '.result[] | select(.hostname=="atechucation.atechspot.com" or .hostname=="atechucationfigures.atechspot.com" or .hostname=="hazilflix.atechspot.com" or .hostname=="visionofsanders.atechspot.com") | {hostname,service,environment,zone_name}' /tmp/domains.json
+
+      - name: Repeated public probes
+        shell: bash
+        run: |
+          set -uo pipefail
+          hosts=(
+            atechucation.atechspot.com
+            atechucationfigures.atechspot.com
+            hazilflix.atechspot.com
+            visionofsanders.atechspot.com
+          )
+          : > /tmp/results.txt
+          for round in $(seq 1 12); do
+            echo "ROUND $round"
+            for host in "${hosts[@]}"; do
+              body="/tmp/${host//./_}.body"
+              headers="/tmp/${host//./_}.headers"
+              code=$(curl -sS -L --connect-timeout 8 --max-time 25 -D "$headers" -o "$body" -w '%{http_code}' "https://$host/" || printf '000')
+              cf=$(awk 'BEGIN{IGNORECASE=1}/^cf-ray:/{gsub("\r","");print $2;exit}' "$headers")
+              server=$(awk 'BEGIN{IGNORECASE=1}/^server:/{gsub("\r","");$1="";sub(/^ /,"");print;exit}' "$headers")
+              denied=$(grep -Eqi 'access denied|attention required|error 1020|forbidden' "$body" && echo yes || echo no)
+              printf '%02d | %s | %s | denied=%s | server=%s | ray=%s\n' "$round" "$host" "$code" "$denied" "$server" "$cf" | tee -a /tmp/results.txt
+            done
+            sleep 2
+          done
+          echo '=== SUMMARY ==='
+          awk -F' \| ' '{key=$2" "$3" denied="$4; count[key]++} END{for(k in count) print count[k],k}' /tmp/results.txt | sort -nr
