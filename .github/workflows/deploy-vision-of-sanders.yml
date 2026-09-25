@@ -43,8 +43,12 @@ jobs:
           set -euo pipefail
           node build.mjs
           test -f public/index.html
+          test -f public/vision-mark.svg
+          grep -q '<svg' public/vision-mark.svg
+          grep -q 'viewBox="0 0 96 96"' public/vision-mark.svg
           ! grep -q '__IMG' public/index.html
           grep -q 'VISION OF SANDERS' public/index.html
+          grep -q 'grid-template-columns:1fr 1fr' public/index.html
           grep -q 'Shot on' public/index.html
           grep -q '/api/inquiry' public/index.html
           node --check worker.js
@@ -65,3 +69,7 @@ jobs:
           grep -q 'See it.' /tmp/index.html
           curl -fsSI --retry 4 --retry-delay 5 https://visionofsanders.atechspot.com/ > /tmp/headers.txt
           grep -qi 'x-content-type-options: nosniff' /tmp/headers.txt
+          curl -fsSI --retry 4 --retry-delay 5 https://visionofsanders.atechspot.com/vision-mark.svg > /tmp/svg-headers.txt
+          grep -Eqi '^content-type: image/svg\+xml' /tmp/svg-headers.txt
+          code=$(curl -sS -o /tmp/missing.html -w '%{http_code}' https://visionofsanders.atechspot.com/this-page-should-not-exist)
+          test "$code" = "404"
