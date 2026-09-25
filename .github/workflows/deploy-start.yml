@@ -1,0 +1,45 @@
+name: Deploy Start Production
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Start-Website/**'
+      - '.github/workflows/deploy-start.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Validate
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check Start-Website/worker.js
+          grep -Fq '"pattern":"start.atechspot.com"' Start-Website/wrangler.jsonc
+      - name: Deploy
+        working-directory: Start-Website
+        run: npx --yes wrangler@latest deploy
+      - name: Verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 10
+          curl -fsSL --retry 5 --retry-delay 4 -o /tmp/start https://start.atechspot.com/
+          grep -Fq 'Choose the right next step.' /tmp/start
+          grep -Fq '<link rel="canonical" href="https://start.atechspot.com/">' /tmp/start
+          grep -Fq 'name="robots" content="noindex,follow"' /tmp/start
+          final=$(curl -LsS --max-time 20 -o /dev/null -w '%{url_effective}' https://start.atechspot.com/)
+          [ "$final" = 'https://start.atechspot.com/' ]
+          echo 'START=GREEN'
