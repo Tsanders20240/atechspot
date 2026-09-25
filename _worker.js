@@ -18,7 +18,7 @@ const CANONICAL_REDIRECTS=new Map([
   ["/business","/assessment/"],["/business/","/assessment/"],["/business.html","/assessment/"],
   ["/ecosystem","/ecosystem/"],["/ecosystem.html","/ecosystem/"],["/resources","/resources/"],["/resources.html","/resources/"],
   ["/privacy","/privacy/"],["/privacy.html","/privacy/"],["/terms","/terms/"],["/terms.html","/terms/"],["/accessibility","/accessibility/"],["/accessibility.html","/accessibility/"],
-  ["/affiliate-disclosure","/affiliate-disclosure/"],["/affiliate-disclosure.html","/affiliate-disclosure/"],["/booking","/booking/"],["/booking.html","/booking/"],["/clients","/clients/"],["/clients.html","/clients/"],["/remote-support","/remote-support/"],["/remote-support.html","/remote-support/"],["/creator","/creator/"],["/creator.html","/creator/"]
+  ["/affiliate-disclosure","/affiliate-disclosure/"],["/affiliate-disclosure.html","/affiliate-disclosure/"],["/booking","/booking/"],["/booking.html","/booking/"],["/growthcare","/growthcare/"],["/growthcare.html","/growthcare/"],["/clients","/clients/"],["/clients.html","/clients/"],["/remote-support","/remote-support/"],["/remote-support.html","/remote-support/"],["/creator","/creator/"],["/creator.html","/creator/"]
 ]);
 
 const LEGACY_PREFIXES=[
