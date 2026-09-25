@@ -1,16 +1,11 @@
 {
-  "$schema": "../node_modules/wrangler/config-schema.json",
-  "name": "atechucation-figures",
-  "compatibility_date": "2026-09-24",
-  "main": "worker.js",
-  "routes": [
-    {
-      "pattern": "www.atechucationfigures.atechspot.com",
-      "custom_domain": true
-    },
-    {
-      "pattern": "atechucationfigures.atechspot.com",
-      "custom_domain": true
-    }
+  "$schema":"../node_modules/wrangler/config-schema.json",
+  "name":"atechucation-figures",
+  "compatibility_date":"2026-09-24",
+  "main":"worker.js",
+  "routes":[
+    {"pattern":"figures.atechspot.com","custom_domain":true},
+    {"pattern":"atechucationfigures.atechspot.com","custom_domain":true},
+    {"pattern":"www.atechucationfigures.atechspot.com","custom_domain":true}
   ]
 }

@@ -1,0 +1,149 @@
+name: Repair Four Public Ecosystem Properties
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'HazilFlix-Website/**'
+      - 'MR-A-Plus-Portfolio-Website/**'
+      - 'TechGuru-Website/**'
+      - 'ATechucation-Figures-Website/**'
+      - '.github/workflows/repair-four-public-properties.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: repair-four-public-properties
+  cancel-in-progress: false
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate production source
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check HazilFlix-Website/worker.js
+          node --check MR-A-Plus-Portfolio-Website/worker.js
+          node --check TechGuru-Website/worker.js
+          node --check ATechucation-Figures-Website/worker.js
+          grep -q 'Music, Creators & Independent Entertainment' HazilFlix-Website/index.html
+          grep -q 'Proof before the' MR-A-Plus-Portfolio-Website/index.html
+          grep -q 'Technology help that starts with the simplest safe step' TechGuru-Website/worker.js
+          grep -q 'Technology education with a world of personality' ATechucation-Figures-Website/worker.js
+
+      - name: Resolve Cloudflare zone
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          z=$(curl -fsS "https://api.cloudflare.com/client/v4/zones?name=atechspot.com&account.id=$CLOUDFLARE_ACCOUNT_ID" "${auth[@]}")
+          zid=$(echo "$z" | jq -r '.result[0].id // empty')
+          test -n "$zid"
+          echo "ZONE_ID=$zid" >> "$GITHUB_ENV"
+          echo "Resolved atechspot.com zone."
+
+      - name: Remove stale Pages domain for TechGuru
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          url="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/techguru/domains/techguru.atechspot.com"
+          code=$(curl -sS -o /tmp/techguru-domain-delete.json -w '%{http_code}' -X DELETE "$url" "${auth[@]}")
+          echo "TechGuru Pages-domain cleanup HTTP $code"
+          cat /tmp/techguru-domain-delete.json || true
+          case "$code" in 200|404) ;; *) echo "Unexpected Pages cleanup status"; exit 1;; esac
+
+      - name: Remove only stale DNS records for repaired hostnames
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          hosts=(
+            "hazilflix.atechspot.com"
+            "mraplusportfolio.atechspot.com"
+            "techguru.atechspot.com"
+            "atechucationfigures.atechspot.com"
+            "www.atechucationfigures.atechspot.com"
+          )
+          for host in "${hosts[@]}"; do
+            echo "Inspecting DNS for $host"
+            records=$(curl -fsS "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?name=$host" "${auth[@]}")
+            echo "$records" | jq -c '.result[]? | {id,type,name,content,proxied}'
+            while IFS=$'\t' read -r id type name content; do
+              [ -z "$id" ] && continue
+              allowed=false
+              if [ "$host" = "techguru.atechspot.com" ] && { [ "$content" = "100::" ] || [ "$type" = "AAAA" ]; }; then allowed=true; fi
+              if { [ "$host" = "hazilflix.atechspot.com" ] || [ "$host" = "mraplusportfolio.atechspot.com" ] || [ "$host" = "atechucationfigures.atechspot.com" ] || [ "$host" = "www.atechucationfigures.atechspot.com" ]; } && [ "$content" = "custom-domains.chatgpt.site" ]; then allowed=true; fi
+              if [ "$allowed" = true ]; then
+                echo "Deleting stale $type record for $name -> $content"
+                curl -fsS -X DELETE "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$id" "${auth[@]}" | jq -e '.success == true' >/dev/null
+              else
+                echo "Refusing to delete unexpected record: $type $name -> $content"
+                exit 1
+              fi
+            done < <(echo "$records" | jq -r '.result[]? | [.id,.type,.name,.content] | @tsv')
+          done
+
+      - name: Deploy HazilFlix
+        working-directory: HazilFlix-Website
+        run: npx --yes wrangler@latest deploy
+
+      - name: Deploy Mr. A+ Portfolio
+        working-directory: MR-A-Plus-Portfolio-Website
+        run: npx --yes wrangler@latest deploy
+
+      - name: Deploy TechGuru
+        working-directory: TechGuru-Website
+        run: npx --yes wrangler@latest deploy
+
+      - name: Deploy A+ Techucation Figures
+        working-directory: ATechucation-Figures-Website
+        run: npx --yes wrangler@latest deploy
+
+      - name: Verify all four public properties
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 12
+          check() {
+            local name="$1"
+            local url="$2"
+            local marker="$3"
+            local body="/tmp/${name//[^a-zA-Z0-9]/_}.html"
+            local code="000"
+            for attempt in 1 2 3 4 5 6 7 8; do
+              code=$(curl -L -sS --max-time 25 -H 'Cache-Control: no-cache' -o "$body" -w '%{http_code}' "$url" || true)
+              echo "$name -> $code (attempt $attempt/8)"
+              if [ "$code" = "200" ] && grep -Fq "$marker" "$body"; then
+                return 0
+              fi
+              sleep 5
+            done
+            echo "$name failed public verification"
+            head -n 60 "$body" 2>/dev/null || true
+            return 1
+          }
+          check "HazilFlix" "https://hazilflix.atechspot.com/" "HAZILFLIX"
+          check "MrAPlusPortfolio" "https://mraplusportfolio.atechspot.com/" "Proof before the"
+          check "TechGuru" "https://techguru.atechspot.com/" "Technology help that starts with the simplest safe step"
+          check "FiguresAlias" "https://figures.atechspot.com/" "Technology education with a world of personality"
+          check "FiguresLegacy" "https://atechucationfigures.atechspot.com/" "Technology education with a world of personality"
+          check "FiguresLegacyWWW" "https://www.atechucationfigures.atechspot.com/" "Technology education with a world of personality"
+
+      - name: Verify health endpoints
+        shell: bash
+        run: |
+          set -euo pipefail
+          for url in             https://hazilflix.atechspot.com/api/health             https://mraplusportfolio.atechspot.com/api/health             https://techguru.atechspot.com/api/health             https://figures.atechspot.com/api/health             https://atechucationfigures.atechspot.com/api/health             https://www.atechucationfigures.atechspot.com/api/health; do
+            echo "Checking $url"
+            curl -fsS --max-time 20 "$url" | tee /tmp/health.json
+            jq -e '.ok == true' /tmp/health.json >/dev/null
+          done
