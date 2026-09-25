@@ -1,0 +1,71 @@
+name: Deploy I Am Modeling
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'I-Am-Modeling-Website/**'
+      - '.github/workflows/deploy-iammodeling.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: iammodeling-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validate production source
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test -f I-Am-Modeling-Website/index.html
+          test -f I-Am-Modeling-Website/styles.css
+          test -f I-Am-Modeling-Website/site.js
+          test -f I-Am-Modeling-Website/_headers
+          grep -q 'I AM MODELING' I-Am-Modeling-Website/index.html
+          grep -q '17-SLOT PORTFOLIO SYSTEM' I-Am-Modeling-Website/index.html
+          grep -q 'Not a modeling agency' I-Am-Modeling-Website/index.html
+          grep -q 'No guaranteed jobs' I-Am-Modeling-Website/index.html
+          grep -q 'AI-generated, composited or materially altered imagery should be clearly disclosed' I-Am-Modeling-Website/index.html
+          grep -q 'Signature Look' I-Am-Modeling-Website/site.js
+          test "$(grep -o '\["[^"]*","#[0-9A-Fa-f]*","#[0-9A-Fa-f]*"\]' I-Am-Modeling-Website/site.js | wc -l)" -eq 17
+          node --check I-Am-Modeling-Website/site.js
+          echo 'I Am Modeling source validation passed.'
+
+      - name: Deploy to Cloudflare Pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx --yes wrangler@latest pages deploy I-Am-Modeling-Website             --project-name visionofsanders             --branch main             --commit-dirty=true
+
+      - name: Verify production
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 15
+          curl -fsS --retry 5 --retry-delay 5 -o /tmp/index.html https://iammodeling.atechspot.com/
+          grep -q 'I AM MODELING' /tmp/index.html
+          grep -q '17-SLOT PORTFOLIO SYSTEM' /tmp/index.html
+          grep -q 'IMAGE PLACEHOLDER' /tmp/index.html
+          curl -fsSI --retry 5 --retry-delay 5 https://iammodeling.atechspot.com/ > /tmp/headers.txt
+          grep -qi 'x-content-type-options: nosniff' /tmp/headers.txt
+          grep -qi 'content-security-policy:' /tmp/headers.txt
+          curl -fsS --retry 5 --retry-delay 5 https://iammodeling.atechspot.com/robots.txt | grep -q 'Sitemap: https://iammodeling.atechspot.com/sitemap.xml'
+          echo 'I Am Modeling production verification passed.'
