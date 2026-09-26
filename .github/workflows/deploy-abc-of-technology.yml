@@ -101,6 +101,11 @@ jobs:
           test -f "$ROOT/public/downloads/activities/phone-stand.pdf"
           node --check "$ROOT/worker.js"
           node --check "$ROOT/public/portal-2026.js"
+          grep -q "path==='/listen'" "$ROOT/worker.js"
+          grep -q 'music.amazon.com/tracks/B0979KNB2S' "$ROOT/worker.js"
+          grep -q 'music.youtube.com/watch?v=j7s5P1pVFtY' "$ROOT/worker.js"
+          grep -q 'open.spotify.com/track/7z5QY0MFuY8IhCOlPLv6wQ' "$ROOT/worker.js"
+          grep -q 'Listen Everywhere' "$HTML"
 
           # Portal and ecosystem identity.
           grep -q 'Website 4 of 22' "$HTML"
@@ -283,11 +288,30 @@ jobs:
           test "$pages_code" = "200"
           grep -q 'START YOUR ADVENTURE' /tmp/abc-pages-origin.html
           grep -q 'GROWN-UP GUIDE' /tmp/abc-pages-origin.html
-          for path in / /robots.txt /sitemap.xml /api/health /portal-2026.css /portal-2026.js /assets/hero/abc-home-hero.webp /assets/activities/battery-hunt.webp /assets/activities/f-floppy-flash-drive-activity.webp /assets/activities/g-game-controller-activity.webp /assets/activities/h-headphones-activity.webp /assets/coloring-pages/a-android.webp /assets/coloring-pages/z-zoom.webp /assets/activities/phone-stand.webp /downloads/activities/battery-hunt.pdf /downloads/activities/phone-stand.pdf /downloads/activities/f-floppy-flash-drive-activity.pdf /downloads/activities/g-game-controller-activity.pdf /downloads/activities/h-headphones-activity.pdf /downloads/coloring-pages/a-android.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp  /assets/authors/april-sanders-final.webp; do
+          for path in / /listen /robots.txt /sitemap.xml /api/health /portal-2026.css /portal-2026.js /assets/hero/abc-home-hero.webp /assets/activities/battery-hunt.webp /assets/activities/f-floppy-flash-drive-activity.webp /assets/activities/g-game-controller-activity.webp /assets/activities/h-headphones-activity.webp /assets/coloring-pages/a-android.webp /assets/coloring-pages/z-zoom.webp /assets/activities/phone-stand.webp /downloads/activities/battery-hunt.pdf /downloads/activities/phone-stand.pdf /downloads/activities/f-floppy-flash-drive-activity.pdf /downloads/activities/g-game-controller-activity.pdf /downloads/activities/h-headphones-activity.pdf /downloads/coloring-pages/a-android.pdf /downloads/coloring-pages/abc-technology-coloring-pages-a-z-26-pages.pdf /assets/book/book-cover.webp /assets/book/book-page-title.webp /assets/book/book-page-best-you.webp  /assets/authors/april-sanders-final.webp; do
             code=$(curl -L -sS -A 'Mozilla/5.0' -o /dev/null -w '%{http_code}' "https://www.abcoftech.atechspot.com${path}")
             echo "$path -> $code"
             test "$code" = "200"
           done
+
+      - name: Verify live listen smart-link and cache policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          for host in abcoftech.atechspot.com www.abcoftech.atechspot.com; do
+            url="https://${host}/listen?qa=${GITHUB_SHA}"
+            echo "Checking ${url}"
+            curl -fsS -A 'Mozilla/5.0' -H 'Cache-Control: no-cache' -D "/tmp/listen-${host}.headers" "${url}" -o "/tmp/listen-${host}.html"
+            grep -q 'ABC of Tech' "/tmp/listen-${host}.html"
+            grep -q 'Amazon Music' "/tmp/listen-${host}.html"
+            grep -q 'YouTube Music' "/tmp/listen-${host}.html"
+            grep -q 'Spotify' "/tmp/listen-${host}.html"
+            grep -q 'music.amazon.com/tracks/B0979KNB2S' "/tmp/listen-${host}.html"
+            grep -q 'music.youtube.com/watch?v=j7s5P1pVFtY' "/tmp/listen-${host}.html"
+            grep -q 'open.spotify.com/track/7z5QY0MFuY8IhCOlPLv6wQ' "/tmp/listen-${host}.html"
+            grep -qi '^cache-control:.*no-store' "/tmp/listen-${host}.headers"
+          done
+          echo 'Live /listen smart-link verified on both hostnames with no-store cache policy.'
 
       - name: Verify non-www redirects to www canonical
         shell: bash
