@@ -54,7 +54,7 @@ function alphabetLanding(){
 }
 
 function sitemap(){
-  const urls=['/',...Object.keys(LANDINGS),'/technology-alphabet-a-to-z/'];
+  const urls=['/','/listen',...Object.keys(LANDINGS),'/technology-alphabet-a-to-z/'];
   const xml='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+urls.map((p,i)=>`<url><loc>${ORIGIN}${p}</loc><changefreq>${i===0?'weekly':'monthly'}</changefreq><priority>${i===0?'1.0':'0.8'}</priority></url>`).join('')+'</urlset>';
   return new Response(xml,{status:200,headers:{'content-type':'application/xml; charset=utf-8','cache-control':'public, max-age=3600','x-content-type-options':'nosniff'}});
 }
@@ -64,6 +64,9 @@ const resourceNav='<section style="padding:34px 18px;background:#f4f9ff;border-t
 export default {
   async fetch(request, env, ctx) {
     const url=new URL(request.url);
+    if((url.pathname==='/listen'||url.pathname==='/listen/')&&(request.method==='GET'||request.method==='HEAD')){
+      return baseWorker.fetch(request,env,ctx);
+    }
     if(url.hostname==='abcoftech.atechspot.com'){
       url.hostname='www.abcoftech.atechspot.com';
       return Response.redirect(url.toString(),301);
