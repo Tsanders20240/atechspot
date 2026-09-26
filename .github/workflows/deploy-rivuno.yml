@@ -76,6 +76,19 @@ jobs:
           grep -q 'ABC of Tech' /tmp/rivuno.html
           grep -q 'Amazon Music' /tmp/rivuno.html
           grep -q 'YouTube Music' /tmp/rivuno.html
+          grep -q 'Launch roadmap.' /tmp/rivuno.html
+          grep -q 'Questions before launch.' /tmp/rivuno.html
+
+          release_code=$(curl -L -sS -A 'Mozilla/5.0' -o /tmp/rivuno-release.html -w '%{http_code}' "https://rivuno.atechspot.com/release/abc-of-tech/")
+          echo "release/abc-of-tech -> $release_code"
+          test "$release_code" = "200"
+          grep -q 'ABC of Tech' /tmp/rivuno-release.html
+          grep -q 'Rights summary' /tmp/rivuno-release.html
+
+          artist_code=$(curl -L -sS -A 'Mozilla/5.0' -o /tmp/rivuno-artist.html -w '%{http_code}' "https://rivuno.atechspot.com/artists/a-plus-techucation/")
+          echo "artists/a-plus-techucation -> $artist_code"
+          test "$artist_code" = "200"
+          grep -q 'A+ Techucation' /tmp/rivuno-artist.html
 
           health=$(curl -L -sS -A 'Mozilla/5.0' "https://rivuno.atechspot.com/api/health")
           echo "$health"
