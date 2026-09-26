@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rivuno | Own the Music. Support the Artist.</title>
+<meta name="description" content="Rivuno is a music platform for artist-owned releases, permanent digital downloads, transparent rights records, and direct fan support.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://rivuno.atechspot.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Rivuno | Own the Music. Support the Artist.">
+<meta property="og:description" content="Discover artist-owned releases, permanent digital downloads, and transparent rights records.">
+<meta property="og:url" content="https://rivuno.atechspot.com/">
+<meta name="theme-color" content="#070b1f">
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+:root{
+  --bg:#070b1f;--panel:#0f1533;--panel2:#121a3f;--text:#f7f8ff;--muted:#aab4d6;
+  --line:rgba(255,255,255,.11);--violet:#8b5cf6;--cyan:#22d3ee;--pink:#ec4899;--green:#34d399
+}
+body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);background:
+radial-gradient(circle at 12% 8%,rgba(34,211,238,.16),transparent 28rem),
+radial-gradient(circle at 88% 14%,rgba(139,92,246,.19),transparent 30rem),
+linear-gradient(180deg,#070b1f,#090e27 48%,#060918)}
+a{color:inherit}
+.wrap{width:min(1180px,calc(100% - 34px));margin:auto}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(7,11,31,.82);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:22px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;font-weight:1000;letter-spacing:.08em}
+.logo{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--cyan),var(--violet) 55%,var(--pink));box-shadow:0 12px 34px rgba(34,211,238,.18)}
+.navlinks{display:flex;gap:22px;align-items:center}.navlinks a{text-decoration:none;color:#c9d1ee;font-weight:750;font-size:.94rem}
+.navlinks a:hover{color:#fff}
+.hero{padding:88px 0 64px}
+.hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:54px;align-items:center}
+.kicker{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid rgba(34,211,238,.24);border-radius:999px;background:rgba(34,211,238,.08);color:#bff7ff;font-weight:900;font-size:.76rem;letter-spacing:.08em}
+h1{font-size:clamp(3.6rem,8vw,7.2rem);line-height:.88;letter-spacing:-.065em;margin:18px 0 20px}
+.grad{background:linear-gradient(90deg,#fff 0%,#bff7ff 35%,#c7b6ff 68%,#ff9fd0 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--muted);font-size:1.12rem;line-height:1.75;max-width:720px}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:50px;padding:0 18px;border-radius:15px;text-decoration:none;font-weight:900;border:1px solid var(--line)}
+.btn.primary{background:linear-gradient(135deg,var(--cyan),var(--violet));color:#07101c;border:0}
+.btn.secondary{background:rgba(255,255,255,.05)}
+.hero-card{background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.03));border:1px solid var(--line);border-radius:30px;padding:22px;box-shadow:0 35px 90px rgba(0,0,0,.35)}
+.cover{aspect-ratio:1/1;border-radius:24px;background:
+radial-gradient(circle at 30% 25%,rgba(34,211,238,.85),transparent 28%),
+radial-gradient(circle at 70% 65%,rgba(236,72,153,.75),transparent 31%),
+linear-gradient(135deg,#171f55,#0b102c 58%,#32134a);display:flex;align-items:flex-end;padding:28px;overflow:hidden;position:relative}
+.cover:before{content:"";position:absolute;width:62%;aspect-ratio:1;border-radius:50%;border:24px solid rgba(255,255,255,.08);right:-9%;top:-8%;box-shadow:0 0 0 18px rgba(255,255,255,.04),0 0 0 38px rgba(255,255,255,.025)}
+.cover-copy{position:relative;z-index:2}.cover small{display:block;color:#d8ddff;font-weight:900;letter-spacing:.08em}.cover strong{display:block;font-size:clamp(2rem,5vw,3.8rem);line-height:.95;margin-top:6px}
+.release-meta{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-top:18px}
+.release-meta h3{margin:0;font-size:1.55rem}.release-meta p{margin:4px 0 0;font-size:.93rem}.price{font-size:1.7rem;font-weight:1000}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+.badge{padding:7px 10px;border-radius:999px;background:rgba(52,211,153,.09);border:1px solid rgba(52,211,153,.25);color:#9ff5d1;font-size:.75rem;font-weight:850}
+.notice{margin-top:14px;color:#8f9aba;font-size:.82rem;line-height:1.5}
+section.block{padding:72px 0;border-top:1px solid rgba(255,255,255,.06)}
+.head{max-width:760px;margin-bottom:30px}.head h2{font-size:clamp(2.3rem,5vw,4.4rem);line-height:.98;letter-spacing:-.045em;margin:0 0 12px}.head p{color:var(--muted);line-height:1.7}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tile{padding:24px;border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.025));border:1px solid var(--line)}
+.tile .num{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:#131c47;color:#b8f7ff;font-weight:1000}
+.tile h3{margin:18px 0 8px;font-size:1.25rem}.tile p{margin:0;color:var(--muted);line-height:1.65;font-size:.94rem}
+.artist-panel{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.artist-panel .tile{min-height:230px}
+.rights{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.rights .tile{min-height:190px}
+footer{padding:34px 0 48px;border-top:1px solid var(--line);color:#8e99bc}.foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}.foot strong{color:#fff}
+@media(max-width:900px){.hero-grid,.artist-panel,.rights{grid-template-columns:1fr}.hero{padding-top:58px}.grid3{grid-template-columns:1fr}.navlinks{display:none}}
+@media(max-width:560px){.wrap{width:min(100% - 22px,1180px)}.hero-card{padding:14px;border-radius:24px}.cover{padding:20px}.release-meta{align-items:start;flex-direction:column}.actions .btn{width:100%}}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap nav">
+    <a class="brand" href="/"><span class="logo">R</span><span>RIVUNO</span></a>
+    <nav class="navlinks" aria-label="Primary">
+      <a href="#release">Featured</a>
+      <a href="#how">How It Works</a>
+      <a href="#artists">For Artists</a>
+      <a href="#rights">Rights</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="kicker">ARTIST-FIRST MUSIC PLATFORM</span>
+      <h1><span class="grad">Own the music.</span><br>Support the artist.</h1>
+      <p>Rivuno is being built for direct music ownership, artist pages, transparent release rights, and account-linked digital downloads. Start with the featured release below and follow the platform as it grows.</p>
+      <div class="actions">
+        <a class="btn primary" href="#release">Explore Featured Release →</a>
+        <a class="btn secondary" href="#artists">For Artists</a>
+      </div>
+    </div>
+
+    <article class="hero-card" id="release">
+      <div class="cover" role="img" aria-label="ABC of Tech release artwork">
+        <div class="cover-copy"><small>A+ TECHUCATION</small><strong>ABC<br>OF TECH</strong></div>
+      </div>
+      <div class="release-meta">
+        <div><h3>ABC of Tech</h3><p>A+ Techucation</p></div>
+        <div class="price">$1.29</div>
+      </div>
+      <div class="badges">
+        <span class="badge">Master Rights Confirmed</span>
+        <span class="badge">Composition Rights Confirmed</span>
+      </div>
+      <div class="actions">
+        <a class="btn primary" href="https://music.amazon.com/tracks/B0979KNB2S?marketplaceId=ATVPDKIKX0DER&musicTerritory=US" target="_blank" rel="noopener noreferrer">Amazon Music ↗</a>
+        <a class="btn secondary" href="https://music.youtube.com/watch?v=j7s5P1pVFtY" target="_blank" rel="noopener noreferrer">YouTube Music ↗</a>
+      </div>
+      <p class="notice">Permanent-download checkout is not activated yet. Rivuno will not charge customers until protected payment and account-linked delivery are fully connected.</p>
+    </article>
+  </div>
+</section>
+
+<section class="block" id="how">
+  <div class="wrap">
+    <div class="head"><h2>Simple for fans. Structured for artists.</h2><p>Rivuno is designed around a clear purchase path and transparent release records rather than opaque ownership.</p></div>
+    <div class="grid3">
+      <article class="tile"><span class="num">01</span><h3>Discover</h3><p>Explore releases, artist pages, music links, and verified release information.</p></article>
+      <article class="tile"><span class="num">02</span><h3>Buy Once</h3><p>Future Rivuno downloads will use a one-time purchase with a permanent account entitlement.</p></article>
+      <article class="tile"><span class="num">03</span><h3>Own Your Download</h3><p>Your purchase record stays tied to your Rivuno account with protected delivery and download history.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="artists">
+  <div class="wrap">
+    <div class="head"><h2>Built to grow with independent artists.</h2><p>The artist system will support structured onboarding, release records, royalty ledgers, and transparent platform fees.</p></div>
+    <div class="artist-panel">
+      <article class="tile"><h3>Artist Pages</h3><p>Dedicated profiles for releases, links, credits, catalog history, and audience discovery.</p></article>
+      <article class="tile"><h3>Transparent Splits</h3><p>Revenue accounting designed to separate platform fees, rights obligations, master revenue, composition revenue, and artist payouts.</p></article>
+      <article class="tile"><h3>Release Rights Records</h3><p>Structured records for master ownership, composition ownership, writers, publishers, PRO information, and supporting authorization.</p></article>
+      <article class="tile"><h3>Marketplace Expansion</h3><p>Third-party artist onboarding and payouts will be added only after payment, rights, tax, and reporting systems are production-ready.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="rights">
+  <div class="wrap">
+    <div class="head"><h2>Rights and transparency from day one.</h2><p>Rivuno keeps sound-recording rights and composition rights as separate release records so the platform can support cleaner accounting and reporting.</p></div>
+    <div class="rights">
+      <article class="tile"><h3>Sound Recording</h3><p>Tracks master ownership, recording authorization, artist identity, label data when applicable, and release identifiers.</p></article>
+      <article class="tile"><h3>Composition</h3><p>Tracks songwriter, composer, lyricist, publishing, ownership percentages, PRO details, and composition identifiers when available.</p></article>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div><strong>Rivuno</strong><br><span>An A+ Techucation platform</span></div>
+    <div>Music ownership • Artist support • Transparent rights</div>
+  </div>
+</footer>
+</body>
+</html>
