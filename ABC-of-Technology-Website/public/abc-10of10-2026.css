@@ -199,3 +199,115 @@ body{background:#f8fcff;color:var(--abc-ink)}
 @media(max-width:620px){
   .creator-card img{height:390px}
 }
+
+
+/* === 2026-09-26 visual framing + author profile fix === */
+/* Keep every real book page completely visible inside its viewer. */
+.actual-book-viewer .book-frame{
+  min-height:620px;
+  padding:24px;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  background:#fff;
+}
+.actual-book-viewer .book-frame img,
+.actual-book-viewer .book-frame img.active{
+  width:100%;
+  height:100%;
+  max-width:100%;
+  max-height:570px;
+  object-fit:contain;
+  object-position:center;
+  margin:auto;
+  background:#fff;
+}
+
+/* Printable activity thumbnails: never crop worksheet titles, letters or instructions. */
+.printable-activity-grid .activity-poster{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.printable-activity-grid .activity-poster img{
+  width:100%;
+  height:auto;
+  aspect-ratio:8.5/11;
+  object-fit:contain;
+  object-position:center top;
+  padding:10px;
+  box-sizing:border-box;
+  background:#fff;
+}
+.printable-activity-grid .activity-meta{
+  margin-top:auto;
+}
+
+/* All A-Z coloring cards use one identical J-style frame, including K-Z. */
+.color-grid-large{
+  align-items:stretch;
+}
+.color-card-large{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+}
+.color-card-large .color-page-thumb{
+  width:100%;
+  aspect-ratio:8.5/11;
+  padding:10px;
+  box-sizing:border-box;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background:#fff;
+}
+.color-card-large .color-page-thumb img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  display:block;
+}
+.color-card-large b{margin-top:12px}
+.color-card-large small{margin-top:auto;padding-top:6px}
+
+/* Entire author cards are now accessible clickable profile links. */
+.creator-card-link{
+  color:inherit;
+  text-decoration:none;
+  cursor:pointer;
+  display:block;
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+.creator-card-link:hover,
+.creator-card-link:focus-visible{
+  transform:translateY(-5px);
+  box-shadow:0 30px 70px rgba(8,37,91,.18);
+  border-color:#4ea8ff;
+  outline:none;
+}
+.creator-card-caption{
+  display:block;
+  padding:20px 22px 24px;
+}
+.creator-card-caption strong{
+  display:block;
+  font-size:22px;
+  color:var(--abc-navy);
+}
+.creator-card-caption > span{
+  display:block;
+  margin-top:5px;
+  color:#1870c8;
+  font-weight:850;
+}
+
+@media(max-width:760px){
+  .actual-book-viewer .book-frame{min-height:430px;padding:14px}
+  .actual-book-viewer .book-frame img,
+  .actual-book-viewer .book-frame img.active{max-height:400px}
+  .printable-activity-grid .activity-poster img,
+  .color-card-large .color-page-thumb{padding:8px}
+}
