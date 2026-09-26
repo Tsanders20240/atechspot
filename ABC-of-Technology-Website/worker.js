@@ -12,6 +12,87 @@ const TEXT_HEADERS={'content-type':'text/plain; charset=utf-8','cache-control':'
 const XML_HEADERS={'content-type':'application/xml; charset=utf-8','cache-control':'public, max-age=3600','x-content-type-options':'nosniff'};
 const SVG_HEADERS={'content-type':'image/svg+xml; charset=utf-8','cache-control':'public, max-age=300','x-content-type-options':'nosniff'};
 
+const LISTEN_LINKS={
+  amazon:'https://music.amazon.com/tracks/B0979KNB2S?marketplaceId=ATVPDKIKX0DER&musicTerritory=US',
+  youtube:'https://music.youtube.com/watch?v=j7s5P1pVFtY',
+  spotify:'https://open.spotify.com/track/7z5QY0MFuY8IhCOlPLv6wQ'
+};
+
+const LISTEN_HEADERS={
+  ...HTML_HEADERS,
+  'cache-control':'no-store, no-cache, must-revalidate, max-age=0, s-maxage=0',
+  'cdn-cache-control':'no-store',
+  'cloudflare-cdn-cache-control':'no-store',
+  'pragma':'no-cache',
+  'expires':'0'
+};
+
+function listenPage(){
+  const html=`<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Listen to ABC of Tech | Amazon Music, YouTube Music & Spotify</title>
+<meta name="description" content="Listen to ABC of Tech on Amazon Music, YouTube Music, or Spotify. Choose your preferred streaming service.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://www.abcoftech.atechspot.com/listen">
+<meta name="theme-color" content="#071b4f">
+<meta property="og:type" content="music.song">
+<meta property="og:title" content="Listen to ABC of Tech">
+<meta property="og:description" content="Choose Amazon Music, YouTube Music, or Spotify to listen to ABC of Tech.">
+<meta property="og:url" content="https://www.abcoftech.atechspot.com/listen">
+<style>
+*{box-sizing:border-box}
+:root{color-scheme:light}
+body{margin:0;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#10265d;background:
+radial-gradient(circle at 15% 10%,rgba(38,200,255,.22),transparent 25rem),
+radial-gradient(circle at 85% 20%,rgba(128,79,255,.2),transparent 24rem),
+linear-gradient(160deg,#edf9ff 0%,#f7f5ff 46%,#fff 100%)}
+main{min-height:100vh;display:grid;place-items:center;padding:28px}
+.card{width:min(620px,100%);background:rgba(255,255,255,.94);border:1px solid #d8e8f7;border-radius:32px;box-shadow:0 30px 80px rgba(18,55,111,.16);padding:34px}
+.brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;color:#0d2b6b;font-weight:900;font-size:.95rem}
+.brand-mark{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#0d7cff,#7a51ef);color:#fff;font-weight:1000}
+.badge{display:inline-block;margin-top:28px;padding:7px 11px;border-radius:999px;background:#e8f5ff;color:#075dbd;font-size:.73rem;font-weight:900;letter-spacing:.08em}
+h1{margin:12px 0 8px;font-size:clamp(2.4rem,7vw,4.6rem);line-height:.95;letter-spacing:-.055em;color:#08255b}
+.lead{margin:0 0 26px;color:#5c6f8d;font-size:1.05rem;line-height:1.65}
+.links{display:grid;gap:12px}
+.listen-btn{display:flex;align-items:center;justify-content:space-between;gap:16px;text-decoration:none;border-radius:20px;padding:18px 19px;font-weight:900;border:1px solid #dce8f6;background:#fff;color:#0a285f;box-shadow:0 10px 28px rgba(14,56,111,.07);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.listen-btn:hover,.listen-btn:focus-visible{transform:translateY(-3px);box-shadow:0 18px 38px rgba(14,56,111,.13);border-color:#82bfff;outline:none}
+.platform{display:flex;align-items:center;gap:13px}
+.icon{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:1.25rem;font-weight:1000;color:#fff}
+.amazon .icon{background:linear-gradient(135deg,#00a8e1,#232f3e)}
+.youtube .icon{background:#ff0033}
+.spotify .icon{background:#1db954}
+.arrow{font-size:1.35rem;color:#4e6f9c}
+.note{margin:22px 0 0;color:#71809a;font-size:.82rem;line-height:1.55}
+.back{display:inline-block;margin-top:20px;color:#176dcc;font-weight:850;text-decoration:none}
+.back:hover{text-decoration:underline}
+@media(max-width:520px){main{padding:16px}.card{padding:24px;border-radius:24px}.listen-btn{padding:15px}.icon{width:40px;height:40px}}
+</style>
+</head>
+<body>
+<main>
+  <section class="card" aria-labelledby="listenTitle">
+    <a class="brand" href="/"><span class="brand-mark">A+</span><span>ABC's of Technology</span></a>
+    <span class="badge">OFFICIAL SMART LINK</span>
+    <h1 id="listenTitle">ABC of Tech</h1>
+    <p class="lead">Choose where to listen.</p>
+    <div class="links" role="list" aria-label="Music streaming services">
+      <a class="listen-btn amazon" role="listitem" href="${LISTEN_LINKS.amazon}" target="_blank" rel="noopener noreferrer"><span class="platform"><span class="icon">a</span><span>Amazon Music</span></span><span class="arrow">↗</span></a>
+      <a class="listen-btn youtube" role="listitem" href="${LISTEN_LINKS.youtube}" target="_blank" rel="noopener noreferrer"><span class="platform"><span class="icon">▶</span><span>YouTube Music</span></span><span class="arrow">↗</span></a>
+      <a class="listen-btn spotify" role="listitem" href="${LISTEN_LINKS.spotify}" target="_blank" rel="noopener noreferrer"><span class="platform"><span class="icon">●</span><span>Spotify</span></span><span class="arrow">↗</span></a>
+    </div>
+    <p class="note">Streaming availability can vary by service and region. Links open on the selected music platform.</p>
+    <a class="back" href="/#watch">← Back to Watch & Listen</a>
+  </section>
+</main>
+</body>
+</html>`;
+  return new Response(html,{status:200,headers:LISTEN_HEADERS});
+}
+
+
 const PDF_BY_LETTER={
   A:'a-analog-phone.pdf',B:'b-battery.pdf',C:'c-computer.pdf',D:'d-drone.pdf',E:'e-email.pdf',F:'f-flash-drive.pdf',
   G:'g-game-controller.pdf',H:'h-headphones.pdf',I:'i-internet.pdf',J:'j-joystick.pdf',K:'k-keyboard.pdf',L:'l-laptop.pdf',
@@ -29,7 +110,7 @@ const LEGACY_COLORING={
 };
 
 const SECTION_REDIRECTS=new Map([
-  ['/shop/','/#shop'],['/shop','/#shop'],['/music/','/#listen'],['/music','/#listen'],['/songs/','/#listen'],
+  ['/shop/','/#shop'],['/shop','/#shop'],['/music/','/listen'],['/music','/listen'],['/songs/','/listen'],
   ['/videos/','/#watch'],['/videos','/#watch'],['/watch/','/#watch'],['/watch','/#watch'],['/play/','/#play'],['/play','/#play'],
   ['/free-resources/','/#free'],['/free-resources','/#free'],['/educators/','/#educators'],['/educators','/#educators'],
   ['/libraries/','/#libraries'],['/libraries','/#libraries'],['/authors/','/#about'],['/authors','/#about'],['/for-authors/','/#about'],
@@ -85,8 +166,9 @@ export default{
   async fetch(request,env){
     const url=new URL(request.url),path=url.pathname;
     if(request.method!=='GET'&&request.method!=='HEAD') return new Response('Method not allowed',{status:405,headers:TEXT_HEADERS});
+    if(path==='/listen'||path==='/listen/') return listenPage();
     if(path==='/assets/book/book-bus-crop.webp') return svgResponse(BUS_ONLY_SVG);
-    if(path==='/api/health') return new Response(JSON.stringify({ok:true,property:"ABC's of Technology",payments:'external-only',childAccounts:false,officialBookAssets:true,bookPreviewPages:3,coloringPDFs:26,authorPortraits:true,bus:'clean-abc-tech-bus',deployment:'ABC-OF-TECHNOLOGY-10OF10-AUTHOR-BUS-FIX'}),{status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'}});
+    if(path==='/api/health') return new Response(JSON.stringify({ok:true,property:"ABC's of Technology",payments:'external-only',childAccounts:false,officialBookAssets:true,bookPreviewPages:3,coloringPDFs:26,authorPortraits:true,bus:'clean-abc-tech-bus',deployment:'ABC-OF-TECHNOLOGY-10OF10-LISTEN-SMARTLINK-CACHE-FIX'}),{status:200,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'}});
     if(path==='/robots.txt') return new Response('User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: https://abcoftech.atechspot.com/sitemap.xml\n',{headers:TEXT_HEADERS});
     if(path==='/sitemap.xml') return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://abcoftech.atechspot.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url></urlset>',{headers:XML_HEADERS});
     if(path==='/coloring/'||path==='/coloring'){
