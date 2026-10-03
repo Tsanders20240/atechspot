@@ -11,7 +11,7 @@ class Bucket{
  async put(k,body,options={}){if(options.onlyIf?.etagDoesNotMatch==='*'&&this.items.has(k))return null;this.items.set(k,{body,httpMetadata:options.httpMetadata});return {};}
 }
 const makeEnv=()=>({STRIPE_API_KEY:'fixture-only',STRIPE_WEBHOOK_SECRET:'fixture-webhook-secret',PLAYBOOK_PRICE_ID:'price_fixture',PLAYBOOK_WEBHOOK_ID:'we_fixture',PLAYBOOK_DOWNLOAD_SECRET:'fixture-signing-secret-longer-than-32-characters',ATECHSPOT_DOWNLOADS:new Bucket(),RESEND_API_KEY:'fixture-email',PLAYBOOK_MODE:'sandbox',PLAYBOOK_TAX_MODE:'reviewed_no_collection'});
-function fixture(){return{id:sessionId,object:'checkout.session',livemode:false,mode:'payment',status:'complete',payment_status:'paid',currency:'usd',amount_subtotal:2900,amount_total:2900,payment_intent:'pi_fixture',metadata:{atechspot_product:'reseller_playbook_v1',terms_version:'2026-10-03-v1'},consent:{terms_of_service:'accepted'},customer_details:{email:'buyer@example.test'},line_items:{has_more:false,data:[{price:{id:'price_fixture'},quantity:1}]}};}
+function fixture(){return{id:sessionId,object:'checkout.session',livemode:false,mode:'payment',status:'complete',payment_status:'paid',currency:'usd',amount_subtotal:2900,amount_total:2900,payment_intent:'pi_fixture',metadata:{atechspot_product:'reseller_playbook_v1',terms_version:'2026-10-03-v2'},consent:{terms_of_service:'accepted'},customer_details:{email:'buyer@example.test'},line_items:{has_more:false,data:[{price:{id:'price_fixture'},quantity:1}]}};}
 let session,payment,emails,emailFail,creates,price,hook;
 function reset(){session=fixture();payment={status:'succeeded',latest_charge:{refunded:false,disputed:false}};emails=0;emailFail=false;creates=[];price={active:true,livemode:false,currency:'usd',unit_amount:2900,recurring:null,product:{active:true,metadata:{atechspot_product:'reseller_playbook_v1'}}};hook={status:'enabled',livemode:false,url:origin+'/api/playbook/webhook',enabled_events:['checkout.session.completed','checkout.session.async_payment_succeeded','checkout.session.async_payment_failed','charge.refunded','charge.dispute.created']};}
 const originalFetch=globalThis.fetch;
@@ -38,7 +38,7 @@ async function event(env,type,object,options={}){
  return handlePlaybook(new Request(origin+'/api/playbook/webhook',{method:'POST',headers:{'stripe-signature':`t=${t},v1=${sig}`},body}),env);
 }
 async function fulfill(env){return event(env,'checkout.session.completed',session);}
-const checkoutBody={acceptTerms:true,termsVersion:'2026-10-03-v1',requestId:'12345678-1234-1234-1234-123456789012'};
+const checkoutBody={acceptTerms:true,termsVersion:'2026-10-03-v2',requestId:'12345678-1234-1234-1234-123456789012'};
 test('Missing configuration closes checkout and status',async()=>{const r=await handlePlaybook(request('status',null,'GET'),{});assert.equal((await r.json()).available,false);assert.equal((await handlePlaybook(request('checkout',checkoutBody),{})).status,503);});
 test('Forged and expired signed downloads are rejected',async()=>{const env=makeEnv();const token=await signDownload(env,sessionId,1000);assert.equal((await verifyDownload(env,token,2000)).sid,sessionId);assert.equal(await verifyDownload(env,token,901001),null);assert.equal(await verifyDownload(env,token+'x',2000),null);});
 test('Cross-origin checkout rejected',async()=>{reset();assert.equal((await handlePlaybook(request('checkout',checkoutBody,'POST','https://other.example'),makeEnv())).status,403);assert.equal(creates.length,0);});
