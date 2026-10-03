@@ -1,74 +1,68 @@
-const looks=[
-["Agency-Ready Headshot","#2c5cff","#101b48","https://images.unsplash.com/photo-1771919364536-cbf77acf749d?auto=format&fit=crop&w=1400&q=86"],
-["Tailored Suit Editorial","#5a351f","#c7a684","https://images.unsplash.com/photo-1758613654216-ea195d4382f7?auto=format&fit=crop&w=1400&q=86"],
-["Clean Beauty","#692b50","#e8b7ce","https://images.unsplash.com/photo-1779207383748-a9b036a9cfb0?auto=format&fit=crop&w=1400&q=86"],
-["Street Style","#1f252a","#8b9298","https://images.unsplash.com/photo-1771012265579-eef6d075777f?auto=format&fit=crop&w=1400&q=86"],
-["Evening Editorial","#391525","#bd274d","https://images.unsplash.com/photo-1767036841826-94cce831c2fb?auto=format&fit=crop&w=1400&q=86"],
-["Denim Commercial","#214c72","#8db9db","https://images.unsplash.com/photo-1758613654186-6ce234bf94ab?auto=format&fit=crop&w=1400&q=86"],
-["Monochrome Portrait","#111","#777","https://images.unsplash.com/photo-1758613653298-738e98658e31?auto=format&fit=crop&w=1400&q=86"],
-["Movement Study","#8c351c","#f0a04b","https://images.unsplash.com/photo-1670108527641-953bb97d5341?auto=format&fit=crop&w=1400&q=86"],
-["Creative Beauty","#2f135c","#9c72e8","https://images.unsplash.com/photo-1768818536330-62ae6edf84ba?auto=format&fit=crop&w=1400&q=86"],
-["Lifestyle Campaign","#2f5836","#bed5a4","https://images.unsplash.com/photo-1579983880984-a202306861b7?auto=format&fit=crop&w=1400&q=86"],
-["Full-Length Studio","#252525","#d6d2c9","https://images.unsplash.com/photo-1654028859265-0e8b12a67aae?auto=format&fit=crop&w=1400&q=86"],
-["Business Fashion","#273b63","#aebbd6","https://images.unsplash.com/photo-1632991727906-8386e1388975?auto=format&fit=crop&w=1400&q=86"],
-["Color Story","#b51e39","#f0b325","https://images.unsplash.com/photo-1758613654311-a9138846d52f?auto=format&fit=crop&w=1400&q=86"],
-["Beauty Close-Up","#613b24","#e6c3a0","https://images.unsplash.com/photo-1650118653784-282e6d9643e4?auto=format&fit=crop&w=1400&q=86"],
-["Editorial Texture","#203a32","#91b8a8","https://images.unsplash.com/photo-1768825136230-34fb80291f19?auto=format&fit=crop&w=1400&q=86"],
-["Natural Light","#8d7258","#e3d4c2","https://images.unsplash.com/photo-1753719734290-564c215cc34e?auto=format&fit=crop&w=1400&q=86"],
-["Signature Look","#111","#2c5cff","https://images.unsplash.com/photo-1767396857332-11399cff43b2?auto=format&fit=crop&w=1400&q=86"]
-];
-
-const intro=document.getElementById("intro"),
-      logo=document.getElementById("logo3d"),
-      label=document.getElementById("slideLabel"),
-      progress=document.getElementById("slideProgress"),
-      grid=document.getElementById("portfolioGrid"),
-      site=document.getElementById("site");
-
-setTimeout(()=>intro.classList.add("logo-ready"),140);
-
-// Intro remains intentionally image-free. Only the 17 portfolio directions animate as color/light.
-let i=0;
-function showSlide(){
-  const x=looks[i];
-  logo.style.setProperty("--p1",x[1]);
-  logo.style.setProperty("--p2",x[2]);
-  logo.style.setProperty("--p3","#f4f1ea");
-  label.textContent=String(i+1).padStart(2,"0")+" / 17 · "+x[0].toUpperCase();
-  progress.style.width=((i+1)/17*100)+"%";
-  i=(i+1)%looks.length;
+"use strict";
+const looks = [{"src": "/assets/portfolio/look-01.webp", "alt": "Red satin slit gown, straight black hair and green eyes \u2014 AI fashion concept", "width": 899, "height": 1600}, {"src": "/assets/portfolio/look-02.webp", "alt": "Emerald tailored suit with long brunette hair \u2014 AI fashion concept", "width": 1024, "height": 1536}, {"src": "/assets/portfolio/look-03.webp", "alt": "Cobalt tailored suit with long black waves \u2014 AI fashion concept", "width": 1024, "height": 1536}, {"src": "/assets/portfolio/look-04.webp", "alt": "Gold trouser suit with straight black hair \u2014 AI fashion concept", "width": 1086, "height": 1448}, {"src": "/assets/portfolio/look-05.webp", "alt": "Black sleeveless jumpsuit with platinum pixie curls \u2014 AI fashion concept", "width": 1024, "height": 1536}, {"src": "/assets/portfolio/look-06.webp", "alt": "Black menswear suit with ivory shirt \u2014 AI fashion concept", "width": 1024, "height": 1536}, {"src": "/assets/portfolio/look-07.webp", "alt": "Athletic platinum-haired model in a black tailored jumpsuit \u2014 AI fashion concept", "width": 1024, "height": 1536}, {"src": "/assets/portfolio/look-08.webp", "alt": "Red catsuit, back view with head turned toward the camera \u2014 AI fashion concept", "width": 899, "height": 1600}, {"src": "/assets/portfolio/look-09.webp", "alt": "White asymmetric evening gown \u2014 AI fashion concept", "width": 1086, "height": 1448}, {"src": "/assets/portfolio/look-10.webp", "alt": "Ivory fitted catsuit \u2014 AI fashion concept", "width": 1086, "height": 1448}, {"src": "/assets/portfolio/look-11.webp", "alt": "White tailored trouser suit \u2014 AI fashion concept", "width": 1086, "height": 1448}, {"src": "/assets/portfolio/look-12.webp", "alt": "Navy catsuit with braided hair \u2014 AI fashion concept", "width": 1086, "height": 1448}, {"src": "/assets/portfolio/look-13.webp", "alt": "Cobalt evening gown \u2014 AI fashion concept", "width": 1024, "height": 1536}, {"src": "/assets/portfolio/look-14.webp", "alt": "Gold pleated maxi dress \u2014 AI fashion concept", "width": 1024, "height": 1536}, {"src": "/assets/portfolio/look-15.webp", "alt": "Bronze satin dress with jacket \u2014 AI fashion concept", "width": 1024, "height": 1536}, {"src": "/assets/portfolio/look-16.webp", "alt": "Coral tailored suit \u2014 AI fashion concept", "width": 1024, "height": 1536}, {"src": "/assets/portfolio/look-17.webp", "alt": "Silver evening gown \u2014 AI fashion concept", "width": 1024, "height": 1536}];
+const intro = document.getElementById("intro");
+const site = document.getElementById("site");
+const logo = document.getElementById("logo3d");
+const label = document.getElementById("slideLabel");
+const progress = document.getElementById("slideProgress");
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let slide = 0;
+let timer;
+function showSlide() {
+  label.textContent = String(slide + 1).padStart(2, "0") + " / 17 · FASHION CONCEPTS";
+  progress.style.width = ((slide + 1) / looks.length * 100) + "%";
+  logo.style.setProperty("--p1", ["#eee9df", "#dc3535", "#c0a86e"][slide % 3]);
+  logo.style.setProperty("--p2", "#777");
+  slide = (slide + 1) % looks.length;
 }
-showSlide();
-const timer=setInterval(showSlide,1150);
-
-document.getElementById("enterSite").addEventListener("click",()=>{
+function enterSite(focusHero = false) {
   clearInterval(timer);
-  intro.classList.add("is-gone");
-  site.classList.add("is-visible");
-  site.setAttribute("aria-hidden","false");
-  setTimeout(()=>document.querySelector(".hero").scrollIntoView(),450);
+  intro.hidden = true;
+  site.inert = false;
+  if (focusHero) {
+    const heading = document.querySelector("h1");
+    heading.tabIndex = -1;
+    heading.focus({preventScroll: true});
+    document.getElementById("top").scrollIntoView({behavior: reducedMotion ? "instant" : "smooth"});
+  }
+}
+if (!location.hash) {
+  intro.hidden = false;
+  site.inert = true;
+  requestAnimationFrame(() => intro.classList.add("logo-ready"));
+  showSlide();
+  if (!reducedMotion) timer = setInterval(showSlide, 1600);
+}
+document.getElementById("enterSite").addEventListener("click", () => enterSite(true));
+window.addEventListener("hashchange", () => enterSite());
+const menu = document.getElementById("menuBtn");
+const nav = document.getElementById("nav");
+function closeMenu() { nav.classList.remove("open"); menu.setAttribute("aria-expanded", "false"); }
+menu.addEventListener("click", () => menu.setAttribute("aria-expanded", String(nav.classList.toggle("open"))));
+nav.querySelectorAll("a").forEach(a => a.addEventListener("click", closeMenu));
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenu(); });
+const dialog = document.getElementById("portraitDialog");
+const portrait = document.getElementById("portraitImage");
+let currentLook = 0;
+function showPortrait(index) {
+  currentLook = (index + looks.length) % looks.length;
+  portrait.src = looks[currentLook].src;
+  portrait.alt = looks[currentLook].alt;
+  document.getElementById("portraitCount").textContent = (currentLook + 1) + " / " + looks.length + " · AI fashion concept";
+}
+document.querySelectorAll("[data-look]").forEach(button => button.addEventListener("click", () => {
+  showPortrait(Number(button.dataset.look));
+  dialog.showModal();
+  document.body.classList.add("portrait-open");
+}));
+dialog.querySelector(".portrait-close").addEventListener("click", () => dialog.close());
+dialog.querySelector(".portrait-prev").addEventListener("click", () => showPortrait(currentLook - 1));
+dialog.querySelector(".portrait-next").addEventListener("click", () => showPortrait(currentLook + 1));
+dialog.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+    e.preventDefault();
+    showPortrait(currentLook + (e.key === "ArrowRight" ? 1 : -1));
+  }
 });
-
-// Portfolio contains the 17 editorial images.
-looks.forEach((x,n)=>{
-  const card=document.createElement("article");
-  card.className="look-card";
-  card.style.setProperty("--c1",x[1]);
-  card.style.setProperty("--c2",x[2]);
-  const img=document.createElement("img");
-  img.src=x[3];
-  img.alt=x[0]+" editorial modeling portfolio image";
-  img.loading=n<4?"eager":"lazy";
-  img.decoding="async";
-  card.appendChild(img);
-  const meta=document.createElement("div");
-  meta.className="look-meta";
-  meta.innerHTML='<b>'+String(n+1).padStart(2,"0")+'</b><span>'+x[0].toUpperCase()+'</span>';
-  card.appendChild(meta);
-  grid.appendChild(card);
-});
-
-const menu=document.getElementById("menuBtn"),nav=document.getElementById("nav");
-menu.addEventListener("click",()=>{const open=nav.classList.toggle("open");menu.setAttribute("aria-expanded",String(open))});
-nav.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{nav.classList.remove("open");menu.setAttribute("aria-expanded","false")}));
-if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){intro.classList.add("logo-ready");clearInterval(timer)}
+dialog.addEventListener("click", e => { if (e.target === dialog) dialog.close(); });
+dialog.addEventListener("close", () => document.body.classList.remove("portrait-open"));
