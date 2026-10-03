@@ -24,6 +24,11 @@ jobs:
         with:
           node-version: 24
 
+      - name: Install payment SDK and test commerce
+        run: |
+          npm ci --ignore-scripts
+          node --test tests/playbook-commerce.test.js
+
       - name: Verify Cloudflare credentials
         shell: bash
         env:

@@ -1,3 +1,4 @@
+import { handlePlaybook } from './lib/playbook-commerce.js';
 const JSON_HEADERS={"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff","access-control-allow-origin":"https://www.atechspot.com","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"content-type,accept"};
 const json=(status,payload)=>new Response(JSON.stringify(payload),{status,headers:JSON_HEADERS});
 const clean=(value,max=4000)=>String(value??"").replace(/\u0000/g,"").trim().slice(0,max);
@@ -131,6 +132,10 @@ export default{async fetch(request,env){
     if(url.pathname==='/dashboard'||url.pathname==='/dashboard/'){url.pathname='/clients/dashboard/';return Response.redirect(url.toString(),302)}
   }
   if(LEGACY_PREFIXES.some(prefix=>url.pathname.startsWith(prefix)))return redirectResponse(request,'/',301);
+
+  if(url.pathname.startsWith('/lib/')||url.pathname.startsWith('/tests/')||url.pathname.startsWith('/node_modules/')||['/package.json','/package-lock.json','/PLAYBOOK-SETUP.md'].includes(url.pathname))return new Response('Not found',{status:404});
+  const commerce=await handlePlaybook(request,env);
+  if(commerce)return commerce;
 
   if(url.pathname==="/api/client-access"){
     if(request.method!=="POST")return json(405,{ok:false,message:"Method not allowed."});

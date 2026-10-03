@@ -55,3 +55,9 @@
 /portal/*
   Cache-Control: no-store, max-age=0, must-revalidate
   X-Robots-Tag: noindex, nofollow, noarchive
+
+/playbook/*
+  Cache-Control: no-store, max-age=0
+/playbook/thanks/*
+  Referrer-Policy: no-referrer
+  X-Robots-Tag: noindex, nofollow
