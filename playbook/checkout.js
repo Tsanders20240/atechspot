@@ -14,7 +14,7 @@ terms?.addEventListener('change',()=>{button.disabled=!terms.checked;});
 form?.addEventListener('submit',async event=>{
  event.preventDefault();if(!terms.checked)return;button.disabled=true;status.textContent='Opening secure checkout…';
  try{
-  const r=await fetch('/api/playbook/checkout',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({acceptTerms:true,termsVersion:'2026-10-03-v1',requestId})});
+  const r=await fetch('/api/playbook/checkout',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({acceptTerms:true,termsVersion:'2026-10-03-v2',requestId})});
   const data=await r.json();if(!r.ok||!data.url)throw Error(data.message||'Checkout is temporarily unavailable.');
   const url=new URL(data.url);if(url.protocol!=='https:'||url.hostname!=='checkout.stripe.com')throw Error('Checkout is temporarily unavailable.');
   window.location.assign(url.toString());
