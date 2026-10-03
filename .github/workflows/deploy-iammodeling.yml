@@ -48,6 +48,20 @@ jobs:
           node --check I-Am-Modeling-Website/site-portfolio-images.js
           echo 'I Am Modeling source validation passed.'
 
+      - name: Align modeling project build and inspect domain routing
+        shell: bash
+        run: |
+          set -euo pipefail
+          auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
+          api="https://api.cloudflare.com/client/v4"
+          project="$api/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/iamodeling"
+          curl -fsS "$project" "${auth[@]}" | jq -e '.success == true' >/dev/null
+          curl -fsS -X PATCH "$project" "${auth[@]}" --data '{"build_config":{"root_dir":"I-Am-Modeling-Website","destination_dir":".","build_command":""}}' | jq -e '.success == true' >/dev/null
+          curl -fsS "$project" "${auth[@]}" | jq '{success,project:(.result|{name,subdomain,domains,build_config:(.build_config|{root_dir,destination_dir,build_command}),canonical:(.canonical_deployment|{id,url,environment})})}'
+          curl -fsS "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects?per_page=100" "${auth[@]}" | jq '[.result[]|select(.domains|index("iammodeling.atechspot.com"))|{name,domains}]'
+          zone=$(curl -fsS "$api/zones?name=atechspot.com" "${auth[@]}" | jq -er '.result[0].id')
+          curl -fsS "$api/zones/$zone/dns_records?name=iammodeling.atechspot.com" "${auth[@]}" | jq '[.result[]|{id,name,type,content,proxied}]'
+
       - name: Deploy to Cloudflare Pages
         shell: bash
         run: |
