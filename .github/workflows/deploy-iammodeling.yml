@@ -80,7 +80,7 @@ jobs:
           grep -q '17-SLOT PORTFOLIO SYSTEM' /tmp/index.html
           curl -fsS --retry 5 --retry-delay 5 -o /tmp/site.js https://iammodeling.atechspot.com/site-portfolio-images.js
           grep -q '/assets/portfolio/look-17.webp' /tmp/site.js
-          curl -fsS --retry 5 --retry-delay 5 https://iamodeling.atechspot.com/assets/portfolio/look-17.webp -o /tmp/portrait.webp
+          curl -fsS --retry 5 --retry-delay 5 https://iammodeling.atechspot.com/assets/portfolio/look-17.webp -o /tmp/portrait.webp
           test -s /tmp/portrait.webp
           ! grep -q 'intro-photo' /tmp/index.html
           grep -q '17 AI fashion portraits' /tmp/index.html
