@@ -48,33 +48,33 @@ jobs:
           node --check I-Am-Modeling-Website/site-portfolio-images.js
           echo 'I Am Modeling source validation passed.'
 
-      - name: Align modeling project build and inspect domain routing
+      - name: Align both modeling Pages projects
         shell: bash
         run: |
           set -euo pipefail
           auth=(-H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H 'Content-Type: application/json')
-          api="https://api.cloudflare.com/client/v4"
-          project="$api/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/iamodeling"
-          curl -fsS "$project" "${auth[@]}" | jq -e '.success == true' >/dev/null
-          curl -fsS -X PATCH "$project" "${auth[@]}" --data '{"build_config":{"root_dir":"I-Am-Modeling-Website","destination_dir":".","build_command":""}}' | jq -e '.success == true' >/dev/null
-          curl -fsS "$project" "${auth[@]}" | jq '{success,project:(.result|{name,subdomain,domains,build_config:(.build_config|{root_dir,destination_dir,build_command}),canonical:(.canonical_deployment|{id,url,environment})})}'
-          curl -fsS "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects" "${auth[@]}" | jq '[.result[]|select(.domains|index("iammodeling.atechspot.com"))|{name,domains}]'
-          zone=$(curl -fsS "$api/zones?name=atechspot.com" "${auth[@]}" | jq -er '.result[0].id')
-          curl -fsS "$api/zones/$zone/dns_records?name=iammodeling.atechspot.com" "${auth[@]}" | jq '[.result[]|{id,name,type,content,proxied}]'
-          curl -sS "$api/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/domains" "${auth[@]}" | jq '{success,errors,matching:[.result[]?|select(.hostname=="iammodeling.atechspot.com")|{hostname,service,environment}]}'
-          curl -sS "$api/zones/$zone/workers/routes" "${auth[@]}" | jq '{success,errors,routes:[.result[]?|select(.pattern|contains("iammodeling"))|{id,pattern,script}]}' 
+          api="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects"
+          # The modeling custom domain is hosted on the legacy Pages project named visionofsanders.
+          # Vision of Sanders itself is deployed separately as a Worker.
+          curl -fsS "$api/visionofsanders" "${auth[@]}" | jq -e '.success and (.result.domains|index("iammodeling.atechspot.com")) and ([.result.domains[]|select(. != "visionofsanders.pages.dev" and . != "iammodeling.atechspot.com")]|length==0)' >/dev/null
+          for project in iamodeling visionofsanders; do
+            curl -fsS -X PATCH "$api/$project" "${auth[@]}" --data '{"build_config":{"root_dir":"I-Am-Modeling-Website","destination_dir":".","build_command":""}}' | jq -e '.success == true' >/dev/null
+          done
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy both modeling Pages addresses
+        working-directory: I-Am-Modeling-Website
         shell: bash
         run: |
           set -euo pipefail
-          npx --yes wrangler@latest pages deploy I-Am-Modeling-Website             --project-name iamodeling             --branch main             --commit-dirty=true
+          npx --yes wrangler@latest pages deploy . --project-name iamodeling --branch main --commit-dirty=true
+          npx --yes wrangler@latest pages deploy . --project-name visionofsanders --branch main --commit-dirty=true
 
       - name: Verify production
         shell: bash
         run: |
           set -euo pipefail
           sleep 15
+          curl -fsS --retry 5 --retry-delay 5 https://iamodeling.pages.dev/ | grep -q '17 AI fashion portraits'
           curl -fsS --retry 5 --retry-delay 5 -o /tmp/index.html https://iammodeling.atechspot.com/
           grep -q 'I AM MODELING' /tmp/index.html
           grep -q '17-SLOT PORTFOLIO SYSTEM' /tmp/index.html
