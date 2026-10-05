@@ -1,3 +1,4 @@
+import { recordAssessment, runTasks, handleAcquisition } from './lib/acquisition.js';
 import { handlePlaybook } from './lib/playbook-commerce.js';
 const JSON_HEADERS={"content-type":"application/json; charset=utf-8","cache-control":"no-store","x-content-type-options":"nosniff","access-control-allow-origin":"https://www.atechspot.com","access-control-allow-methods":"GET,POST,OPTIONS","access-control-allow-headers":"content-type,accept"};
 const json=(status,payload)=>new Response(JSON.stringify(payload),{status,headers:JSON_HEADERS});
@@ -71,8 +72,8 @@ function cookieValue(request,name){const raw=request.headers.get("cookie")||"";f
 
 function redirectResponse(request,url,status=301){const target=new URL(url,request.url);return Response.redirect(target.toString(),status)}
 async function parseBody(request){const type=request.headers.get("content-type")||"";if(type.includes("application/json"))return request.json();return Object.fromEntries((await request.formData()).entries())}
-async function resend(env,payload){
-  const response=await fetch("https://api.resend.com/emails",{method:"POST",headers:{authorization:`Bearer ${env.RESEND_API_KEY}`,"content-type":"application/json"},body:JSON.stringify(payload)});
+async function resend(env,payload,idempotencyKey){
+  const response=await fetch("https://api.resend.com/emails",{method:"POST",headers:{authorization:`Bearer ${env.RESEND_API_KEY}`,"content-type":"application/json",...(idempotencyKey?{"Idempotency-Key":idempotencyKey}:{})},body:JSON.stringify(payload)});
   const text=await response.text();
   let parsed={};try{parsed=JSON.parse(text)}catch{}
   if(!response.ok){const error=new Error(`Resend request failed with HTTP ${response.status}`);error.status=response.status;error.providerCode=clean(parsed.name||parsed.code||"RESEND_ERROR",80);error.providerMessage=clean(parsed.message||text||"Unknown Resend error",240);throw error}
@@ -90,6 +91,12 @@ async function deliverLead(request,env,leadType,requiredFields,{confirmation=tru
   const ignored=new Set(["website","form_started_at","cf-turnstile-response"]),fields={};for(const [key,value] of Object.entries(body)){if(!ignored.has(key))fields[clean(key,100)]=clean(value)}
   const combined=Object.values(fields).join("\n");if((combined.match(/https?:\/\/|www\./gi)||[]).length>5||/<\s*(script|iframe|object|embed)/i.test(combined))return json(400,{ok:false,message:"Submission rejected."});
   const property=propertyContext(request,fields);const publicInbox=publicInboxFor(leadType,fields,property);fields["ATechSpot Property"]=`#${String(property.id).padStart(2,"0")} ${property.name}`;fields["ATechSpot Source"]=property.source;fields["ATechSpot Routing Identity"]=publicInbox;
+  if(leadType==="Business Growth Assessment"&&env.ACQUISITION_DB){
+    let lead;
+    try{lead=await recordAssessment(env,fields)}catch{return json(503,{ok:false,message:"We could not record your assessment. Please retry shortly."})}
+    try{await runTasks(env,(payload,key)=>resend(env,{from:PRODUCTION_SENDER,...payload},key))}catch{console.error("Acquisition immediate delivery deferred to scheduled retry")}
+    return json(200,{ok:true,trackingRecorded:true,message:"Thank you. Your assessment was recorded successfully. We will review it and follow up."});
+  }
   const remoteCare=leadType==="Contact Request"&&fields["Form Type"]==="ATechSpot RemoteCare Support Request"&&publicInbox===PUBLIC_INBOXES.support;
   const displayLeadType=remoteCare?"RemoteCare Support Request":leadType;
   const confirmationDetail=remoteCare?"We will review your technology issue and reply with the recommended support scope and any applicable fee before paid work begins.":"We will review the business problem, desired outcome, timing and fit before recommending the appropriate next step.";
@@ -133,7 +140,9 @@ export default{async fetch(request,env){
   }
   if(LEGACY_PREFIXES.some(prefix=>url.pathname.startsWith(prefix)))return redirectResponse(request,'/',301);
 
-  if(url.pathname.startsWith('/lib/')||url.pathname.startsWith('/tests/')||url.pathname.startsWith('/node_modules/')||['/package.json','/package-lock.json','/PLAYBOOK-SETUP.md'].includes(url.pathname))return new Response('Not found',{status:404});
+  if(url.pathname.startsWith('/lib/')||url.pathname.startsWith('/tests/')||url.pathname.startsWith('/migrations/')||url.pathname.startsWith('/scripts/')||url.pathname.startsWith('/node_modules/')||['/package.json','/package-lock.json','/PLAYBOOK-SETUP.md'].includes(url.pathname))return new Response('Not found',{status:404});
+  const acquisition=await handleAcquisition(request,env,(payload,key)=>resend(env,{from:PRODUCTION_SENDER,...payload},key));
+  if(acquisition)return acquisition;
   const commerce=await handlePlaybook(request,env);
   if(commerce)return commerce;
 

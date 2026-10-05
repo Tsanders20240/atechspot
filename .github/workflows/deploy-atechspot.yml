@@ -27,7 +27,7 @@ jobs:
       - name: Install payment SDK and test commerce
         run: |
           npm ci --ignore-scripts
-          node --test tests/playbook-commerce.test.js
+          node --test tests/playbook-commerce.test.js tests/acquisition.test.js
 
       - name: Verify Cloudflare credentials
         shell: bash
@@ -216,6 +216,12 @@ jobs:
             cat /tmp/pages-project-update.json
             test "$(jq -r '.success' /tmp/pages-project-update.json)" = "true"
           fi
+
+      - name: Configure acquisition tracking and follow-up
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: node scripts/configure-acquisition.mjs
 
       - name: Deploy ATechSpot to Cloudflare Pages
         id: deploy

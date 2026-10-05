@@ -61,3 +61,8 @@
 /playbook/thanks/*
   Referrer-Policy: no-referrer
   X-Robots-Tag: noindex, nofollow
+
+/acquisition/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
