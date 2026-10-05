@@ -65,3 +65,12 @@ test('Staff magic link is single-use, creates a secure cookie, and blocks cross-
  const write=new Request('https://www.atechspot.com/api/acquisition/run',{method:'POST',headers:{cookie,origin:'https://other.example'}});assert.equal((await handleAcquisition(write,env,send)).status,401);
  const replay=await handleAcquisition(new Request(url),env,send);assert.equal(replay.headers.get('location'),'/acquisition/?error=expired');
 });
+
+test('Health checks real acquisition schema and protected automation access',async()=>{
+ const check=async env=>{const r=await handleAcquisition(req('health'),env,async()=>{});return {status:r.status,...await r.json()}};
+ assert.deepEqual(await check({}),{status:503,ok:false,trackingConfigured:false,automationConfigured:false});
+ assert.deepEqual(await check({ACQUISITION_DB:{prepare(){throw new Error('missing schema')}},ACQUISITION_ADMIN_TOKEN:'test'}),{status:503,ok:false,trackingConfigured:false,automationConfigured:false});
+ const db=database();
+ assert.deepEqual(await check({ACQUISITION_DB:db}),{status:503,ok:false,trackingConfigured:true,automationConfigured:false});
+ assert.deepEqual(await check({ACQUISITION_DB:db,ACQUISITION_ADMIN_TOKEN:'test'}),{status:200,ok:true,trackingConfigured:true,automationConfigured:true});
+});
