@@ -237,6 +237,24 @@ jobs:
           echo "DEPLOY_URL=$deploy_url" >> "$GITHUB_ENV"
           echo "Deployment URL: $deploy_url"
 
+      - name: Diagnose deployed acquisition bindings
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          node --input-type=module <<'JS'
+          const base='https://api.cloudflare.com/client/v4/accounts/'+process.env.CLOUDFLARE_ACCOUNT_ID+'/pages/projects/atechspot';
+          const headers={authorization:'Bearer '+process.env.CLOUDFLARE_API_TOKEN};
+          const data=await (await fetch(base,{headers})).json();
+          if(!data.success)throw new Error('Cannot read deployment metadata');
+          for(const stage of ['production','preview']){
+            const c=data.result.deployment_configs[stage];
+            console.log(stage,JSON.stringify({bindings:c.d1_databases,secretNames:Object.keys(c.env_vars||{})}));
+          }
+          const deployments=await (await fetch(base+'/deployments',{headers})).json();
+          for(const d of (deployments.result||[]).slice(0,2))console.log('deployment',JSON.stringify({id:d.id,environment:d.environment,stage:d.latest_stage,url:d.url,bindings:d.deployment_config?.d1_databases,secretNames:Object.keys(d.deployment_config?.env_vars||{})}));
+          JS
+
       - name: RemoteCare deployment ownership
         shell: bash
         run: |
