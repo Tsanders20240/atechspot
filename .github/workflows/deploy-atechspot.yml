@@ -255,6 +255,22 @@ jobs:
               if [ "$code" = "200" ]; then
                 return 0
               fi
+              if [ "$code" = "302" ]; then
+                curl -sS -D /tmp/preview-headers.txt -o /dev/null "$DEPLOY_URL${path}"
+                if python3 - <<'PYACCESS'
+          from pathlib import Path
+          from urllib.parse import urlparse
+          headers=Path('/tmp/preview-headers.txt').read_text()
+          locations=[line.split(':',1)[1].strip() for line in headers.splitlines() if line.lower().startswith('location:')]
+          host=urlparse(locations[-1]).hostname if locations else ''
+          print('Preview redirect host:',host)
+          raise SystemExit(0 if host and host.endswith('.cloudflareaccess.com') else 1)
+          PYACCESS
+                then
+                  echo 'Preview requires Cloudflare Access. Public production routes will be checked separately.'
+                  return 0
+                fi
+              fi
               sleep 5
             done
             echo "Preview route failed to become ready: $path (last status $code)"
@@ -381,6 +397,23 @@ jobs:
           echo "Preview form-health -> $form_health_code"
           node -e "const fs=require('fs'); const j=JSON.parse(fs.readFileSync('/tmp/form-health.json','utf8')); const code=process.argv[1]; const inboxes=Array.isArray(j.publicInboxes)&&j.publicInboxes.length===6; const healthy=code==='200'&&j.ok===true&&j.resendConfigured===true; const previewExpected=code==='503'&&j.ok===false&&j.resendConfigured===false; if(!inboxes||(!healthy&&!previewExpected)) process.exit(1);" "$form_health_code"
           echo 'Deployment preview QA passed.'
+
+      - name: Verify Houston acquisition pages and configuration state
+        shell: bash
+        run: |
+          set -euo pipefail
+          for slug in home-services restaurants-hospitality beauty-wellness professional-services ecommerce; do
+            curl -fsS "https://www.atechspot.com/industries/$slug/" > /tmp/industry-page.html
+            grep -q 'Take the Free Growth Assessment' /tmp/industry-page.html
+            grep -q "houston_holiday_2026_$slug" /tmp/industry-page.html
+          done
+          curl -fsS 'https://www.atechspot.com/industries/' > /tmp/industry-hub.html
+          grep -q 'Technology around your industry.' /tmp/industry-hub.html
+          curl -sS 'https://www.atechspot.com/api/acquisition/health' > /tmp/acquisition-health.json
+          node -e "const j=JSON.parse(require('fs').readFileSync('/tmp/acquisition-health.json'));console.log('Acquisition tracking configured:',j.trackingConfigured,'automation configured:',j.automationConfigured);if(typeof j.trackingConfigured!=='boolean')process.exit(1)"
+          code=$(curl -sS -o /dev/null -w '%{http_code}' 'https://www.atechspot.com/api/acquisition/leads')
+          test "$code" = '401'
+          echo 'Five industry pages, attribution links, hub and staff API access checks passed.'
 
       - name: Verify production custom domain serves B2B flagship
         shell: bash
