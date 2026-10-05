@@ -267,6 +267,7 @@ jobs:
           raise SystemExit(0 if host and host.endswith('.cloudflareaccess.com') else 1)
           PYACCESS
                 then
+                  preview_protected=true
                   echo 'Preview requires Cloudflare Access. Public production routes will be checked separately.'
                   return 0
                 fi
@@ -280,6 +281,11 @@ jobs:
           for path in / /ecosystem/ /dji/ /dji/real-estate/ /dji/roofing-inspections/ /dji/mini-5-pro-vs-mavic-4-pro/ /dji/construction/ /dji/buying-guide/ /assessment/ /ai-readiness/ /growthcare/ /intake/ /contact/ /resources/ /remote-support/ /data-recovery/ /booking/ /clients/ /payments/ /commerce-terms/ /payment-success/; do
             check_path "$path"
           done
+
+          if [ "${preview_protected:-false}" = true ]; then
+            echo 'Skipping preview content checks behind Cloudflare Access; continuing with public production verification.'
+            exit 0
+          fi
 
           curl -fsS --retry 4 --retry-delay 3 --retry-all-errors "$DEPLOY_URL/" -o /tmp/home.html
           grep -q 'Technology problem?' /tmp/home.html
