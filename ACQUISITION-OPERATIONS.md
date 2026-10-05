@@ -48,3 +48,7 @@ After deployment: confirm five landing routes, assessment fields, staff access, 
 A separate ChatGPT automation researches five Houston-area candidates each morning through December 31, 2026. It produces evidence, service-fit hypotheses and outreach drafts. It does not send outreach or automatically import prospects into the inbound assessment database.
 
 Start with the existing nine researched candidates. Keep candidate research separate from qualified inbound leads until a real sales conversation establishes fit.
+
+## Activation blocker observed October 5, 2026 UTC
+
+The production deployment credential received HTTP 401 from the D1 database-list API. It needs Account → D1 → Edit permission. The workflow now skips acquisition provisioning on an explicit 401/403 and publishes the independent pages while preserving the existing assessment email flow. The new database CRM, staff desk login and follow-up runner remain inactive until permission is corrected and production is redeployed. No live CRM record or inbox test has been verified for this new system.

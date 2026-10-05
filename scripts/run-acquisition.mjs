@@ -1,5 +1,8 @@
 import {createHmac} from 'node:crypto';
 const token=process.env.CLOUDFLARE_API_TOKEN;if(!token)throw new Error('Cloudflare credential required.');
+const health=await fetch('https://www.atechspot.com/api/acquisition/health');
+const state=await health.json();
+if(!state.automationConfigured){console.log('Acquisition follow-up is awaiting D1 permission and production activation. No task processing occurred.');process.exit(0)}
 const admin=createHmac('sha256',token).update('atechspot-acquisition-admin-v1').digest('hex');
 const r=await fetch('https://www.atechspot.com/api/acquisition/run',{method:'POST',headers:{authorization:'Bearer '+admin}});
 if(!r.ok)throw new Error('Acquisition task runner returned HTTP '+r.status);
