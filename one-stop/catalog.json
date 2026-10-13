@@ -1,0 +1,283 @@
+[
+  {
+    "id": 1,
+    "name": "ATechSpot",
+    "description": "Business technology, AI, automation, websites, ecommerce, apps, software and service routing.",
+    "url": "/",
+    "services": [
+      "AI consulting",
+      "Automation",
+      "Business strategy",
+      "Ecommerce",
+      "Software development",
+      "Website design"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 2,
+    "name": "A+ Techucation Academy",
+    "description": "Adult technology education, AI training, digital literacy, business skills, structured learning pathways and memberships.",
+    "url": "https://atechucation.atechspot.com/",
+    "services": [
+      "AI training",
+      "Digital literacy",
+      "Education",
+      "Workforce development"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 3,
+    "name": "ATechSpot Creator",
+    "description": "Owned websites, audience systems, monetization, ecommerce and automation for creators.",
+    "url": "/creator/",
+    "services": [
+      "Automation",
+      "Content creation",
+      "Creator business",
+      "Digital products",
+      "Ecommerce",
+      "Website design"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 4,
+    "name": "ABC of Technology",
+    "description": "Children-first books, activities and playful technology learning experiences for ages 3–8.",
+    "url": "https://www.abcoftech.atechspot.com/",
+    "services": [
+      "Children’s learning",
+      "Education"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 5,
+    "name": "ABC Tech Products",
+    "description": "Technology buying guides, comparisons, decision tools and product discovery.",
+    "url": "https://abctechproducts.atechspot.com/",
+    "services": [
+      "Apparel",
+      "Ecommerce",
+      "Product discovery"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 6,
+    "name": "ATechSpot DJI",
+    "description": "Independent DJI buying guidance, mission selection and business workflow education.",
+    "url": "/dji/",
+    "services": [
+      "Drone guidance",
+      "Education"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 7,
+    "name": "A+ Automotive",
+    "description": "Automotive technology education, troubleshooting guidance and product recommendations.",
+    "url": null,
+    "services": [
+      "Automotive technology",
+      "Education"
+    ],
+    "inquiryOnly": true,
+    "contentOnly": false
+  },
+  {
+    "id": 8,
+    "name": "A+ Credit Education",
+    "description": "Compliance-first consumer credit education and financial literacy resources without score promises.",
+    "url": null,
+    "services": [
+      "Credit education",
+      "Financial literacy"
+    ],
+    "inquiryOnly": true,
+    "contentOnly": false
+  },
+  {
+    "id": 9,
+    "name": "ASCR Financial",
+    "description": "Financial-service pathways and consultations with service-specific eligibility and disclosures.",
+    "url": null,
+    "services": [
+      "Financial coaching",
+      "Financial literacy"
+    ],
+    "inquiryOnly": true,
+    "contentOnly": false
+  },
+  {
+    "id": 10,
+    "name": "A Clean Sweep",
+    "description": "Residential and commercial cleaning services with local quote, booking and recurring-service paths.",
+    "url": "https://acleansweep.atechspot.com/",
+    "services": [
+      "Cleaning services"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 11,
+    "name": "Vision of Sanders",
+    "description": "Photography, short-form content, visual branding and creative-direction services built around a vision-first approach.",
+    "url": "https://visionofsanders.atechspot.com/",
+    "services": [
+      "Branding",
+      "Content creation",
+      "Photography"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 12,
+    "name": "A Studio MX",
+    "description": "Recording, video, podcast and creator-media production services.",
+    "url": "https://astudiomx.atechspot.com/",
+    "services": [
+      "Audio production",
+      "Podcast production",
+      "Video production"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 13,
+    "name": "I Am Modeling",
+    "description": "Model development, education, workshops and opportunity information with clear representation boundaries.",
+    "url": "https://iammodeling.atechspot.com/",
+    "services": [
+      "Model development",
+      "Photography"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 14,
+    "name": "HÄZIL",
+    "description": "Official artist universe for music, video, fan growth, booking and licensing.",
+    "url": "https://hazil.atechspot.com/",
+    "services": [
+      "Artist booking",
+      "Music",
+      "Music licensing"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 15,
+    "name": "HazilFlix",
+    "description": "Future entertainment platform building traction through waitlists, creator applications and beta milestones.",
+    "url": null,
+    "services": [
+      "Entertainment",
+      "Video production"
+    ],
+    "inquiryOnly": true,
+    "contentOnly": false
+  },
+  {
+    "id": 16,
+    "name": "ATech Network",
+    "description": "Technology and creator programming with watch, sponsorship, creator and distribution pathways.",
+    "url": "https://atechnetwork.atechspot.com/",
+    "services": [
+      "Content creation",
+      "Sponsorship",
+      "Technology media"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 17,
+    "name": "A+ Techucation Figures",
+    "description": "Educational characters, collectibles, learning products and future licensing opportunities.",
+    "url": null,
+    "services": [
+      "Children’s learning",
+      "Education",
+      "Product licensing"
+    ],
+    "inquiryOnly": true,
+    "contentOnly": false
+  },
+  {
+    "id": 18,
+    "name": "Royal Up With The Hughes",
+    "description": "Our relationship story, wedding-day memories, future wedding film, anniversaries and family legacy content.",
+    "url": null,
+    "services": [
+      "Family stories",
+      "Wedding content"
+    ],
+    "inquiryOnly": true,
+    "contentOnly": true
+  },
+  {
+    "id": 19,
+    "name": "Mr. A Plus Portfolio",
+    "description": "Project proof, technology capabilities and case-study evidence supporting ATechSpot credibility.",
+    "url": null,
+    "services": [
+      "Portfolio examples",
+      "Website design"
+    ],
+    "inquiryOnly": true,
+    "contentOnly": true
+  },
+  {
+    "id": 20,
+    "name": "WarriorJ",
+    "description": "Independently owned apparel and lifestyle brand for T-shirts, hoodies, limited drops and future merchandise. ATechSpot supports the digital infrastructure without absorbing the brand identity.",
+    "url": "https://warriorj.atechspot.com/",
+    "services": [
+      "Apparel",
+      "Ecommerce"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 21,
+    "name": "ATechSpot RemoteCare",
+    "description": "Consent-first remote technical support routed through a secure request, scope confirmation and authorized support process.",
+    "url": "https://remotecare.atechspot.com/",
+    "services": [
+      "Computer support",
+      "Remote technical support",
+      "Troubleshooting"
+    ],
+    "inquiryOnly": false,
+    "contentOnly": false
+  },
+  {
+    "id": 22,
+    "name": "ATechSpot Tech Guru",
+    "description": "Adult DIY troubleshooting, human-reviewed how-to guidance and technology problem solving. The dedicated property will be linked when production is ready.",
+    "url": null,
+    "services": [
+      "Computer support",
+      "Digital literacy",
+      "Troubleshooting"
+    ],
+    "inquiryOnly": true,
+    "contentOnly": false
+  }
+]
