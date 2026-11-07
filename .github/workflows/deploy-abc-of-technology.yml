@@ -7,6 +7,12 @@ on:
       - 'ABC-of-Technology-Website/**'
       - '.github/workflows/deploy-abc-of-technology.yml'
   workflow_dispatch:
+    inputs:
+      deploy_worker:
+        description: Deploy the redirect Worker too (requires Cloudflare Workers access)
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: abc-of-technology-production
@@ -229,6 +235,7 @@ jobs:
           echo 'ABC standalone A-Z ecosystem portal source assertions passed.'
 
       - name: Deploy non-www redirect Worker
+        if: (github.event_name == 'push' && (contains(join(github.event.head_commit.modified, ','), 'ABC-of-Technology-Website/worker.js') || contains(join(github.event.head_commit.modified, ','), 'ABC-of-Technology-Website/wrangler.jsonc'))) || (github.event_name == 'workflow_dispatch' && inputs.deploy_worker)
         working-directory: ABC-of-Technology-Website
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
